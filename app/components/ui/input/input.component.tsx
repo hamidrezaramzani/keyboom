@@ -2,9 +2,12 @@ import { forwardRef } from "react";
 import { InputProps } from "./input.type";
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, icon, className = "", ...props }, ref) => {
+  (
+    { label, error, icon, containerClassName = "", className = "", ...props },
+    ref,
+  ) => {
     return (
-      <div className="w-full">
+      <div className={`w-full ${containerClassName}`}>
         {label && (
           <label className="block text-sm font-medium text-gray-300 mb-2">
             {label}
