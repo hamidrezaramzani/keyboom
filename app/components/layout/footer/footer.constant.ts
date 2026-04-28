@@ -12,9 +12,9 @@ export const footerSections: FooterSection[] = [
   {
     title: "شرکت",
     links: [
-      { name: "درباره ما", href: "#" },
+      { name: "درباره ما", href: "/about" },
       { name: "بلاگ", href: "#" },
-      { name: "تماس با ما", href: "#" },
+      { name: "تماس با ما", href: "/contact" },
     ],
   },
   {
