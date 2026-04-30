@@ -25,7 +25,7 @@ export const Header = ({
   onWorkspaceChange,
 }: HeaderProps) => {
   return (
-    <header className="w-10/12 bg-gray-900/80 backdrop-blur-md border-b border-gray-800 z-40">
+    <header className="w-full bg-gray-900/80 backdrop-blur-md border-b border-gray-800 z-40">
       <div className="flex items-center justify-between px-4 py-3 md:px-6">
         <button
           onClick={onMenuClick}
