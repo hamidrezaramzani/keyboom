@@ -1,0 +1,5 @@
+- [] implement register page
+- [] Implement login page
+- [] Implement dashboard page
+- [] Implement new subscription 
+- [] Implement new payment 

@@ -42,3 +42,6 @@ next-env.d.ts
 
 
 notes.md
+# اضافه‌های مخصوص monorepo
+../../node_modules/
+../../.turbo/

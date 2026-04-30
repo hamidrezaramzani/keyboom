@@ -95,7 +95,7 @@ export const NotificationPopover = () => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative z-50">
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
