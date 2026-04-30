@@ -8,3 +8,4 @@ export { Avatar } from "./avatar/avatar.component";
 export { Badge } from "./badge/badge.component";
 export { Modal } from "./modal/modal.component";
 export { Select } from "./select/select.component";
+export { EmptyState } from "./empty-state/empty-state.component";

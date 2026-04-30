@@ -1,4 +1,3 @@
-// app/settings/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -18,7 +17,7 @@ export default function SettingsPage() {
   return (
     <DashboardLayout>
       <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
+        <div className="mb-6 mt-4">
           <h1 className="text-2xl font-bold text-white">تنظیمات</h1>
           <p className="text-gray-400 text-sm mt-1">
             مدیریت حساب کاربری و تنظیمات اعلان‌ها

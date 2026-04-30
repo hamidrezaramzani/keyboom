@@ -1,4 +1,3 @@
-// app/components/sections/settings/SettingsTabs.tsx
 "use client";
 
 import { User, Bell, Inbox } from "lucide-react";

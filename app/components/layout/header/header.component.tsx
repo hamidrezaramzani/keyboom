@@ -1,10 +1,9 @@
-// app/components/layout/Header.tsx
 "use client";
 
-import { useState } from "react";
-import { Bell, Menu, Search, ChevronDown, Plus, Check } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import { Avatar } from "@/app/components/ui";
 import { WorkspaceSwitcher } from "../workspace-switcher/workspace-switcher.component";
+import { NotificationPopover } from "@/app/components/sections/notifications";
 
 interface Workspace {
   id: string;
@@ -19,24 +18,14 @@ interface HeaderProps {
   onWorkspaceChange?: (workspace: Workspace) => void;
 }
 
-const mockWorkspaces: Workspace[] = [
-  { id: "1", name: "شرکت کیان", isCurrent: true },
-  { id: "2", name: "فضای شخصی" },
-];
-
 export const Header = ({
   onMenuClick,
   user,
   activeWorkspace,
   onWorkspaceChange,
 }: HeaderProps) => {
-  const [isWorkspaceOpen, setIsWorkspaceOpen] = useState(false);
-  const [workspaces] = useState(mockWorkspaces);
-  const currentWorkspace =
-    activeWorkspace || workspaces.find((w) => w.isCurrent);
-
   return (
-    <header className="w-full bg-gray-900/80 backdrop-blur-md border-b border-gray-800 z-40 w-10/12">
+    <header className="w-10/12 bg-gray-900/80 backdrop-blur-md border-b border-gray-800 z-40">
       <div className="flex items-center justify-between px-4 py-3 md:px-6">
         <button
           onClick={onMenuClick}
@@ -63,10 +52,7 @@ export const Header = ({
             }}
           />
 
-          <button className="relative p-2 text-gray-400 hover:text-white rounded-lg transition-colors">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-500 rounded-full"></span>
-          </button>
+          <NotificationPopover />
 
           {user && (
             <div className="flex items-center gap-2">
