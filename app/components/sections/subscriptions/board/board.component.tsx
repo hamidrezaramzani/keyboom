@@ -1,0 +1,132 @@
+// app/components/sections/subscriptions/board/board.component.tsx
+"use client";
+
+import { useState } from "react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { BoardColumn } from "../board-column/board-column.component";
+import { AddGroupColumn } from "../add-group-column/add-group-column.component";
+
+interface Subscription {
+  id: string;
+  name: string;
+  price: number;
+  status: "active" | "expiring" | "expired";
+  endDate: string;
+}
+
+interface Group {
+  id: string;
+  name: string;
+  supervisorId?: string;
+  subscriptions: Subscription[];
+}
+
+interface BoardProps {
+  groups: Group[];
+  onGroupsReorder: (groups: Group[]) => void;
+  onAddGroup: () => void;
+  onGroupSettings: (groupId: string) => void;
+  onSubscriptionClick: (subscriptionId: string) => void;
+  onSubscriptionMove?: (subscriptionId: string, fromGroupId: string, toGroupId: string) => void;
+  onSubscriptionReorder: (groupId: string, newSubscriptions: Subscription[]) => void;
+}
+
+export const Board = ({
+  groups: initialGroups,
+  onGroupsReorder,
+  onAddGroup,
+  onGroupSettings,
+  onSubscriptionClick,
+  onSubscriptionMove,
+  onSubscriptionReorder,
+}: BoardProps) => {
+  const [groups, setGroups] = useState(initialGroups);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    // پیدا کردن گروه و اشتراک مبدا و مقصد
+    const activeGroup = groups.find((g) => g.subscriptions.some((s) => s.id === activeId));
+    const overGroup = groups.find((g) => g.subscriptions.some((s) => s.id === overId));
+    const activeIsGroup = groups.some((g) => g.id === activeId);
+    const overIsGroup = groups.some((g) => g.id === overId);
+
+    // جابه‌جایی ستون‌ها (گروه‌ها)
+    if (activeIsGroup && overIsGroup) {
+      const oldIndex = groups.findIndex((g) => g.id === activeId);
+      const newIndex = groups.findIndex((g) => g.id === overId);
+      const newGroups = arrayMove(groups, oldIndex, newIndex);
+      setGroups(newGroups);
+      onGroupsReorder(newGroups);
+      return;
+    }
+
+    // جابه‌جایی اشتراک‌ها
+    if (!activeIsGroup && !overIsGroup && activeGroup && overGroup) {
+      const activeSubIndex = activeGroup.subscriptions.findIndex((s) => s.id === activeId);
+      const overSubIndex = overGroup.subscriptions.findIndex((s) => s.id === overId);
+
+      if (activeGroup.id === overGroup.id) {
+        // جابه‌جایی داخل یک گروه
+        const newSubscriptions = arrayMove(activeGroup.subscriptions, activeSubIndex, overSubIndex);
+        onSubscriptionReorder(activeGroup.id, newSubscriptions);
+      } else if (onSubscriptionMove) {
+        // جابه‌جایی بین گروه‌ها
+        onSubscriptionMove(activeId, activeGroup.id, overGroup.id);
+      }
+      return;
+    }
+  };
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="flex gap-4 overflow-x-auto pb-4 min-h-[500px]">
+        <SortableContext
+          items={groups.map((g) => g.id)}
+          strategy={horizontalListSortingStrategy}
+        >
+          {groups.map((group) => (
+            <BoardColumn
+              key={group.id}
+              group={group}
+              onSettings={() => onGroupSettings(group.id)}
+              onSubscriptionClick={onSubscriptionClick}
+              onAddSubscriptionClick={() => {}}
+            />
+          ))}
+        </SortableContext>
+        <AddGroupColumn onClick={onAddGroup} />
+      </div>
+    </DndContext>
+  );
+};
