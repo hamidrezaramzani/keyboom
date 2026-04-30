@@ -1,5 +1,5 @@
 import { CheckCircle } from "lucide-react";
-import { Card } from "../../ui";
+import { Card } from "../../../ui";
 import { benefits, subscriptions } from "./benefits.constant";
 
 export default function Benefits() {

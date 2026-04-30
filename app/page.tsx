@@ -2,10 +2,10 @@ import { Suspense, lazy } from "react";
 import { Navbar, Footer, Hero } from "@/app/components";
 
 const Features = lazy(
-  () => import("@/app/components/sections/features/features.component"),
+  () => import("@/app/components/sections/landing/features/features.component"),
 );
 const Benefits = lazy(
-  () => import("@/app/components/sections/benefits/benefits.component"),
+  () => import("@/app/components/sections/landing/benefits/benefits.component"),
 );
 
 function SectionLoading() {

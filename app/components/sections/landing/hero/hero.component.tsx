@@ -1,5 +1,5 @@
 import { Zap } from "lucide-react";
-import { Button } from "../../ui";
+import { Button } from "../../../ui";
 import { stats } from "./hero.constant";
 
 export const Hero = () => {

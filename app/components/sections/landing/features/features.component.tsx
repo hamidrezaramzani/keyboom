@@ -1,4 +1,4 @@
-import { Card } from "../../ui";
+import { Card } from "../../../ui";
 import { colorClasses, features } from "./features.constant";
 
 export default function Features() {
