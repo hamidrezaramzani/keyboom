@@ -1,19 +1,21 @@
 @import "tailwindcss";
 
-
 @font-face {
-    font-family: 'Vazirmatn';
-    src: url('./assets/fonts/vazir/Vazirmatn[wght].woff2') format('woff2-variations');
-    font-weight: 100 900;
-    font-style: normal;
-    font-display: swap;
+  font-family: "Vazirmatn";
+  src: url("./assets/fonts/vazir/Vazirmatn[wght].woff2")
+    format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
 }
 
 body {
-    font-family: 'Vazirmatn', sans-serif;
-    background-color: black;
+  background-color: black;
 }
 
+.vazir {
+  font-family: "Vazirmatn", sans-serif;
+}
 @theme {
   --color-primary-50: #eef2ff;
   --color-primary-100: #e0e7ff;
@@ -25,7 +27,7 @@ body {
   --color-primary-700: #4338ca;
   --color-primary-800: #3730a3;
   --color-primary-900: #312e81;
-  
+
   --color-gray-50: #f9fafb;
   --color-gray-100: #f3f4f6;
   --color-gray-200: #e5e7eb;
@@ -37,19 +39,19 @@ body {
   --color-gray-800: #1f2937;
   --color-gray-900: #111827;
   --color-gray-950: #030712;
-  
+
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
   --color-info: #3b82f6;
-  
+
   --font-sans: "Vazirmatn", "Inter", system-ui, sans-serif;
-  
+
   --animate-fade-in-up: fadeInUp 0.6s ease-out forwards;
   --animate-fade-in: fadeIn 0.4s ease-out forwards;
   --animate-scale-in: scaleIn 0.2s ease-out forwards;
   --animate-slide-in-right: slideInRight 0.3s ease-out forwards;
-  
+
   --shadow-glow: 0 0 15px rgba(99, 102, 241, 0.3);
   --shadow-glow-lg: 0 0 30px rgba(99, 102, 241, 0.4);
 }
@@ -58,99 +60,99 @@ body {
   .card {
     @apply bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-800 p-6;
   }
-  
+
   .card-hover {
     @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-glow hover:border-primary-500/50;
   }
-  
+
   .btn-primary {
     @apply bg-primary-600 hover:bg-primary-500 text-white font-medium rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
-  
+
   .btn-secondary {
     @apply bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 font-medium rounded-xl transition-all duration-200;
   }
-  
+
   .btn-outline {
     @apply border border-gray-700 text-gray-300 hover:bg-gray-800 font-medium rounded-xl transition-all duration-200;
   }
-  
+
   .btn-ghost {
     @apply text-gray-400 hover:text-white hover:bg-gray-800 font-medium rounded-xl transition-all duration-200;
   }
-  
+
   .btn-danger {
     @apply bg-red-600 hover:bg-red-500 text-white font-medium rounded-xl transition-all duration-200;
   }
-  
+
   .btn-sm {
     @apply px-3 py-1.5 text-sm rounded-lg;
   }
-  
+
   .btn-md {
     @apply px-4 py-2 text-sm rounded-xl;
   }
-  
+
   .btn-lg {
     @apply px-6 py-2.5 text-base rounded-xl;
   }
-  
+
   .input {
     @apply w-full px-4 py-2.5 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all;
   }
-  
+
   .input-error {
     @apply border-red-500 focus:ring-red-500;
   }
-  
+
   .badge {
     @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
   }
-  
+
   .badge-success {
     @apply bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
   }
-  
+
   .badge-warning {
     @apply bg-amber-500/10 text-amber-400 border border-amber-500/20;
   }
-  
+
   .badge-danger {
     @apply bg-red-500/10 text-red-400 border border-red-500/20;
   }
-  
+
   .badge-info {
     @apply bg-blue-500/10 text-blue-400 border border-blue-500/20;
   }
-  
+
   .badge-primary {
     @apply bg-primary-500/10 text-primary-400 border border-primary-500/20;
   }
-  
+
   .sidebar-item {
     @apply flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-gray-400 hover:bg-gray-800 hover:text-white;
   }
-  
+
   .sidebar-item-active {
     @apply bg-primary-500/10 text-primary-400;
   }
-  
+
   .custom-scroll {
     @apply overflow-auto;
     scrollbar-width: thin;
     scrollbar-color: #4f46e5 #1f2937;
   }
-  
+
   .custom-scroll::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
-  
+
   .custom-scroll::-webkit-scrollbar-track {
     background: #1f2937;
     border-radius: 3px;
   }
-  
+
   .custom-scroll::-webkit-scrollbar-thumb {
     background: #4f46e5;
     border-radius: 3px;
@@ -212,11 +214,11 @@ body {
   .animation-delay-800 {
     animation-delay: 0.8s;
   }
-  
+
   .rtl {
     direction: rtl;
   }
-  
+
   .ltr {
     direction: ltr;
   }
@@ -227,7 +229,6 @@ html {
 }
 
 body {
-  font-family: var(--font-sans);
   background: linear-gradient(to bottom right, #030712, #18181b, #030712);
   min-height: 100vh;
   color: white;

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Toaster } from "sonner";
+import StoreProvider from "./lib/store/store.provider";
 
 export const metadata: Metadata = {
   title: "Keyboom",
@@ -12,8 +14,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa">
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="fa" dir="rtl">
+      <Toaster
+        position="bottom-right"
+        closeButton
+        richColors={false}
+        expand={false}
+        duration={4000}
+      />
+      <body className="min-h-full flex flex-col">
+        <StoreProvider>{children}</StoreProvider>
+      </body>
     </html>
   );
 }
