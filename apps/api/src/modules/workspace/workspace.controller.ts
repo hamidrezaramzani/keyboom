@@ -5,11 +5,14 @@ import {
   Get,
   Body,
   Post,
+  Patch,
 } from '@nestjs/common';
 import {
   WorkspaceCreatePayloadDto,
   WorkspaceCreateResponseOkDto,
   WorkspaceReadManyResponseOkDto,
+  WorkspaceUpdateCurrentPayloadDto,
+  WorkspaceUpdateCurrentResponseOkDto,
 } from '@keyboom/contracts/server';
 import { UserId } from 'src/core/decorators';
 import { WorkspaceService } from './workspace.service';
@@ -38,6 +41,24 @@ export class WorkspaceController {
       data: workspace,
       message: 'Workspace created successfully',
       statusCode: 201,
+    };
+  }
+
+  @Patch('/current')
+  @HttpCode(HttpStatus.OK)
+  async updateCurrentWorkspace(
+    @UserId() userId: string,
+    @Body() body: WorkspaceUpdateCurrentPayloadDto,
+  ): Promise<WorkspaceUpdateCurrentResponseOkDto> {
+    const workspace = await this.workspaceService.updateCurrentWorkspace(
+      userId,
+      body.workspaceId,
+    );
+
+    return {
+      data: workspace,
+      message: 'Current workspace updated successfully',
+      statusCode: 200,
     };
   }
 }

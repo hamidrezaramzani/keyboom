@@ -94,7 +94,6 @@ export class WorkspaceRepository {
     return workspaceMembersList.map((item) => item.workspaces);
   }
 
-  // workspace.repository.ts - متد جدید اضافه کن
   async createWorkspace(
     userId: string,
     name: string,
@@ -162,5 +161,34 @@ export class WorkspaceRepository {
       .update(users)
       .set({ defaultWorkspaceId: workspaceId })
       .where(eq(users.id, userId));
+  }
+
+  async isUserMemberOfWorkspace(
+    userId: string,
+    workspaceId: string,
+  ): Promise<boolean> {
+    const result = await this.db
+      .select()
+      .from(workspaceMembers)
+      .where(
+        and(
+          eq(workspaceMembers.userId, userId),
+          eq(workspaceMembers.workspaceId, workspaceId),
+          eq(workspaceMembers.isActive, true),
+        ),
+      )
+      .limit(1);
+
+    return result.length > 0;
+  }
+
+  async getUserDefaultWorkspaceId(userId: string): Promise<string | null> {
+    const result = await this.db
+      .select({ defaultWorkspaceId: users.defaultWorkspaceId })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    return result[0]?.defaultWorkspaceId || null;
   }
 }

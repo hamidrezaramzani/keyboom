@@ -70,4 +70,34 @@ export class WorkspaceService {
       createdAt: workspace.createdAt,
     };
   }
+
+  async updateCurrentWorkspace(userId: string, workspaceId: string) {
+    const isMember = await this.workspaceRepository.isUserMemberOfWorkspace(
+      userId,
+      workspaceId,
+    );
+    if (!isMember) {
+      throw new NotFoundException(
+        'Workspace not found or you are not a member',
+      );
+    }
+
+    await this.workspaceRepository.updateUserDefaultWorkspace(
+      userId,
+      workspaceId,
+    );
+
+    const workspace =
+      await this.workspaceRepository.findWorkspaceById(workspaceId);
+    if (!workspace) {
+      throw new NotFoundException('Workspace not found');
+    }
+
+    return {
+      id: workspace.id,
+      name: workspace.name,
+      isOwner: workspace.ownerId === userId,
+      isCurrent: true,
+    };
+  }
 }

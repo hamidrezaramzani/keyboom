@@ -14,6 +14,17 @@ const createWorkspacePayload = z.object({
   name: z.string().min(1, "Name is required").max(255, "Name is too long"),
 });
 
+const updateCurrentWorkspacePayload = z.object({
+  workspaceId: z.string().min(1, "Workspace ID is required"),
+});
+
+const updateCurrentWorkspaceResponse = z.object({
+  id: z.string(),
+  name: z.string(),
+  isOwner: z.boolean(),
+  isCurrent: z.boolean(),
+});
+
 const workspaceActions = {
   create: {
     payload: createWorkspacePayload,
@@ -31,6 +42,12 @@ const workspaceActions = {
       ),
     },
   },
+  updateCurrent: {
+    payload: updateCurrentWorkspacePayload,
+    response: {
+      ok: cdtoSuccess(updateCurrentWorkspaceResponse),
+    },
+  },
 } as const;
 
 export type WorkspaceActions = Actions<typeof workspaceActions>;
@@ -45,4 +62,12 @@ export class WorkspaceCreatePayloadDto extends createZodDto(
 
 export class WorkspaceCreateResponseOkDto extends createZodDto(
   workspaceActions.create.response.ok,
+) {}
+
+export class WorkspaceUpdateCurrentPayloadDto extends createZodDto(
+  workspaceActions.updateCurrent.payload,
+) {}
+
+export class WorkspaceUpdateCurrentResponseOkDto extends createZodDto(
+  workspaceActions.updateCurrent.response.ok,
 ) {}

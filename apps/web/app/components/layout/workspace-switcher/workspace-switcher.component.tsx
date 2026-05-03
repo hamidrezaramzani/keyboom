@@ -7,18 +7,20 @@ import { cn } from "@/app/lib/utils";
 import { WorkspaceSettingsModal } from "@/app/components/sections/settings";
 import {
   useReadManyWorkspacesQuery,
+  useUpdateCurrentWorkspaceMutation,
   Workspace,
 } from "@/app/services/workspace";
+import { toast } from "@/app/lib";
 
 interface WorkspaceSwitcherProps {
-  onWorkspaceChange?: (workspace: Workspace) => void;
   onAddWorkspace?: () => void;
 }
 
 export const WorkspaceSwitcher = ({
-  onWorkspaceChange,
   onAddWorkspace,
 }: WorkspaceSwitcherProps) => {
+  const [updateCurrentWorkspace] = useUpdateCurrentWorkspaceMutation();
+
   const { data: workspacesData } = useReadManyWorkspacesQuery({});
   const workspaces = workspacesData?.data.list;
   const currentWorkspace = workspacesData?.data.defaultWorkspace;
@@ -33,6 +35,19 @@ export const WorkspaceSwitcher = ({
     e.stopPropagation();
     setSelectedWorkspace(workspace);
     setIsSettingsOpen(true);
+  };
+
+  const handleWorkspaceChange = async (
+    workspaceId: string,
+    workspaceName: string,
+  ) => {
+    try {
+      await updateCurrentWorkspace({ payload: { workspaceId } }).unwrap();
+      toast.success(`شما به فضای کاری «${workspaceName}» وارد شدید`);
+      setIsOpen(false);
+    } catch {
+      toast.error("خطا در تغییر فضای کاری");
+    }
   };
 
   return (
@@ -66,10 +81,9 @@ export const WorkspaceSwitcher = ({
                   className="flex items-center justify-between group"
                 >
                   <button
-                    onClick={() => {
-                      onWorkspaceChange?.(workspace);
-                      setIsOpen(false);
-                    }}
+                    onClick={() =>
+                      handleWorkspaceChange(workspace.id, workspace.name)
+                    }
                     className="flex-1 flex items-center justify-between px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
                   >
                     <span className="truncate">{workspace.name}</span>
