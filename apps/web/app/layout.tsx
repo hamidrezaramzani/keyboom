@@ -6,6 +6,9 @@ import StoreProvider from "./lib/store/store.provider";
 export const metadata: Metadata = {
   title: "Keyboom",
   description: "Keyboom is a subscription tracker",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({

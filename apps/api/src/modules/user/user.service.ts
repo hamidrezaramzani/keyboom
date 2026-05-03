@@ -15,12 +15,14 @@ import {
   UserRegisterPayloadDto,
 } from '@keyboom/contracts/server';
 import { JwtService } from '@nestjs/jwt';
+import { WorkspaceRepository } from '../workspace/workspace.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
     @Inject(DRIZZLE) private db: NodePgDatabase,
     private readonly usersRepository: UsersRepository,
+    private readonly workspaceRepository: WorkspaceRepository,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -75,6 +77,11 @@ export class UsersService {
       password: hashedPassword,
       isActive: true,
     });
+
+    await this.workspaceRepository.initiateWorkspaceForUser(
+      newUser.id,
+      newUser.fullName,
+    );
 
     return newUser;
   }
