@@ -14,6 +14,7 @@ import {
 import { cn } from "@/app/lib/utils";
 import { Avatar } from "@/app/components/ui";
 import { Me } from "@/app/services";
+import { useReadManyWorkspacesQuery } from "@/app/services/workspace";
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -34,7 +35,6 @@ export const Sidebar = ({
   collapsed = false,
   onToggleCollapse,
   onCloseMobile,
-  activeWorkspace,
   user,
   onLogout,
 }: SidebarProps) => {
@@ -43,6 +43,9 @@ export const Sidebar = ({
   const handleLinkClick = () => {
     if (onCloseMobile) onCloseMobile();
   };
+
+  const { data: workspaceData } = useReadManyWorkspacesQuery({});
+  const currentWorkspace = workspaceData?.data.defaultWorkspace;
 
   return (
     <aside
@@ -86,11 +89,11 @@ export const Sidebar = ({
         </button>
       </div>
 
-      {!collapsed && activeWorkspace && (
+      {!collapsed && currentWorkspace && (
         <div className="mx-4 mt-4 p-2 bg-gray-800/50 rounded-lg border border-gray-700">
           <p className="text-xs text-gray-500">فضای کاری فعلی</p>
           <p className="text-sm text-white font-medium truncate">
-            {activeWorkspace.name}
+            {currentWorkspace?.name}
           </p>
         </div>
       )}

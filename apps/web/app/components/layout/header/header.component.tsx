@@ -5,6 +5,8 @@ import { Avatar } from "@/app/components/ui";
 import { WorkspaceSwitcher } from "../workspace-switcher/workspace-switcher.component";
 import { NotificationPopover } from "@/app/components/sections/notifications";
 import { Me } from "@/app/services";
+import { AddWorkspaceModal } from "../../sections";
+import { useState } from "react";
 
 interface Workspace {
   id: string;
@@ -15,16 +17,16 @@ interface Workspace {
 interface HeaderProps {
   onMenuClick: () => void;
   user?: Me;
-  activeWorkspace?: Workspace;
+  currentWorkspace?: Workspace;
   onWorkspaceChange?: (workspace: Workspace) => void;
 }
 
 export const Header = ({
   onMenuClick,
   user,
-  activeWorkspace,
   onWorkspaceChange,
 }: HeaderProps) => {
+  const [isOpen, setOpen] = useState(false);
   return (
     <header className="w-full bg-gray-900/80 backdrop-blur-md border-b border-gray-800 z-40">
       <div className="flex items-center justify-between px-4 py-3 md:px-6">
@@ -46,14 +48,15 @@ export const Header = ({
 
         <div className="flex items-center gap-3 md:gap-4">
           <WorkspaceSwitcher
-            currentWorkspace={activeWorkspace}
             onWorkspaceChange={onWorkspaceChange}
             onAddWorkspace={() => {
-              /* باز کردن مودال ساخت workspace */
+              setOpen(true);
             }}
           />
 
           <NotificationPopover />
+
+          <AddWorkspaceModal isOpen={isOpen} onClose={() => setOpen(false)} />
 
           {user && (
             <div className="flex items-center gap-2">

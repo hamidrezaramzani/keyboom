@@ -5,6 +5,7 @@ import { UsersModule } from './modules/user/user.module';
 import { LoggerModule } from 'pino-nestjs';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './core/guards/auth.guard';
+import { WorkspaceModule } from './modules/workspace/workspace.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AuthGuard } from './core/guards/auth.guard';
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
     UsersModule,
+    WorkspaceModule,
   ],
   providers: [
     {

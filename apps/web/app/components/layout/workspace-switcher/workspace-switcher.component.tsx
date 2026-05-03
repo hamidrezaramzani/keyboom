@@ -2,41 +2,33 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, Plus, Check, Settings } from "lucide-react";
+import { ChevronDown, Plus, Check, Settings, Building } from "lucide-react";
 import { cn } from "@/app/lib/utils";
 import { WorkspaceSettingsModal } from "@/app/components/sections/settings";
-
-interface Workspace {
-  id: string;
-  name: string;
-  isCurrent?: boolean;
-}
+import {
+  useReadManyWorkspacesQuery,
+  Workspace,
+} from "@/app/services/workspace";
 
 interface WorkspaceSwitcherProps {
-  currentWorkspace?: Workspace;
   onWorkspaceChange?: (workspace: Workspace) => void;
   onAddWorkspace?: () => void;
-  workspaces?: Workspace[];
 }
 
-const defaultWorkspaces: Workspace[] = [
-  { id: "1", name: "شرکت کیان", isCurrent: true },
-  { id: "2", name: "فضای شخصی" },
-];
-
 export const WorkspaceSwitcher = ({
-  currentWorkspace,
   onWorkspaceChange,
   onAddWorkspace,
-  workspaces = defaultWorkspaces,
 }: WorkspaceSwitcherProps) => {
+  const { data: workspacesData } = useReadManyWorkspacesQuery({});
+  const workspaces = workspacesData?.data.list;
+  const currentWorkspace = workspacesData?.data.defaultWorkspace;
+  console.log(workspacesData);
+
   const [isOpen, setIsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(
     null,
   );
-  const activeWorkspace =
-    currentWorkspace || workspaces.find((w) => w.isCurrent);
 
   const handleSettingsClick = (workspace: Workspace, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -51,8 +43,9 @@ export const WorkspaceSwitcher = ({
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center gap-2 px-3 py-1.5 bg-gray-800/50 rounded-lg border border-gray-700 text-white text-sm hover:bg-gray-800 transition-colors"
         >
-          <span className="max-w-[120px] truncate">
-            {activeWorkspace?.name}
+          <span className="w-full truncate flex gap-2 items-center">
+            <Building size="15" />
+            {currentWorkspace?.name}
           </span>
           <ChevronDown
             className={cn(
@@ -68,7 +61,7 @@ export const WorkspaceSwitcher = ({
               <div className="text-xs text-gray-500 px-3 py-2">
                 فضاهای کاری شما
               </div>
-              {workspaces.map((workspace) => (
+              {workspaces?.map((workspace) => (
                 <div
                   key={workspace.id}
                   className="flex items-center justify-between group"
@@ -85,12 +78,14 @@ export const WorkspaceSwitcher = ({
                       <Check className="w-4 h-4 text-indigo-400 shrink-0" />
                     )}
                   </button>
-                  <button
-                    onClick={(e) => handleSettingsClick(workspace, e)}
-                    className="opacity-0 group-hover:opacity-100 p-2 text-gray-500 hover:text-gray-300 transition-all"
-                  >
-                    <Settings className="w-4 h-4" />
-                  </button>
+                  {workspace.isOwner && (
+                    <button
+                      onClick={(e) => handleSettingsClick(workspace, e)}
+                      className="opacity-0 group-hover:opacity-100 p-2 text-gray-500 hover:text-gray-300 transition-all"
+                    >
+                      <Settings className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               ))}
               <div className="border-t border-gray-700 my-1" />

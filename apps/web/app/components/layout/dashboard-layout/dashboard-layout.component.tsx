@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Sidebar } from "../sidebar/sidebar.component";
 import { Header } from "../header/header.component";
 import { useGetMeQuery, useLogoutUserMutation } from "@/app/services";
@@ -13,18 +13,31 @@ interface DashboardLayoutProps {
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const { push } = useRouter();
   const [logoutUser] = useLogoutUserMutation();
-  const { data } = useGetMeQuery();
-  const user = data?.data;
+  const { data: userData } = useGetMeQuery();
+
+  const collapsedDraft = localStorage.getItem("sidebar-collapsed");
+
+  const [collapsed, setCollapsed] = useState(
+    collapsedDraft ? Boolean(collapsedDraft === "true") : false,
+  );
+
+  const user = userData?.data;
   const handleLogout = async () => {
     await logoutUser();
     push("/login");
     toast.success("خروج با موفقیت انجام شد");
   };
 
+  const handleCollapsed = () => {
+    setCollapsed((prevCollapsed) => !prevCollapsed);
+    localStorage.setItem("sidebar-collapsed", JSON.stringify(!collapsed));
+  };
+
   return (
     <div className="flex w-full">
       <Sidebar
-        collapsed={false}
+        collapsed={collapsed}
+        onToggleCollapse={handleCollapsed}
         activeWorkspace={{ id: "1", name: "شرکت کیان" }}
         onLogout={handleLogout}
         user={user}

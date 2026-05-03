@@ -1,8 +1,8 @@
 import { UserActions } from "@keyboom/contracts/client";
 import { baseApi } from "../api";
 import { RequestParams } from "../api.type";
-import { USER_ENDPOINTS } from "./user.constant";
-import { ERD } from "./user.type";
+import { USER_ENDPOINTS } from "./api-user.constant";
+import { ERD } from "./api-user.type";
 
 export const userEndpoints = baseApi.injectEndpoints({
   endpoints: (builder) => ({

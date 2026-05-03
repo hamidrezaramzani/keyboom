@@ -1,2 +1,2 @@
-export * from "./user.endpoint";
-export * from "./user.type";
+export * from "./api-user.endpoint";
+export * from "./api-user.type";

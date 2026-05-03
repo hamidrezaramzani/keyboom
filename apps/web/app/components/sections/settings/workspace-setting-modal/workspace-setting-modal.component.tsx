@@ -7,18 +7,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Modal, Input, Button } from "@/app/components";
 import { cn } from "@/app/lib/utils";
+import { Workspace } from "@/app/services/workspace";
 
 const workspaceSettingsSchema = z.object({
   name: z.string().min(1, "نام فضای کاری الزامی است"),
 });
 
 type WorkspaceSettingsForm = z.infer<typeof workspaceSettingsSchema>;
-
-interface Workspace {
-  id: string;
-  name: string;
-  isCurrent?: boolean;
-}
 
 interface WorkspaceSettingsModalProps {
   isOpen: boolean;

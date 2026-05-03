@@ -1,5 +1,4 @@
-- [] implement register page
-- [] Implement login page
-- [] Implement dashboard page
-- [] Implement new subscription 
-- [] Implement new payment 
+- [ ] workspaces list
+- [ ] create new workspace
+- [ ] workspace settings
+- [ ] invitation

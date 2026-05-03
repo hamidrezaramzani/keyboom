@@ -12,6 +12,8 @@ import {
   NewGroup,
   Group,
 } from './workspace.schema';
+import { and, eq } from 'drizzle-orm';
+import { users } from '../user/user.schema';
 
 @Injectable()
 export class WorkspaceRepository {
@@ -38,6 +40,12 @@ export class WorkspaceRepository {
       .values(newWorkspace)
       .returning();
     const workspace = workspaceResult[0];
+
+    await this.db
+      .update(users)
+      .set({ defaultWorkspaceId: workspace.id })
+      .where(eq(users.id, userId))
+      .returning();
 
     const newMember: NewWorkspaceMember = {
       id: crypto.randomUUID(),
@@ -68,5 +76,21 @@ export class WorkspaceRepository {
     const defaultGroup = groupResult[0];
 
     return { workspace, member, defaultGroup };
+  }
+
+  async findWorkspacesByUserId(userId: string) {
+    const workspaceMembersList = await this.db
+      .select()
+      .from(workspaceMembers)
+      .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
+      .where(
+        and(
+          eq(workspaceMembers.userId, userId),
+          eq(workspaceMembers.isActive, true),
+          eq(workspaces.isArchived, false),
+        ),
+      );
+
+    return workspaceMembersList.map((item) => item.workspaces);
   }
 }
