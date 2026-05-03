@@ -6,7 +6,7 @@ export const toast = {
     toastLib.success(message, {
       description,
       className:
-        "!bg-white/10 !backdrop-blur-xl !border !border-white/20 !shadow-xl !rounded-2xl",
+        "!bg-success/10 !backdrop-blur-xl !border !border-white/20 !shadow-xl !rounded-2xl",
       style: {
         background: "rgba(255, 255, 255, 0.1)",
         backdropFilter: "blur(12px)",

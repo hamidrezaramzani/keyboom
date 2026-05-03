@@ -26,8 +26,19 @@ export const userEndpoints = baseApi.injectEndpoints({
         body: payload,
       }),
     }),
+
+    logoutUser: builder.mutation<void, void>({
+      query: () => ({
+        url: USER_ENDPOINTS.logout,
+        method: "POST",
+      }),
+    }),
   }),
   overrideExisting: false,
 });
 
-export const { useRegisterUserMutation, useLoginUserMutation } = userEndpoints;
+export const {
+  useRegisterUserMutation,
+  useLoginUserMutation,
+  useLogoutUserMutation,
+} = userEndpoints;

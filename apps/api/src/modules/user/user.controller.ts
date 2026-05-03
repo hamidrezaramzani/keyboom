@@ -13,11 +13,13 @@ import {
   UserRegisterPayloadDto,
   UserRegisterResponseOkDto,
 } from '@keyboom/contracts/server';
-import type { Request, Response } from 'express';
+import type { Response } from 'express';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  private accessTokenKey: string = 'ACCESS_TOKEN';
 
   @Post('/register')
   @HttpCode(HttpStatus.CREATED)
@@ -36,7 +38,7 @@ export class UsersController {
   ): Promise<UserLoginResponseOkDto> {
     const result = await this.usersService.login(payload);
 
-    response.cookie('access_token', result.accessToken, {
+    response.cookie(this.accessTokenKey, result.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -46,6 +48,22 @@ export class UsersController {
 
     return {
       data: { id: result.id },
+      message: 'Login successful',
+      statusCode: 200,
+    };
+  }
+
+  @Post('/logout')
+  @HttpCode(HttpStatus.OK)
+  logout(@Res({ passthrough: true }) response: Response) {
+    response.clearCookie(this.accessTokenKey, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+    });
+
+    return {
       message: 'Login successful',
       statusCode: 200,
     };
