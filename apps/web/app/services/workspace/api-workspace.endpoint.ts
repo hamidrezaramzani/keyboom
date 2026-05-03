@@ -5,6 +5,23 @@ import { WORKSPACE_ENDPOINTS } from "./api-workspace.constant";
 
 export const workspaceEndpoints = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    createWorkspace: builder.mutation<
+      WorkspaceActions["create"]["response"]["ok"],
+      RequestParams<
+        WorkspaceActions["create"]["payload"],
+        WorkspaceActions["create"]["payload"]
+      >
+    >({
+      query: ({ payload }) => {
+        console.log("payload", payload);
+        return {
+          url: WORKSPACE_ENDPOINTS.create,
+          method: "POST",
+          body: payload,
+        };
+      },
+      invalidatesTags: ["Workspace"],
+    }),
     readManyWorkspaces: builder.query<
       WorkspaceActions["readMany"]["response"]["ok"],
       RequestParams<WorkspaceActions["readMany"]["payload"], void>
@@ -13,9 +30,11 @@ export const workspaceEndpoints = baseApi.injectEndpoints({
         url: WORKSPACE_ENDPOINTS.readMany,
         method: "GET",
       }),
+      providesTags: ["Workspace"],
     }),
   }),
   overrideExisting: false,
 });
 
-export const { useReadManyWorkspacesQuery } = workspaceEndpoints;
+export const { useReadManyWorkspacesQuery, useCreateWorkspaceMutation } =
+  workspaceEndpoints;

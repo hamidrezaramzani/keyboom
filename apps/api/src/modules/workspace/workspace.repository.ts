@@ -93,4 +93,74 @@ export class WorkspaceRepository {
 
     return workspaceMembersList.map((item) => item.workspaces);
   }
+
+  // workspace.repository.ts - متد جدید اضافه کن
+  async createWorkspace(
+    userId: string,
+    name: string,
+  ): Promise<{
+    workspace: Workspace;
+    member: WorkspaceMember;
+    defaultGroup: Group;
+  }> {
+    const newWorkspace: NewWorkspace = {
+      id: crypto.randomUUID(),
+      name: name,
+      ownerId: userId,
+      isArchived: false,
+    };
+
+    const workspaceResult = await this.db
+      .insert(workspaces)
+      .values(newWorkspace)
+      .returning();
+    const workspace = workspaceResult[0];
+
+    const newMember: NewWorkspaceMember = {
+      id: crypto.randomUUID(),
+      workspaceId: workspace.id,
+      userId: userId,
+      role: 'owner',
+      isActive: true,
+    };
+
+    const memberResult = await this.db
+      .insert(workspaceMembers)
+      .values(newMember)
+      .returning();
+    const member = memberResult[0];
+
+    const newGroup: NewGroup = {
+      id: crypto.randomUUID(),
+      workspaceId: workspace.id,
+      name: 'بدون نام',
+      order: '0',
+      isArchived: false,
+    };
+
+    const groupResult = await this.db
+      .insert(groups)
+      .values(newGroup)
+      .returning();
+    const defaultGroup = groupResult[0];
+
+    return { workspace, member, defaultGroup };
+  }
+
+  async findWorkspaceById(workspaceId: string): Promise<Workspace | undefined> {
+    const result = await this.db
+      .select()
+      .from(workspaces)
+      .where(eq(workspaces.id, workspaceId))
+      .limit(1);
+
+    return result[0];
+  }
+
+  async updateUserDefaultWorkspace(userId: string, workspaceId: string) {
+    await this.db
+      .update(users)
+      .set({ defaultWorkspaceId: workspaceId })
+      .where(eq(users.id, userId));
+  }
 }

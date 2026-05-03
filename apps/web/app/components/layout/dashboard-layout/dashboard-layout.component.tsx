@@ -42,7 +42,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         onLogout={handleLogout}
         user={user}
       />
-      <main className="w-10/12">
+      <main className={`w-10/12 ${collapsed ? "w-full" : ""}`}>
         <Header onMenuClick={console.log} user={user} />
         <div className="p-3">{children}</div>
       </main>

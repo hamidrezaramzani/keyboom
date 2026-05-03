@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Modal, Input, Button } from "@/app/components";
+import { useCreateWorkspaceMutation } from "@/app/services/workspace";
+import { toast } from "@/app/lib";
 
 const addWorkspaceSchema = z.object({
   name: z.string().min(1, "نام فضای کاری الزامی است"),
@@ -17,7 +19,12 @@ interface AddWorkspaceModalProps {
   onClose: () => void;
 }
 
-export const AddWorkspaceModal = ({ isOpen, onClose }: AddWorkspaceModalProps) => {
+export const AddWorkspaceModal = ({
+  isOpen,
+  onClose,
+}: AddWorkspaceModalProps) => {
+  const [createWorkspace] = useCreateWorkspaceMutation();
+
   const {
     register,
     handleSubmit,
@@ -31,14 +38,24 @@ export const AddWorkspaceModal = ({ isOpen, onClose }: AddWorkspaceModalProps) =
   });
 
   const onSubmit = async (data: AddWorkspaceForm) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Create workspace:", data);
-    reset();
-    onClose();
+    try {
+      await createWorkspace({ payload: data }).unwrap();
+      toast.success("فضای کاری جدید با موفقیت اضافه شد");
+      reset();
+      onClose();
+    } catch (error) {
+      console.error(error);
+      toast.error("خطا در ایجاد فضای کاری جدید");
+    }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="ساخت فضای کاری جدید" size="md">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="ساخت فضای کاری جدید"
+      size="md"
+    >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Input
           label="نام فضای کاری"

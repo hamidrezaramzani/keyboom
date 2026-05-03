@@ -7,3 +7,5 @@ export type ERD<T> = {
   status: number;
   data: T;
 };
+
+export type TagTypes = "Workspace" | "Group" | "Member" | "Invitation";

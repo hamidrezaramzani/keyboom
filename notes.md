@@ -1,4 +1,4 @@
-- [ ] workspaces list
+- [X] workspaces list
 - [ ] create new workspace
 - [ ] workspace settings
 - [ ] invitation

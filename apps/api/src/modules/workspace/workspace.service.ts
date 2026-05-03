@@ -11,9 +11,7 @@ export class WorkspaceService {
     private readonly workspaceRepository: WorkspaceRepository,
     private readonly userRepository: UsersRepository,
   ) {}
-  async readMany(
-    userId: string,
-  ): Promise<{ defaultWorkspace: { name: string }; list: { name: string }[] }> {
+  async readMany(userId: string) {
     const workspaces =
       await this.workspaceRepository.findWorkspacesByUserId(userId);
 
@@ -27,13 +25,49 @@ export class WorkspaceService {
     }
 
     return {
-      defaultWorkspace: { name: defaultWorkspace?.name },
+      defaultWorkspace: {
+        id: defaultWorkspace.id,
+        name: defaultWorkspace.name,
+        isOwner: defaultWorkspace.ownerId === userId,
+        isCurrent: defaultWorkspace.id === defaultWorkspace.id,
+      },
       list: workspaces.map((ws) => ({
         id: ws.id,
         name: ws.name,
         isOwner: ws.ownerId === userId,
         isCurrent: ws.id === defaultWorkspace.id,
       })),
+    };
+  }
+
+  async create(
+    userId: string,
+    name: string,
+  ): Promise<{
+    id: string;
+    name: string;
+    ownerId: string;
+    isOwner: boolean;
+    isCurrent: boolean;
+    createdAt: Date;
+  }> {
+    const { workspace } = await this.workspaceRepository.createWorkspace(
+      userId,
+      name,
+    );
+
+    await this.workspaceRepository.updateUserDefaultWorkspace(
+      userId,
+      workspace.id,
+    );
+
+    return {
+      id: workspace.id,
+      name: workspace.name,
+      ownerId: workspace.ownerId,
+      isOwner: true,
+      isCurrent: true,
+      createdAt: workspace.createdAt,
     };
   }
 }
