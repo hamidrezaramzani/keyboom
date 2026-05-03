@@ -22,7 +22,6 @@ export const WorkspaceSwitcher = ({
   const { data: workspacesData } = useReadManyWorkspacesQuery({});
   const workspaces = workspacesData?.data.list;
   const currentWorkspace = workspacesData?.data.defaultWorkspace;
-  console.log(workspacesData);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);

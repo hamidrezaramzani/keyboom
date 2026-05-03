@@ -70,8 +70,6 @@ export class UsersController {
   @Post('/logout')
   @HttpCode(HttpStatus.OK)
   logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    console.log('🔍 Before clear:', req.cookies);
-
     res.clearCookie(this.accessTokenKey, {
       httpOnly: true,
       secure: false,

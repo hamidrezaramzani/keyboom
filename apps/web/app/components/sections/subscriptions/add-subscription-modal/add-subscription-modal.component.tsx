@@ -70,7 +70,6 @@ export const AddSubscriptionModal = ({
 
   const onSubmit = async (data: AddSubscriptionForm) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log(data);
     reset();
     onClose();
   };
