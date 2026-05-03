@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { email, z } from "zod";
 import { createZodDto } from "nestjs-zod";
 import type { Actions } from "../../types";
 import { cdtoSuccess } from "../../helpers";
@@ -37,6 +37,18 @@ const userActions = {
       ),
     },
   },
+
+  getMe: {
+    response: {
+      ok: cdtoSuccess(
+        z.object({
+          id: z.string(),
+          email: z.string(),
+          fullName: z.string(),
+        }),
+      ),
+    },
+  },
 } as const;
 
 export type UserActions = Actions<typeof userActions>;
@@ -55,4 +67,8 @@ export class UserLoginResponseOkDto extends createZodDto(
 
 export class UserLoginPayloadDto extends createZodDto(
   userActions.loginUser.payload,
+) {}
+
+export class UserGetMeResponseOkDTO extends createZodDto(
+  userActions.getMe.response.ok,
 ) {}

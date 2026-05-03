@@ -4,6 +4,7 @@ import { Menu, Search } from "lucide-react";
 import { Avatar } from "@/app/components/ui";
 import { WorkspaceSwitcher } from "../workspace-switcher/workspace-switcher.component";
 import { NotificationPopover } from "@/app/components/sections/notifications";
+import { Me } from "@/app/services";
 
 interface Workspace {
   id: string;
@@ -13,7 +14,7 @@ interface Workspace {
 
 interface HeaderProps {
   onMenuClick: () => void;
-  user?: { name: string; email: string; avatar?: string | null };
+  user?: Me;
   activeWorkspace?: Workspace;
   onWorkspaceChange?: (workspace: Workspace) => void;
 }
@@ -56,9 +57,11 @@ export const Header = ({
 
           {user && (
             <div className="flex items-center gap-2">
-              <Avatar name={user.name} src={user.avatar} />
+              <Avatar name={user.fullName} />
               <div className="hidden lg:block">
-                <p className="text-white text-sm font-medium">{user.name}</p>
+                <p className="text-white text-sm font-medium">
+                  {user.fullName}
+                </p>
                 <p className="text-gray-500 text-xs">{user.email}</p>
               </div>
             </div>

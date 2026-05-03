@@ -11,6 +11,7 @@ import { DRIZZLE } from 'src/core/db/drizzle.provider';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { UsersRepository } from './user.repository';
 import {
+  UserGetMeResponseOkDTO,
   UserLoginPayloadDto,
   UserRegisterPayloadDto,
 } from '@keyboom/contracts/server';
@@ -35,6 +36,14 @@ export class UsersService {
     return this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,
     });
+  }
+
+  async getMe(userId: string): Promise<UserGetMeResponseOkDTO['data']> {
+    const user = await this.usersRepository.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    return { id: user.id, fullName: user.fullName, email: user.email };
   }
 
   async login(payload: UserLoginPayloadDto) {

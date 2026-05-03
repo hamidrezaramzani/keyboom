@@ -5,21 +5,31 @@ import {
   HttpCode,
   HttpStatus,
   Res,
+  Get,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
 import {
+  UserGetMeResponseOkDTO,
   UserLoginPayloadDto,
   UserLoginResponseOkDto,
   UserRegisterPayloadDto,
   UserRegisterResponseOkDto,
 } from '@keyboom/contracts/server';
 import type { Response } from 'express';
+import { UserId } from 'src/core/decorators';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   private accessTokenKey: string = 'ACCESS_TOKEN';
+
+  @Get('/me')
+  @HttpCode(HttpStatus.OK)
+  async getMe(@UserId() userId: string): Promise<UserGetMeResponseOkDTO> {
+    const me = await this.usersService.getMe(userId);
+    return { data: me, message: 'User created', statusCode: 201 };
+  }
 
   @Post('/register')
   @HttpCode(HttpStatus.CREATED)

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
-import StoreProvider from "./lib/store/store.provider";
+import StoreProvider from "./lib/store/store/store.provider";
+import { AuthInitializer } from "./components";
 
 export const metadata: Metadata = {
   title: "Keyboom",
@@ -26,7 +27,10 @@ export default function RootLayout({
         duration={4000}
       />
       <body className="min-h-full flex flex-col">
-        <StoreProvider>{children}</StoreProvider>
+        <StoreProvider>
+          <AuthInitializer />
+          {children}
+        </StoreProvider>
       </body>
     </html>
   );

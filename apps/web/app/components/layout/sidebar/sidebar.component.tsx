@@ -13,13 +13,14 @@ import {
 } from "lucide-react";
 import { cn } from "@/app/lib/utils";
 import { Avatar } from "@/app/components/ui";
+import { Me } from "@/app/services";
 
 interface SidebarProps {
   collapsed?: boolean;
   onToggleCollapse?: () => void;
   onCloseMobile?: () => void;
   activeWorkspace?: { id: string; name: string };
-  user?: { name: string; email: string; avatar?: string | null };
+  user?: Me;
   onLogout?: () => void;
 }
 
@@ -96,10 +97,10 @@ export const Sidebar = ({
 
       {!collapsed && user && (
         <div className="mx-4 mt-4 p-3 bg-gray-800/30 rounded-xl flex items-center gap-3">
-          <Avatar name={user.name} src={user.avatar} size="sm" />
+          <Avatar name={user.fullName} size="sm" />
           <div className="flex-1 min-w-0">
             <p className="text-white text-sm font-medium truncate">
-              {user.name}
+              {user.fullName}
             </p>
             <p className="text-gray-500 text-xs truncate">{user.email}</p>
           </div>
