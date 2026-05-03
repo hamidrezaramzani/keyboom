@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Res,
   Get,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
 import {
@@ -15,8 +16,8 @@ import {
   UserRegisterPayloadDto,
   UserRegisterResponseOkDto,
 } from '@keyboom/contracts/server';
-import type { Response } from 'express';
-import { UserId } from 'src/core/decorators';
+import type { Request, Response } from 'express';
+import { Public, UserId } from 'src/core/decorators';
 
 @Controller('users')
 export class UsersController {
@@ -31,6 +32,7 @@ export class UsersController {
     return { data: me, message: 'User created', statusCode: 201 };
   }
 
+  @Public()
   @Post('/register')
   @HttpCode(HttpStatus.CREATED)
   async create(
@@ -40,6 +42,7 @@ export class UsersController {
     return { data: createUser, message: 'User created', statusCode: 201 };
   }
 
+  @Public()
   @Post('/login')
   @HttpCode(HttpStatus.OK)
   async login(
@@ -63,19 +66,19 @@ export class UsersController {
     };
   }
 
+  @Public()
   @Post('/logout')
   @HttpCode(HttpStatus.OK)
-  logout(@Res({ passthrough: true }) response: Response) {
-    response.clearCookie(this.accessTokenKey, {
+  logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    console.log('🔍 Before clear:', req.cookies);
+
+    res.clearCookie(this.accessTokenKey, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false,
       sameSite: 'strict',
       path: '/',
     });
 
-    return {
-      message: 'Login successful',
-      statusCode: 200,
-    };
+    return { message: 'Logout successful' };
   }
 }

@@ -1,14 +1,9 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithAuth } from "./baseApi";
 
 export const baseApi = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
-    credentials: "include",
-    prepareHeaders: (headers) => {
-      return headers;
-    },
-  }),
-  tagTypes: [],
+  baseQuery: baseQueryWithAuth,
+  tagTypes: ["User", "Workspace", "Subscription", "Group"],
   endpoints: () => ({}),
 });

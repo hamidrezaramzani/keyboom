@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './core/db/database.module';
 import { UsersModule } from './modules/user/user.module';
 import { LoggerModule } from 'pino-nestjs';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './core/guards/auth.guard';
 
 @Module({
   imports: [
@@ -18,6 +20,12 @@ import { LoggerModule } from 'pino-nestjs';
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
     UsersModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
   ],
 })
 export class AppModule {}

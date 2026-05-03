@@ -5,7 +5,7 @@ import * as jwt from 'jsonwebtoken';
 export const UserId = createParamDecorator(
   (data: unknown, ctx: ExecutionContext): string | null => {
     const request = ctx.switchToHttp().getRequest<Request>();
-    const token = request.cookies?.['access_token'] as string;
+    const token = request.cookies?.['ACCESS_TOKEN'] as string;
     if (!token) {
       return null;
     }
