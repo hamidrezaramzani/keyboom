@@ -87,6 +87,9 @@ const workspaceEvents = {
   workspaceUpdated: z.object({
     workspace,
   }),
+  workspaceAdded: z.object({
+    workspace,
+  }),
 };
 
 export type WorkspaceActions = Actions<typeof workspaceActions>;

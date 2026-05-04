@@ -10,14 +10,18 @@ import { WorkspaceRepository } from '../workspace/workspace.repository';
 import { UsersRepository } from '../user/user.repository';
 import { NotificationService } from '../notification/notification.service';
 import { customAlphabet } from 'nanoid';
+import { SanityCheckService } from '../sanity-check/sanity-check.service';
+import { WebSocketGateway } from '../websocket/websocket.gateway';
 
 @Injectable()
 export class InvitationService {
   constructor(
     private readonly invitationRepo: InvitationRepository,
+    private readonly sanityCheckService: SanityCheckService,
     private readonly workspaceRepo: WorkspaceRepository,
     private readonly userRepo: UsersRepository,
     private readonly notificationService: NotificationService,
+    private readonly websocketGateway: WebSocketGateway,
   ) {}
 
   private generateId(): string {
@@ -109,6 +113,16 @@ export class InvitationService {
         metadata: JSON.stringify({ invitationId: invitation.id, role }),
         id: this.generateId(),
       });
+
+      const invitationPending = await this.invitationRepo.findPendingByEmail(
+        inviteeUser.email,
+        invitation.id,
+      );
+
+      this.websocketGateway.emitInviteCreated(
+        inviteeUser.id,
+        invitationPending[0],
+      );
     }
 
     return invitation;
@@ -128,8 +142,12 @@ export class InvitationService {
     return this.invitationRepo.findByWorkspaceId(workspaceId);
   }
 
-  async getIncomingInvitations(email: string) {
-    return this.invitationRepo.findPendingByEmail(email);
+  async getUserInvites(userId: string) {
+    const user = await this.sanityCheckService.checkUserIsExists(userId);
+
+    const pending = await this.invitationRepo.findPendingByEmail(user.email);
+    const history = await this.invitationRepo.findHistoryByEmail(user.email);
+    return { pending, history };
   }
 
   async respondToInvitation(
@@ -174,6 +192,8 @@ export class InvitationService {
         metadata: JSON.stringify({ userId, email: user.email }),
         id: this.generateId(),
       });
+
+      this.websocketGateway.emitInviteAccepted(userId, invitation.id);
     } else {
       await this.invitationRepo.updateStatus(invitationId, 'rejected');
 
@@ -186,6 +206,8 @@ export class InvitationService {
         metadata: JSON.stringify({ userId, email: user.email }),
         id: this.generateId(),
       });
+
+      this.websocketGateway.emitInviteRejected(userId, invitation.id);
     }
 
     return invitation;

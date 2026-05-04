@@ -1,6 +1,7 @@
 import { InvitationActions } from "@keyboom/contracts/client";
 import { baseApi } from "../api";
 import { INVITATION_ENDPOINTS } from "./api-invite.constant";
+import { handleInviteCacheEntryAdded } from "./api-invite.on-cache";
 
 export const invitationEndpoints = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -25,15 +26,16 @@ export const invitationEndpoints = baseApi.injectEndpoints({
       }),
       providesTags: ["Invitation"],
     }),
-    getIncomingInvitations: builder.query<
-      InvitationActions["getIncoming"]["response"]["ok"],
+    getMyInvites: builder.query<
+      InvitationActions["readMany"]["response"]["ok"],
       void
     >({
       query: () => ({
-        url: INVITATION_ENDPOINTS.incoming,
+        url: INVITATION_ENDPOINTS.readMany,
         method: "GET",
       }),
       providesTags: ["Invitation"],
+      onCacheEntryAdded: handleInviteCacheEntryAdded,
     }),
     respondInvitation: builder.mutation<
       InvitationActions["respond"]["response"]["ok"],
@@ -47,12 +49,12 @@ export const invitationEndpoints = baseApi.injectEndpoints({
       invalidatesTags: ["Invitation", "Workspace"],
     }),
   }),
-  overrideExisting: false,
+  overrideExisting: true,
 });
 
 export const {
   useCreateInvitationMutation,
   useGetWorkspaceInvitationsQuery,
-  useGetIncomingInvitationsQuery,
+  useGetMyInvitesQuery,
   useRespondInvitationMutation,
 } = invitationEndpoints;

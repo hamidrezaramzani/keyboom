@@ -64,6 +64,21 @@ const respondInvitationResponse = z.object({
   statusCode: z.number(),
 });
 
+const invite = z.object({
+  id: z.string(),
+  workspaceId: z.string(),
+  workspaceName: z.string(),
+  inviterId: z.string(),
+  inviterName: z.string(),
+  inviterEmail: z.string(),
+  inviteeEmail: z.string(),
+  role: z.string(),
+  status: z.string(),
+  invitedAt: z.date(),
+  respondedAt: z.date().nullable(),
+  expiresAt: z.date(),
+});
+
 const invitationActions = {
   create: {
     payload: createInvitationPayload,
@@ -72,7 +87,11 @@ const invitationActions = {
         z.object({
           error: z
             .object({
-              code: z.enum(["USER_NOT_FOUND", "ALREADY_IN_WORKSPACE", "ALREADY_INVITE"]),
+              code: z.enum([
+                "USER_NOT_FOUND",
+                "ALREADY_IN_WORKSPACE",
+                "ALREADY_INVITE",
+              ]),
               message: z.string(),
             })
             .optional(),
@@ -87,9 +106,14 @@ const invitationActions = {
       ok: cdtoSuccess(getWorkspaceInvitationsResponse),
     },
   },
-  getIncoming: {
+  readMany: {
     response: {
-      ok: cdtoSuccess(getIncomingInvitationsResponse),
+      ok: cdtoSuccess(
+        z.object({
+          pending: z.array(invite),
+          history: z.array(invite),
+        }),
+      ),
     },
   },
   respond: {
@@ -127,8 +151,8 @@ export class GetWorkspaceInvitationsResponseOkDto extends createZodDto(
   invitationActions.getWorkspaceInvitations.response.ok,
 ) {}
 
-export class GetIncomingInvitationsResponseOkDto extends createZodDto(
-  invitationActions.getIncoming.response.ok,
+export class ReadManyInvitationsResponseOkDto extends createZodDto(
+  invitationActions.readMany.response.ok,
 ) {}
 
 export class RespondInvitationResponseOkDto extends createZodDto(

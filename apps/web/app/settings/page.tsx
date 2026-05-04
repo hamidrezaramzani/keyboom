@@ -1,19 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { DashboardLayout } from "@/app/components/layout";
 import {
-  SettingsTabs,
   ProfileTab,
   NotificationsTab,
   InboxTab,
 } from "@/app/components/sections/settings";
-
-type TabType = "profile" | "notifications" | "inbox";
+import { Tabs } from "../components";
+import { Bell, User, User2 } from "lucide-react";
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState<TabType>("profile");
-
   return (
     <DashboardLayout>
       <div className="max-w-4xl mx-auto">
@@ -24,13 +20,28 @@ export default function SettingsPage() {
           </p>
         </div>
 
-        <SettingsTabs activeTab={activeTab} onTabChange={setActiveTab} />
-
-        <div className="mt-6">
-          {activeTab === "profile" && <ProfileTab />}
-          {activeTab === "notifications" && <NotificationsTab />}
-          {activeTab === "inbox" && <InboxTab />}
-        </div>
+        <Tabs
+          tabs={[
+            {
+              id: "profile",
+              icon: User,
+              label: "پروفایل کاربری",
+              content: <ProfileTab />,
+            },
+            {
+              id: "notifications",
+              icon: Bell,
+              label: "اطلاع رسانی",
+              content: <NotificationsTab />,
+            },
+            {
+              id: "inbox",
+              icon: User2,
+              label: "دعوت ها",
+              content: <InboxTab />,
+            },
+          ]}
+        />
       </div>
     </DashboardLayout>
   );

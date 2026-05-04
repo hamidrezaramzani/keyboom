@@ -40,6 +40,16 @@ const typeConfig = {
     bg: "bg-emerald-500/10",
   },
   invitation: { icon: Users, color: "text-blue-400", bg: "bg-blue-500/10" },
+  invitation_accepted: {
+    icon: Users,
+    color: "text-green-400",
+    bg: "bg-green-500/10",
+  },
+  invitation_rejected: {
+    icon: Users,
+    color: "text-red-400",
+    bg: "bg-red-500/10",
+  },
   reminder: {
     icon: Calendar,
     color: "text-indigo-400",

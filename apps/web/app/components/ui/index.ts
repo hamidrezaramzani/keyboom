@@ -9,3 +9,4 @@ export { Badge } from "./badge/badge.component";
 export { Modal } from "./modal/modal.component";
 export { Select } from "./select/select.component";
 export { EmptyState } from "./empty-state/empty-state.component";
+export { Tabs } from "./tab/tab.component";

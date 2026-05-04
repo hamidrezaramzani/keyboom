@@ -81,6 +81,10 @@ export const handleOnCacheEntryCountAdded = async (
 
   const handleNotificationNew = () => {
     updateCachedData((draft: { data: { count: number } }) => {
+      const audio = new Audio("/notif.mp3");
+      audio.play().catch((error) => {
+        console.error("Audio playback failed:", error);
+      });
       draft.data.count += 1;
     });
   };

@@ -27,9 +27,17 @@ export const handleWorkspaceCacheUpdate = async (
     });
   };
 
+  const handleWorkspaceAdded = (event: WorkspaceEvents["workspaceAdded"]) => {
+    updateCachedData((draft) => {
+      draft.data.data.list.push(event.workspace);
+    });
+  };
+
+  socket.on("workspace:added", handleWorkspaceAdded);
   socket.on("workspace:updated", handleWorkspaceUpdated);
 
   return () => {
+    socket.off("workspace:added", handleWorkspaceAdded);
     socket.off("workspace:updated", handleWorkspaceUpdated);
   };
 };

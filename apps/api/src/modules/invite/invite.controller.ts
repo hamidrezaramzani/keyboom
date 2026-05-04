@@ -14,8 +14,10 @@ import { InvitationService } from './invite.service';
 import { AuthGuard } from '../../core/guards/auth.guard';
 import {
   CreateInvitationPayloadDto,
+  ReadManyInvitationsResponseOkDto,
   RespondInvitationPayloadDto,
 } from '@keyboom/contracts/server';
+import { UserId } from 'src/core/decorators';
 
 @Controller('invitations')
 @UseGuards(AuthGuard)
@@ -48,16 +50,16 @@ export class InvitationController {
     return { data: invitations, message: 'Invitations list', statusCode: 200 };
   }
 
-  @Get('incoming')
-  async getIncomingInvitations(@Req() req: Request) {
-    const userId = req.userId!;
-    const user = await this.invitationService.getUserByUserId(userId);
-    const invitations = await this.invitationService.getIncomingInvitations(
-      user?.email || '',
-    );
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async getMyInvites(
+    @UserId() userId: string,
+  ): Promise<ReadManyInvitationsResponseOkDto> {
+    const invitations = await this.invitationService.getUserInvites(userId);
+
     return {
       data: invitations,
-      message: 'Incoming invitations',
+      message: 'Invitations list',
       statusCode: 200,
     };
   }

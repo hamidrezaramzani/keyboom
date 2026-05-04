@@ -1,8 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq, ne } from 'drizzle-orm';
 import { DRIZZLE } from '../../core/db/drizzle.provider';
 import { Invitation, invitations, NewInvitation } from './invite.schema';
+import { workspaces } from '../workspace/workspace.schema';
+import { users } from '../user/user.schema';
 
 @Injectable()
 export class InvitationRepository {
@@ -27,19 +29,6 @@ export class InvitationRepository {
       .select()
       .from(invitations)
       .where(eq(invitations.workspaceId, workspaceId))
-      .orderBy(invitations.invitedAt);
-  }
-
-  async findPendingByEmail(email: string): Promise<Invitation[]> {
-    return this.db
-      .select()
-      .from(invitations)
-      .where(
-        and(
-          eq(invitations.inviteeEmail, email),
-          eq(invitations.status, 'pending'),
-        ),
-      )
       .orderBy(invitations.invitedAt);
   }
 
@@ -71,5 +60,72 @@ export class InvitationRepository {
       .where(eq(invitations.id, id))
       .returning();
     return result[0];
+  }
+
+  async findPendingByEmail(email: string, invitationId?: string) {
+    const conditions = [
+      eq(invitations.inviteeEmail, email),
+      eq(invitations.status, 'pending'),
+    ];
+
+    if (invitationId) {
+      conditions.push(eq(invitations.id, invitationId));
+    }
+
+    return this.db
+      .select({
+        id: invitations.id,
+        workspaceId: invitations.workspaceId,
+        workspaceName: workspaces.name,
+        inviterId: invitations.inviterId,
+        inviterName: users.fullName,
+        inviterEmail: users.email,
+        inviteeEmail: invitations.inviteeEmail,
+        role: invitations.role,
+        status: invitations.status,
+        invitedAt: invitations.invitedAt,
+        respondedAt: invitations.respondedAt,
+        expiresAt: invitations.expiresAt,
+      })
+      .from(invitations)
+      .innerJoin(workspaces, eq(invitations.workspaceId, workspaces.id))
+      .innerJoin(users, eq(invitations.inviterId, users.id))
+      .where(and(...conditions))
+      .orderBy(desc(invitations.invitedAt));
+  }
+
+  async findHistoryByEmail(email: string) {
+    const user = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+    const userEmail = user[0]?.email;
+
+    return this.db
+      .select({
+        id: invitations.id,
+        workspaceId: invitations.workspaceId,
+        workspaceName: workspaces.name,
+        inviterId: invitations.inviterId,
+        inviterName: users.fullName,
+        inviterEmail: users.email,
+        inviteeEmail: invitations.inviteeEmail,
+        role: invitations.role,
+        status: invitations.status,
+        invitedAt: invitations.invitedAt,
+        respondedAt: invitations.respondedAt,
+        expiresAt: invitations.expiresAt,
+      })
+      .from(invitations)
+      .innerJoin(workspaces, eq(invitations.workspaceId, workspaces.id))
+      .innerJoin(users, eq(invitations.inviterId, users.id))
+      .where(
+        and(
+          eq(invitations.inviteeEmail, userEmail),
+          ne(invitations.status, 'pending'),
+        ),
+      )
+      .orderBy(desc(invitations.respondedAt));
   }
 }

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+// apps/api/src/modules/websocket/websocket.gateway.ts
 import {
   WebSocketGateway as WebSocketGateway2,
   WebSocketServer,
@@ -27,6 +27,7 @@ export class WebSocketGateway
   server: Server;
 
   private userSockets: Map<string, string[]> = new Map();
+
   afterInit(server: Server) {
     server.use((socket: Socket, next) => {
       let token = null;
@@ -127,5 +128,17 @@ export class WebSocketGateway
       ...notification,
       timestamp: new Date(),
     });
+  }
+
+  emitInviteCreated(userId: string, invite: any) {
+    this.emitToUser(userId, 'invite:created', { invite });
+  }
+
+  emitInviteAccepted(userId: string, inviteId: string) {
+    this.emitToUser(userId, 'invite:accepted', { inviteId, userId });
+  }
+
+  emitInviteRejected(userId: string, inviteId: string) {
+    this.emitToUser(userId, 'invite:rejected', { inviteId });
   }
 }
