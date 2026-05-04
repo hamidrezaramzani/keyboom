@@ -1,11 +1,16 @@
+// apps/web/store/api/notification.endpoints.ts
 import { NotificationActions } from "@keyboom/contracts/client";
 import { baseApi } from "../api";
 import { NOTIFICATION_ENDPOINTS } from "./api-notification.constant";
+import {
+  handleOnCacheEntryAdded,
+  handleOnCacheEntryCountAdded,
+} from "./api-notification.on-cache";
 
 export const notificationEndpoints = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getNotifications: builder.query<
-      NotificationActions["getMany"]["response"]["ok"]['data'],
+      NotificationActions["getMany"]["response"]["ok"],
       void
     >({
       query: () => ({
@@ -13,9 +18,10 @@ export const notificationEndpoints = baseApi.injectEndpoints({
         method: "GET",
       }),
       providesTags: ["Notification"],
+      onCacheEntryAdded: handleOnCacheEntryAdded,
     }),
     getRecentNotifications: builder.query<
-      NotificationActions["getRecent"]["response"]["ok"]["data"],
+      NotificationActions["getRecent"]["response"]["ok"],
       void
     >({
       query: () => ({
@@ -25,7 +31,7 @@ export const notificationEndpoints = baseApi.injectEndpoints({
       providesTags: ["Notification"],
     }),
     getUnreadCount: builder.query<
-      NotificationActions["getUnreadCount"]["response"]["ok"]['data'],
+      NotificationActions["getUnreadCount"]["response"]["ok"],
       void
     >({
       query: () => ({
@@ -33,9 +39,10 @@ export const notificationEndpoints = baseApi.injectEndpoints({
         method: "GET",
       }),
       providesTags: ["Notification"],
+      onCacheEntryAdded: handleOnCacheEntryCountAdded,
     }),
     markAsRead: builder.mutation<
-      NotificationActions["markAsRead"]["response"]["ok"]['data'],
+      NotificationActions["markAsRead"]["response"]["ok"],
       { id: string }
     >({
       query: ({ id }) => ({
@@ -45,7 +52,7 @@ export const notificationEndpoints = baseApi.injectEndpoints({
       invalidatesTags: ["Notification"],
     }),
     markAllAsRead: builder.mutation<
-      NotificationActions["markAllAsRead"]["response"]["ok"]['data'],
+      NotificationActions["markAllAsRead"]["response"]["ok"],
       void
     >({
       query: () => ({

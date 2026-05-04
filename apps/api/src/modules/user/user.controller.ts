@@ -25,6 +25,17 @@ export class UsersController {
 
   private accessTokenKey: string = 'ACCESS_TOKEN';
 
+  @Get('/token')
+  @HttpCode(HttpStatus.OK)
+  getToken(@Req() req: Request) {
+    const token = req.cookies[this.accessTokenKey] as string;
+    return {
+      data: { token: token || null },
+      message: 'Token retrieved',
+      statusCode: 200,
+    };
+  }
+
   @Get('/me')
   @HttpCode(HttpStatus.OK)
   async getMe(@UserId() userId: string): Promise<UserGetMeResponseOkDTO> {

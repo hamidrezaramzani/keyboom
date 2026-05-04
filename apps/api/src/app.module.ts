@@ -7,6 +7,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './core/guards/auth.guard';
 import { WorkspaceModule } from './modules/workspace/workspace.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { InvitationModule } from './modules/invite/invite.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { NotificationModule } from './modules/notification/notification.module';
     UsersModule,
     WorkspaceModule,
     NotificationModule,
+    InvitationModule,
   ],
   providers: [
     {

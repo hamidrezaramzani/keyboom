@@ -7,6 +7,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { users } from '../user/user.schema';
 import { relations } from 'drizzle-orm';
+import { invitations } from '../invite/invite.schema';
 
 export const workspaces = pgTable(
   'workspaces',
@@ -113,33 +114,6 @@ export const groupMembers = pgTable(
   }),
 );
 
-export const invitations = pgTable(
-  'invitations',
-  {
-    id: varchar('id', { length: 36 }).primaryKey(),
-    workspaceId: varchar('workspace_id', { length: 36 })
-      .notNull()
-      .references(() => workspaces.id, { onDelete: 'cascade' }),
-    inviterId: varchar('inviter_id', { length: 36 })
-      .notNull()
-      .references(() => users.id),
-    inviteeEmail: varchar('invitee_email', { length: 255 }).notNull(),
-    role: varchar('role', { length: 20 }).notNull().default('member'), // admin, member
-    status: varchar('status', { length: 20 }).notNull().default('pending'), // pending, accepted, rejected, expired
-    invitedAt: timestamp('invited_at').defaultNow().notNull(),
-    respondedAt: timestamp('responded_at'),
-    expiresAt: timestamp('expires_at').notNull(),
-  },
-  (table) => ({
-    workspaceIdIdx: index('invitations_workspace_id_idx').on(table.workspaceId),
-    inviterIdIdx: index('invitations_inviter_id_idx').on(table.inviterId),
-    inviteeEmailIdx: index('invitations_invitee_email_idx').on(
-      table.inviteeEmail,
-    ),
-    statusIdx: index('invitations_status_idx').on(table.status),
-  }),
-);
-
 // ==================== Relations ====================
 
 export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
@@ -197,17 +171,6 @@ export const groupMembersRelations = relations(groupMembers, ({ one }) => ({
   }),
 }));
 
-export const invitationsRelations = relations(invitations, ({ one }) => ({
-  workspace: one(workspaces, {
-    fields: [invitations.workspaceId],
-    references: [workspaces.id],
-  }),
-  inviter: one(users, {
-    fields: [invitations.inviterId],
-    references: [users.id],
-  }),
-}));
-
 // ==================== Types ====================
 
 export type Workspace = typeof workspaces.$inferSelect;
@@ -222,14 +185,9 @@ export type NewGroup = typeof groups.$inferInsert;
 export type GroupMember = typeof groupMembers.$inferSelect;
 export type NewGroupMember = typeof groupMembers.$inferInsert;
 
-export type Invitation = typeof invitations.$inferSelect;
-export type NewInvitation = typeof invitations.$inferInsert;
-
 // ==================== Enums ====================
 
 export type WorkspaceRole = 'owner' | 'admin' | 'member' | 'viewer';
-export type InvitationStatus = 'pending' | 'accepted' | 'rejected' | 'expired';
-export type InvitationRole = 'admin' | 'member';
 
 // ==================== Migration Key ====================
 
@@ -237,4 +195,3 @@ export const WorkspaceMigrationKey = 'workspaces';
 export const WorkspaceMemberMigrationKey = 'workspace_members';
 export const GroupMigrationKey = 'groups';
 export const GroupMemberMigrationKey = 'group_members';
-export const InvitationMigrationKey = 'invitations';

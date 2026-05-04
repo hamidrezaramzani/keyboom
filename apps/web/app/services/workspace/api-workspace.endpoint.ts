@@ -60,13 +60,24 @@ export const workspaceEndpoints = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Workspace"],
     }),
+
+    getWorkspaceMembers: builder.query<
+      WorkspaceActions["readManyMembers"]["response"]["ok"],
+      RequestParams<void, WorkspaceActions["readManyMembers"]["params"]>
+    >({
+      query: ({ params }) => ({
+        url: WORKSPACE_ENDPOINTS.readManyMembers(params?.workspaceId || ""),
+        method: "GET",
+      }),
+    }),
   }),
   overrideExisting: false,
 });
 
 export const {
-  useReadManyWorkspacesQuery,
   useCreateWorkspaceMutation,
+  useReadManyWorkspacesQuery,
+  useGetWorkspaceMembersQuery,
   useUpdateCurrentWorkspaceMutation,
   useUpdateWorkspaceSettingMutation,
 } = workspaceEndpoints;

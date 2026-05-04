@@ -200,4 +200,77 @@ export class WorkspaceRepository {
 
     return result[0]?.defaultWorkspaceId || null;
   }
+
+  async getUserRoleInWorkspace(
+    userId: string,
+    workspaceId: string,
+  ): Promise<string | null> {
+    const result = await this.db
+      .select({ role: workspaceMembers.role })
+      .from(workspaceMembers)
+      .where(
+        and(
+          eq(workspaceMembers.userId, userId),
+          eq(workspaceMembers.workspaceId, workspaceId),
+          eq(workspaceMembers.isActive, true),
+        ),
+      )
+      .limit(1);
+    return result[0]?.role || null;
+  }
+
+  async isUserMemberOfWorkspaceByEmail(
+    email: string,
+    workspaceId: string,
+  ): Promise<boolean> {
+    const result = await this.db
+      .select()
+      .from(workspaceMembers)
+      .innerJoin(users, eq(workspaceMembers.userId, users.id))
+      .where(
+        and(
+          eq(users.email, email),
+          eq(workspaceMembers.workspaceId, workspaceId),
+          eq(workspaceMembers.isActive, true),
+        ),
+      )
+      .limit(1);
+    return result.length > 0;
+  }
+
+  async addMemberToWorkspace(
+    userId: string,
+    workspaceId: string,
+    role: 'admin' | 'member',
+  ): Promise<void> {
+    await this.db.insert(workspaceMembers).values({
+      id: crypto.randomUUID(),
+      workspaceId,
+      userId,
+      role,
+      isActive: true,
+      invitedAt: new Date(),
+      joinedAt: new Date(),
+    });
+  }
+
+  async getWorkspaceMembers(workspaceId: string) {
+    const members = await this.db
+      .select({
+        id: users.id,
+        name: users.fullName,
+        email: users.email,
+        role: workspaceMembers.role,
+        joinedAt: workspaceMembers.joinedAt,
+      })
+      .from(workspaceMembers)
+      .innerJoin(users, eq(workspaceMembers.userId, users.id))
+      .where(
+        and(
+          eq(workspaceMembers.workspaceId, workspaceId),
+          eq(workspaceMembers.isActive, true),
+        ),
+      );
+    return members;
+  }
 }

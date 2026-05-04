@@ -18,6 +18,10 @@ const updateCurrentWorkspacePayload = z.object({
   workspaceId: z.string().min(1, "Workspace ID is required"),
 });
 
+const readManyWorkspaceParams = z.object({
+  workspaceId: z.string(),
+});
+
 const updateCurrentWorkspaceResponse = z.object({
   id: z.string(),
   name: z.string(),
@@ -43,6 +47,22 @@ const workspaceActions = {
           defaultWorkspace: workspace,
           list: z.array(workspace),
         }),
+      ),
+    },
+  },
+  readManyMembers: {
+    params: readManyWorkspaceParams,
+    response: {
+      ok: cdtoSuccess(
+        z.array(
+          z.object({
+            id: z.string(),
+            name: z.string(),
+            email: z.string(),
+            role: z.string(),
+            joinedAt: z.date(),
+          }),
+        ),
       ),
     },
   },
@@ -95,4 +115,12 @@ export class WorkspaceUpdateSettingParamsDto extends createZodDto(
 
 export class WorkspaceUpdateSettingResponseOkDto extends createZodDto(
   workspaceActions.updateSetting.response.ok,
+) {}
+
+export class WorkspaceReadManyMembersParamsDto extends createZodDto(
+  workspaceActions.readManyMembers.params,
+) {}
+
+export class WorkspaceReadManyMembersResponseOkDto extends createZodDto(
+  workspaceActions.readManyMembers.response.ok,
 ) {}

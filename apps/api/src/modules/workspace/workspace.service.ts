@@ -128,4 +128,16 @@ export class WorkspaceService {
       isCurrent: true,
     };
   }
+
+  async getWorkspaceMembers(userId: string, workspaceId: string) {
+    await this.sanityCheckService.checkUserIsWorkspaceMember(
+      userId,
+      workspaceId,
+    );
+
+    const members =
+      await this.workspaceRepository.getWorkspaceMembers(workspaceId);
+
+    return members;
+  }
 }

@@ -86,4 +86,17 @@ export class WorkspaceController {
       statusCode: 200,
     };
   }
+
+  @Get(':workspaceId/members')
+  @HttpCode(HttpStatus.OK)
+  async getWorkspaceMembers(
+    @Param('workspaceId') workspaceId: string,
+    @UserId() userId: string,
+  ) {
+    const members = await this.workspaceService.getWorkspaceMembers(
+      userId,
+      workspaceId,
+    );
+    return { data: members, message: 'Workspace members', statusCode: 200 };
+  }
 }
