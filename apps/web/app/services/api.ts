@@ -4,6 +4,6 @@ import { baseQueryWithAuth } from "./baseApi";
 export const baseApi = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithAuth,
-  tagTypes: ["User", "Workspace", "Subscription", "Group"],
+  tagTypes: ["User", "Workspace", "Subscription", "Group", "Notification"],
   endpoints: () => ({}),
 });

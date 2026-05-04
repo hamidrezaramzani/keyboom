@@ -1,89 +1,36 @@
 "use client";
 
-import { useState } from "react";
 import {
   NotificationItem,
   NotificationType,
 } from "../notification-item/notification-item.component";
 import { EmptyState } from "@/app/components/ui";
 import { BellOff } from "lucide-react";
-
-interface Notification {
-  id: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  createdAt: string;
-  isRead: boolean;
-  link?: string;
-}
-
-const mockNotifications: Notification[] = [
-  {
-    id: "1",
-    type: "expiring",
-    title: "اشتراک در حال اتمام",
-    message: "اشتراک فیلیمو ۳ روز دیگر به اتمام می‌رسد. برای تمدید اقدام کنید.",
-    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    isRead: false,
-    link: "/subscriptions/1",
-  },
-  {
-    id: "2",
-    type: "invitation",
-    title: "دعوت به فضای کاری",
-    message: "علی حسینی شما را به فضای کاری «شرکت کیان» دعوت کرده است.",
-    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    isRead: false,
-    link: "/settings/inbox",
-  },
-  {
-    id: "3",
-    type: "payment",
-    title: "پرداخت موفق",
-    message:
-      "پرداخت اشتراک یوتیوب پریمیوم به مبلغ ۶۵,۰۰۰ تومان با موفقیت انجام شد.",
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    isRead: true,
-  },
-  {
-    id: "4",
-    type: "reminder",
-    title: "یادآوری تمدید خودکار",
-    message: "تمديد خودکار اشتراک ادوبی کریتیو در ۲ روز آینده انجام خواهد شد.",
-    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    isRead: true,
-  },
-  {
-    id: "5",
-    type: "expired",
-    title: "اشتراک منقضی شد",
-    message: "اشتراک نواپلی منقضی شد. برای استفاده دوباره آن را تمدید کنید.",
-    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    isRead: false,
-  },
-];
+import {
+  useGetNotificationsQuery,
+  useMarkAsReadMutation,
+} from "@/app/services/notification";
 
 export const NotificationList = () => {
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const { data: notificationsData, refetch } = useGetNotificationsQuery();
+  const [markAsRead] = useMarkAsReadMutation();
 
-  const handleRead = (id: string) => {
-    setNotifications(
-      notifications.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
-    );
+  const notifications = notificationsData?.data || [];
+
+  const handleRead = async (id: string) => {
+    await markAsRead({ id });
+    refetch();
   };
 
-  // const handleMarkAllAsRead = () => {
-  //   setNotifications(notifications.map((n) => ({ ...n, isRead: true })));
-  // };
-
-  const handleNotificationClick = (notification: Notification) => {
-    if (notification.link) {
-      console.log("Navigate to:", notification.link);
+  const handleNotificationClick = (notification: unknown) => {
+    const link = notification.metadata
+      ? JSON.parse(notification.metadata)?.link
+      : null;
+    if (link) {
+      // eslint-disable-next-line react-hooks/immutability
+      window.location.href = link;
     }
   };
-
-  // const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   if (notifications.length === 0) {
     return (
@@ -100,7 +47,17 @@ export const NotificationList = () => {
       {notifications.map((notification) => (
         <NotificationItem
           key={notification.id}
-          notification={notification}
+          notification={{
+            id: notification.id,
+            type: notification.type as NotificationType,
+            title: notification.title,
+            message: notification.message,
+            createdAt: new Date(notification.createdAt).toISOString(),
+            isRead: notification.isRead,
+            link: notification.metadata
+              ? JSON.parse(notification.metadata)?.link
+              : undefined,
+          }}
           onRead={handleRead}
           onClick={() => handleNotificationClick(notification)}
         />

@@ -4,9 +4,14 @@ import { UsersService } from './user.service';
 import { UsersRepository } from './user.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { WorkspaceModule } from '../workspace/workspace.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
-  imports: [JwtModule, forwardRef(() => WorkspaceModule)],
+  imports: [
+    JwtModule,
+    forwardRef(() => WorkspaceModule),
+    forwardRef(() => NotificationModule),
+  ],
   controllers: [UsersController],
   providers: [UsersService, UsersRepository],
   exports: [UsersService, UsersRepository],

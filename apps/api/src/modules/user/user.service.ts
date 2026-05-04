@@ -17,6 +17,7 @@ import {
 } from '@keyboom/contracts/server';
 import { JwtService } from '@nestjs/jwt';
 import { WorkspaceRepository } from '../workspace/workspace.repository';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class UsersService {
@@ -25,6 +26,7 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
     private readonly workspaceRepository: WorkspaceRepository,
     private readonly jwtService: JwtService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   private generateId(): string {
@@ -62,6 +64,14 @@ export class UsersService {
     }
 
     const accessToken = this.generateAccessToken(user.id);
+
+    await this.notificationService.create({
+      title: 'ورود به حساب',
+      message: 'کاربر گرامی ورود جدیدی به حساب شما صورت گرفته است',
+      id: this.generateId(),
+      userId: user.id,
+      type: 'system',
+    });
 
     return {
       id: user.id,

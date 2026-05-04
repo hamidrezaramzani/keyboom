@@ -1,64 +1,34 @@
-// app/components/ui/NotificationPopover.tsx
 "use client";
 
 import { useState, useEffect, useRef } from "react";
 import { Bell, BellOff, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { NotificationItem } from "@/app/components/sections/notifications";
-
-interface Notification {
-  id: string;
-  type:
-    | "expiring"
-    | "expired"
-    | "payment"
-    | "invitation"
-    | "reminder"
-    | "system";
-  title: string;
-  message: string;
-  createdAt: string;
-  isRead: boolean;
-  link?: string;
-}
-
-const mockNotifications: Notification[] = [
-  {
-    id: "1",
-    type: "expiring",
-    title: "اشتراک در حال اتمام",
-    message: "اشتراک فیلیمو ۳ روز دیگر به اتمام می‌رسد.",
-    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    isRead: false,
-    link: "/subscriptions/1",
-  },
-  {
-    id: "2",
-    type: "invitation",
-    title: "دعوت به فضای کاری",
-    message: "علی حسینی شما را به فضای کاری «شرکت کیان» دعوت کرده است.",
-    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    isRead: false,
-    link: "/settings/inbox",
-  },
-  {
-    id: "3",
-    type: "payment",
-    title: "پرداخت موفق",
-    message: "پرداخت اشتراک یوتیوب پریمیوم انجام شد.",
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    isRead: true,
-  },
-];
+import {
+  NotificationItem,
+  NotificationType,
+} from "@/app/components/sections/notifications";
+import {
+  useGetRecentNotificationsQuery,
+  useGetUnreadCountQuery,
+  useMarkAsReadMutation,
+  useMarkAllAsReadMutation,
+} from "@/app/services/notification";
 
 export const NotificationPopover = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState(mockNotifications);
   const popoverRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const { data: recentData, refetch: refetchRecent } =
+    useGetRecentNotificationsQuery();
+  const { data: unreadCountData, refetch: refetchUnreadCount } =
+    useGetUnreadCountQuery();
+  const [markAsRead] = useMarkAsReadMutation();
+  const [markAllAsRead] = useMarkAllAsReadMutation();
+
+  const notifications = recentData?.data || [];
+  const unreadCount = unreadCountData?.data?.count || 0;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -76,15 +46,24 @@ export const NotificationPopover = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleRead = (id: string) => {
-    setNotifications(
-      notifications.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
-    );
+  const handleRead = async (id: string) => {
+    await markAsRead({ id });
+    refetchRecent();
+    refetchUnreadCount();
   };
 
-  const handleNotificationClick = (notification: Notification) => {
-    if (notification.link) {
-      router.push(notification.link);
+  const handleMarkAllAsRead = async () => {
+    await markAllAsRead();
+    refetchRecent();
+    refetchUnreadCount();
+  };
+
+  const handleNotificationClick = (notification: unknown) => {
+    const link = notification.metadata
+      ? JSON.parse(notification.metadata)?.link
+      : null;
+    if (link) {
+      router.push(link);
       setIsOpen(false);
     }
   };
@@ -116,11 +95,7 @@ export const NotificationPopover = () => {
             <h3 className="text-white font-semibold">اعلان‌ها</h3>
             {unreadCount > 0 && (
               <button
-                onClick={() => {
-                  setNotifications(
-                    notifications.map((n) => ({ ...n, isRead: true })),
-                  );
-                }}
+                onClick={handleMarkAllAsRead}
                 className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
               >
                 علامت زدن همه به عنوان خوانده
@@ -135,16 +110,24 @@ export const NotificationPopover = () => {
                 <p className="text-gray-500 text-sm">هیچ اعلانی وجود ندارد</p>
               </div>
             ) : (
-              notifications
-                .slice(0, 5)
-                .map((notification) => (
-                  <NotificationItem
-                    key={notification.id}
-                    notification={notification}
-                    onRead={handleRead}
-                    onClick={() => handleNotificationClick(notification)}
-                  />
-                ))
+              notifications.slice(0, 5).map((notification) => (
+                <NotificationItem
+                  key={notification.id}
+                  notification={{
+                    id: notification.id,
+                    type: notification.type as NotificationType,
+                    title: notification.title,
+                    message: notification.message,
+                    createdAt: new Date(notification.createdAt).toISOString(),
+                    isRead: notification.isRead,
+                    link: notification.metadata
+                      ? JSON.parse(notification.metadata)?.link
+                      : undefined,
+                  }}
+                  onRead={handleRead}
+                  onClick={() => handleNotificationClick(notification)}
+                />
+              ))
             )}
           </div>
 

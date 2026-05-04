@@ -6,6 +6,7 @@ import { LoggerModule } from 'pino-nestjs';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './core/guards/auth.guard';
 import { WorkspaceModule } from './modules/workspace/workspace.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     DatabaseModule,
     UsersModule,
     WorkspaceModule,
+    NotificationModule,
   ],
   providers: [
     {

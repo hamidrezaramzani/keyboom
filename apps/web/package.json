@@ -13,6 +13,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@hookform/resolvers": "^5.2.2",
+    "@keyboom/contracts": "*",
     "@reduxjs/toolkit": "^2.11.2",
     "lucide-react": "^1.11.0",
     "next": "16.2.4",
@@ -21,9 +22,9 @@
     "react-hook-form": "^7.74.0",
     "react-redux": "^9.2.0",
     "recharts": "^3.8.1",
+    "socket.io-client": "^4.8.3",
     "sonner": "^2.0.7",
-    "tailwind-merge": "^3.5.0",
-    "@keyboom/contracts": "*"
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
