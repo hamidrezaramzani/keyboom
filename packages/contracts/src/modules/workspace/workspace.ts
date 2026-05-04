@@ -25,6 +25,10 @@ const updateCurrentWorkspaceResponse = z.object({
   isCurrent: z.boolean(),
 });
 
+const updateWorkspaceSetting = z.object({
+  name: z.string(),
+});
+
 const workspaceActions = {
   create: {
     payload: createWorkspacePayload,
@@ -44,6 +48,15 @@ const workspaceActions = {
   },
   updateCurrent: {
     payload: updateCurrentWorkspacePayload,
+    response: {
+      ok: cdtoSuccess(updateCurrentWorkspaceResponse),
+    },
+  },
+  updateSetting: {
+    params: z.object({
+      workspaceId: z.string(),
+    }),
+    payload: updateWorkspaceSetting,
     response: {
       ok: cdtoSuccess(updateCurrentWorkspaceResponse),
     },
@@ -70,4 +83,16 @@ export class WorkspaceUpdateCurrentPayloadDto extends createZodDto(
 
 export class WorkspaceUpdateCurrentResponseOkDto extends createZodDto(
   workspaceActions.updateCurrent.response.ok,
+) {}
+
+export class WorkspaceUpdateSettingPayloadDto extends createZodDto(
+  workspaceActions.updateSetting.payload,
+) {}
+
+export class WorkspaceUpdateSettingParamsDto extends createZodDto(
+  workspaceActions.updateSetting.params,
+) {}
+
+export class WorkspaceUpdateSettingResponseOkDto extends createZodDto(
+  workspaceActions.updateSetting.response.ok,
 ) {}

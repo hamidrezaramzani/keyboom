@@ -1,5 +1,9 @@
+import { WorkspaceActions } from "@keyboom/contracts/client";
+
 export const WORKSPACE_ENDPOINTS = {
   readMany: "workspaces",
   create: "workspaces",
   updateCurrent: "workspaces/current",
+  updateSettings: (params?: WorkspaceActions["updateSetting"]["params"]) =>
+    `workspaces/update-settings/${params?.workspaceId}`,
 };

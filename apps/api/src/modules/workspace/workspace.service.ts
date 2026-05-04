@@ -3,6 +3,8 @@ import { DRIZZLE } from 'src/core/db/drizzle.provider';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { WorkspaceRepository } from './workspace.repository';
 import { UsersRepository } from '../user/user.repository';
+import { SanityCheckService } from '../sanity-check/sanity-check.service';
+import { WorkspaceUpdateSettingPayloadDto } from '@keyboom/contracts/server';
 
 @Injectable()
 export class WorkspaceService {
@@ -10,6 +12,7 @@ export class WorkspaceService {
     @Inject(DRIZZLE) private db: NodePgDatabase,
     private readonly workspaceRepository: WorkspaceRepository,
     private readonly userRepository: UsersRepository,
+    private readonly sanityCheckService: SanityCheckService,
   ) {}
   async readMany(userId: string) {
     const workspaces =
@@ -92,6 +95,31 @@ export class WorkspaceService {
     if (!workspace) {
       throw new NotFoundException('Workspace not found');
     }
+
+    return {
+      id: workspace.id,
+      name: workspace.name,
+      isOwner: workspace.ownerId === userId,
+      isCurrent: true,
+    };
+  }
+
+  async updateWorkspaceSetting(
+    userId: string,
+    workspaceId: string,
+    body: WorkspaceUpdateSettingPayloadDto,
+  ) {
+    await this.sanityCheckService.checkUserIsWorkspaceMember(
+      userId,
+      workspaceId,
+    );
+
+    const workspace =
+      await this.sanityCheckService.checkWorkspaceIsExists(workspaceId);
+
+    await this.workspaceRepository.updateWorkspaceSetting(workspaceId, {
+      name: body.name,
+    });
 
     return {
       id: workspace.id,

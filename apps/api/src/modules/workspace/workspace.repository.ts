@@ -163,6 +163,15 @@ export class WorkspaceRepository {
       .where(eq(users.id, userId));
   }
 
+  async updateWorkspaceSetting(workspaceId: string, body: { name: string }) {
+    await this.db
+      .update(workspaces)
+      .set({
+        name: body.name,
+      })
+      .where(eq(workspaces.id, workspaceId));
+  }
+
   async isUserMemberOfWorkspace(
     userId: string,
     workspaceId: string,

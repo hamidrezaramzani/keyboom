@@ -46,6 +46,20 @@ export const workspaceEndpoints = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Workspace"],
     }),
+    updateWorkspaceSetting: builder.mutation<
+      WorkspaceActions["updateSetting"]["response"]["ok"],
+      RequestParams<
+        WorkspaceActions["updateSetting"]["payload"],
+        WorkspaceActions["updateSetting"]["params"]
+      >
+    >({
+      query: ({ payload, params }) => ({
+        url: WORKSPACE_ENDPOINTS.updateSettings(params),
+        method: "PUT",
+        body: payload,
+      }),
+      invalidatesTags: ["Workspace"],
+    }),
   }),
   overrideExisting: false,
 });
@@ -54,4 +68,5 @@ export const {
   useReadManyWorkspacesQuery,
   useCreateWorkspaceMutation,
   useUpdateCurrentWorkspaceMutation,
+  useUpdateWorkspaceSettingMutation,
 } = workspaceEndpoints;

@@ -7,7 +7,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Modal, Input, Button } from "@/app/components";
 import { cn } from "@/app/lib/utils";
-import { Workspace } from "@/app/services/workspace";
+import {
+  useUpdateWorkspaceSettingMutation,
+  Workspace,
+} from "@/app/services/workspace";
+import { toast } from "@/app/lib";
 
 const workspaceSettingsSchema = z.object({
   name: z.string().min(1, "نام فضای کاری الزامی است"),
@@ -60,6 +64,8 @@ export const WorkspaceSettingsModal = ({
   onClose,
   workspace,
 }: WorkspaceSettingsModalProps) => {
+  const [updateWorkspaceSetting] = useUpdateWorkspaceSettingMutation();
+
   const [activeTab, setActiveTab] = useState<TabType>("general");
   const [members, setMembers] = useState(mockMembers);
   const [inviteEmail, setInviteEmail] = useState("");
@@ -69,18 +75,35 @@ export const WorkspaceSettingsModal = ({
   const {
     register,
     handleSubmit,
+
     formState: { errors, isSubmitting },
   } = useForm<WorkspaceSettingsForm>({
     resolver: zodResolver(workspaceSettingsSchema),
-    defaultValues: {
+    values: {
       name: workspace?.name || "",
     },
   });
 
   const onSubmit = async (data: WorkspaceSettingsForm) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Update workspace:", { id: workspace?.id, ...data });
-    onClose();
+    try {
+      if (!workspace?.id) {
+        console.error("Workspace id is not found");
+        return;
+      }
+
+      await updateWorkspaceSetting({
+        payload: data,
+        params: {
+          workspaceId: workspace?.id,
+        },
+      }).unwrap();
+
+      toast.success("به روزرسانی تنظیمات فضای کاری با موفقیت انجام شد");
+      onClose();
+    } catch (error) {
+      console.error(error);
+      toast.error("خطا در به روز رسانی تنظیمات فضای کاری");
+    }
   };
 
   const handleDeleteWorkspace = async () => {
