@@ -1,4 +1,3 @@
-// apps/web/store/api/notification.endpoints.ts
 import { NotificationActions } from "@keyboom/contracts/client";
 import { baseApi } from "../api";
 import { NOTIFICATION_ENDPOINTS } from "./api-notification.constant";
@@ -21,7 +20,7 @@ export const notificationEndpoints = baseApi.injectEndpoints({
       onCacheEntryAdded: handleOnCacheEntryAdded,
     }),
     getRecentNotifications: builder.query<
-      NotificationActions["getRecent"]["response"]["ok"],
+      NotificationActions["getRecent"]["response"]["ok"]["data"],
       void
     >({
       query: () => ({
@@ -29,9 +28,10 @@ export const notificationEndpoints = baseApi.injectEndpoints({
         method: "GET",
       }),
       providesTags: ["Notification"],
+      onCacheEntryAdded: handleOnCacheEntryAdded,
     }),
     getUnreadCount: builder.query<
-      NotificationActions["getUnreadCount"]["response"]["ok"],
+      NotificationActions["getUnreadCount"]["response"]["ok"]['data'],
       void
     >({
       query: () => ({

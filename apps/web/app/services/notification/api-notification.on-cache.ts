@@ -1,15 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-param-reassign */
-import type { Draft } from "@reduxjs/toolkit";
 import { getSocket } from "../socket";
-import { NotificationActions } from "@keyboom/contracts/client";
-
-type NotificationsDraft = Draft<
-  NotificationActions["getMany"]["response"]["ok"]
->;
-type UnreadCountDraft = Draft<
-  NotificationActions["getUnreadCount"]["response"]["ok"]
->;
+import { Notification } from "./api-notification.type";
 
 export const handleOnCacheEntryAdded = async (
   _arg: void,
@@ -19,18 +11,35 @@ export const handleOnCacheEntryAdded = async (
 
   const socket = await getSocket();
 
-  const handleNotificationNew = (data: { notification: any }) => {
-    updateCachedData((draft: NotificationsDraft) => {
-      draft.data.unshift(data.notification);
-      if (draft.data.length > 20) {
-        draft.data.pop();
-      }
-    });
+  const handleNotificationNew = (data: { notification: Notification }) => {
+    updateCachedData(
+      (draft: {
+        data: {
+          id: string;
+          userId: string;
+          workspaceId: string | null;
+          type: string;
+          title: string;
+          message: string;
+          metadata: string | null;
+          isRead: boolean;
+          createdAt: Date;
+          readAt: Date | null;
+        }[];
+      }) => {
+        draft.data.unshift(data.notification);
+        if (draft.data.length > 20) {
+          draft.data.pop();
+        }
+      },
+    );
   };
 
   const handleNotificationRead = (data: { notificationId: string }) => {
-    updateCachedData((draft: NotificationsDraft) => {
-      const notification = draft.data.find((n) => n.id === data.notificationId);
+    updateCachedData((draft: { data: any[] }) => {
+      const notification = draft.data.find(
+        (n: { id: string }) => n.id === data.notificationId,
+      );
       if (notification) {
         notification.isRead = true;
         notification.readAt = new Date().toISOString();
@@ -39,12 +48,16 @@ export const handleOnCacheEntryAdded = async (
   };
 
   const handleAllNotificationsRead = () => {
-    updateCachedData((draft: NotificationsDraft) => {
-      draft.data.forEach((notification) => {
-        notification.isRead = true;
-        notification.readAt = new Date().toISOString();
-      });
-    });
+    updateCachedData(
+      (draft: { data: { isRead: boolean; readAt: string }[] }) => {
+        draft.data.forEach(
+          (notification: { isRead: boolean; readAt: string }) => {
+            notification.isRead = true;
+            notification.readAt = new Date().toISOString();
+          },
+        );
+      },
+    );
   };
 
   socket.on("notification:new", handleNotificationNew);
@@ -67,13 +80,13 @@ export const handleOnCacheEntryCountAdded = async (
   const socket = await getSocket();
 
   const handleNotificationNew = () => {
-    updateCachedData((draft: UnreadCountDraft) => {
+    updateCachedData((draft: { data: { count: number } }) => {
       draft.data.count += 1;
     });
   };
 
   const handleNotificationRead = () => {
-    updateCachedData((draft: UnreadCountDraft) => {
+    updateCachedData((draft: { data: { count: number } }) => {
       if (draft.data.count > 0) {
         draft.data.count -= 1;
       }
@@ -81,7 +94,7 @@ export const handleOnCacheEntryCountAdded = async (
   };
 
   const handleAllNotificationsRead = () => {
-    updateCachedData((draft: UnreadCountDraft) => {
+    updateCachedData((draft: { data: { count: number } }) => {
       draft.data.count = 0;
     });
   };

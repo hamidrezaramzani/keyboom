@@ -12,6 +12,7 @@ import {
   useGetUnreadCountQuery,
   useMarkAsReadMutation,
   useMarkAllAsReadMutation,
+  Notification,
 } from "@/app/services/notification";
 
 export const NotificationPopover = () => {
@@ -58,7 +59,7 @@ export const NotificationPopover = () => {
     refetchUnreadCount();
   };
 
-  const handleNotificationClick = (notification: unknown) => {
+  const handleNotificationClick = (notification: Notification) => {
     const link = notification.metadata
       ? JSON.parse(notification.metadata)?.link
       : null;
@@ -73,16 +74,29 @@ export const NotificationPopover = () => {
     setIsOpen(false);
   };
 
+  const formatNotificationCount = (count: number): string => {
+    if (count > 99) {
+      return "+99";
+    }
+    return count.toString();
+  };
+
+  const countLabel = formatNotificationCount(unreadCount);
+
   return (
     <div className="relative z-50">
       <button
+        type="button"
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 text-gray-400 hover:text-white rounded-lg transition-colors"
       >
         <Bell className="w-5 h-5" />
+
         {unreadCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-500 rounded-full" />
+          <div className="absolute flex items-center justify-center w-4 h-4 text-[9px] font-bold text-white bg-danger border-2 border-buffer rounded-full -top-1 -start-1">
+            <span>{countLabel}</span>
+          </div>
         )}
       </button>
 

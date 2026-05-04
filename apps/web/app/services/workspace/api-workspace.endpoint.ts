@@ -2,6 +2,7 @@ import { WorkspaceActions } from "@keyboom/contracts/client";
 import { baseApi } from "../api";
 import { RequestParams } from "../api.type";
 import { WORKSPACE_ENDPOINTS } from "./api-workspace.constant";
+import { handleWorkspaceCacheUpdate } from "./api-workspace.on-cache";
 
 export const workspaceEndpoints = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -31,6 +32,18 @@ export const workspaceEndpoints = baseApi.injectEndpoints({
         method: "GET",
       }),
       providesTags: ["Workspace"],
+      onCacheEntryAdded: async (
+        _arg,
+        { cacheDataLoaded, updateCachedData, cacheEntryRemoved },
+      ) => {
+        await cacheDataLoaded;
+
+        const cleanup = handleWorkspaceCacheUpdate(updateCachedData);
+
+        await cacheEntryRemoved;
+
+        cleanup();
+      },
     }),
     updateCurrentWorkspace: builder.mutation<
       WorkspaceActions["updateCurrent"]["response"]["ok"],

@@ -1,6 +1,6 @@
 import { email, z } from "zod";
 import { createZodDto } from "nestjs-zod";
-import type { Actions } from "../../types";
+import type { Actions, Events } from "../../types";
 import { cdtoSuccess } from "../../helpers";
 
 const workspace = z.object({
@@ -83,7 +83,14 @@ const workspaceActions = {
   },
 } as const;
 
+const workspaceEvents = {
+  workspaceUpdated: z.object({
+    workspace,
+  }),
+};
+
 export type WorkspaceActions = Actions<typeof workspaceActions>;
+export type WorkspaceEvents = Events<typeof workspaceEvents>;
 
 export class WorkspaceReadManyResponseOkDto extends createZodDto(
   workspaceActions.readMany.response.ok,

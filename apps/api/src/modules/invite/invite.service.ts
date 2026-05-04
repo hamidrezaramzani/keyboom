@@ -98,13 +98,14 @@ export class InvitationService {
     });
 
     const inviteeUser = await this.userRepo.findByEmail(inviteeEmail);
+    const inviterUser = await this.userRepo.findById(inviterId);
     if (inviteeUser) {
       await this.notificationService.create({
         userId: inviteeUser.id,
         workspaceId,
         type: 'invitation',
         title: 'دعوت به فضای کاری',
-        message: `${workspace.name}: شما توسط ${inviterId} به این فضای کاری دعوت شده‌اید`,
+        message: `${workspace.name}: شما توسط ${inviterUser?.fullName} به این فضای کاری دعوت شده‌اید`,
         metadata: JSON.stringify({ invitationId: invitation.id, role }),
         id: this.generateId(),
       });

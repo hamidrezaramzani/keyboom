@@ -60,13 +60,11 @@ export class NotificationRepository {
   }
 
   async getUnreadCount(userId: string): Promise<number> {
-    const result = await this.db
-      .select({ count: this.db.$count(notifications) })
-      .from(notifications)
-      .where(
-        and(eq(notifications.userId, userId), eq(notifications.isRead, false)),
-      );
+    const count = await this.db.$count(
+      notifications,
+      and(eq(notifications.userId, userId), eq(notifications.isRead, false)),
+    );
 
-    return result[0]?.count || 0;
+    return count;
   }
 }

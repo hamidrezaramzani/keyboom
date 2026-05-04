@@ -14,29 +14,30 @@ export const getSocket = async (): Promise<Socket> => {
 
   connectionPromise = (async () => {
     const BASE_URL = process.env.NEXT_PUBLIC_WS_URL || "http://localhost:3001";
-    const tokenResponse = await fetch(BASE_URL + "/users/token", {
-      credentials: "include",
-    });
-    const { token } = await tokenResponse.json();
 
     socket = io(BASE_URL, {
-      auth: { token },
       transports: ["websocket"],
+      withCredentials: true,
       autoConnect: false,
     });
 
     return new Promise<Socket>((resolve, reject) => {
-      socket!.connect();
+      const timeout = setTimeout(() => {
+        reject(new Error("Connection timeout"));
+      }, 10000);
 
       socket!.on("connect", () => {
-        console.log("🔌 Socket connected");
+        clearTimeout(timeout);
         resolve(socket!);
       });
 
       socket!.on("connect_error", (error) => {
-        console.error("Socket connection error:", error);
+        clearTimeout(timeout);
+        console.error("❌ Socket connection error:", error.message);
         reject(error);
       });
+
+      socket!.connect();
     });
   })();
 

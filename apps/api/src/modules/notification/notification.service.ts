@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { NotificationRepository } from './notification.repository';
 import { NewNotification, Notification } from './notification.schema';
-import { NotificationGateway } from './notification.gateway';
+import { WebSocketGateway } from '../websocket/websocket.gateway';
 
 @Injectable()
 export class NotificationService {
   constructor(
     private readonly notificationRepo: NotificationRepository,
-    private readonly notificationGateway: NotificationGateway,
+    private readonly websocketGateway: WebSocketGateway,
   ) {}
 
   async create(data: NewNotification): Promise<Notification> {
     const notification = await this.notificationRepo.create(data);
 
-    this.notificationGateway.emitToUser(data.userId, 'notification:new', {
+    this.websocketGateway.emitToUser(data.userId, 'notification:new', {
       notification,
     });
 
@@ -38,7 +38,7 @@ export class NotificationService {
     const notification = await this.notificationRepo.markAsRead(notificationId);
 
     if (notification) {
-      this.notificationGateway.emitToUser(userId, 'notification:read', {
+      this.websocketGateway.emitToUser(userId, 'notification:read', {
         notificationId,
       });
     }
@@ -48,7 +48,7 @@ export class NotificationService {
 
   async markAllAsRead(userId: string): Promise<void> {
     await this.notificationRepo.markAllAsRead(userId);
-    this.notificationGateway.emitToUser(userId, 'notification:all-read', {});
+    this.websocketGateway.emitToUser(userId, 'notification:all-read', {});
   }
 
   async getUnreadCount(userId: string): Promise<{ count: number }> {
