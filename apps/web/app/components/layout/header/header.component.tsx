@@ -1,3 +1,4 @@
+// app/components/layout/header/header.component.tsx
 "use client";
 
 import { Menu, Search } from "lucide-react";
@@ -8,28 +9,16 @@ import { Me } from "@/app/services";
 import { AddWorkspaceModal } from "../../sections";
 import { useState } from "react";
 
-interface Workspace {
-  id: string;
-  name: string;
-  isCurrent?: boolean;
-}
-
 interface HeaderProps {
   onMenuClick: () => void;
   user?: Me;
-  onWorkspaceChange?: (workspace: Workspace) => void;
 }
 
-export const Header = ({
-  onMenuClick,
-  user,
-  onWorkspaceChange,
-}: HeaderProps) => {
-  const [isOpen, setOpen] = useState(false);
+export const Header = ({ onMenuClick, user }: HeaderProps) => {
+  const [isAddWorkspaceOpen, setIsAddWorkspaceOpen] = useState(false);
+
   return (
-    <header
-      className={`w-full bg-gray-900/80 backdrop-blur-md border-b border-gray-800 z-40`}
-    >
+    <header className="w-full bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-40">
       <div className="flex items-center justify-between px-4 py-3 md:px-6">
         <button
           onClick={onMenuClick}
@@ -49,15 +38,10 @@ export const Header = ({
 
         <div className="flex items-center gap-3 md:gap-4">
           <WorkspaceSwitcher
-            onWorkspaceChange={onWorkspaceChange}
-            onAddWorkspace={() => {
-              setOpen(true);
-            }}
+            onAddWorkspace={() => setIsAddWorkspaceOpen(true)}
           />
 
           <NotificationPopover />
-
-          <AddWorkspaceModal isOpen={isOpen} onClose={() => setOpen(false)} />
 
           {user && (
             <div className="flex items-center gap-2">
@@ -72,6 +56,11 @@ export const Header = ({
           )}
         </div>
       </div>
+
+      <AddWorkspaceModal 
+        isOpen={isAddWorkspaceOpen} 
+        onClose={() => setIsAddWorkspaceOpen(false)} 
+      />
     </header>
   );
 };

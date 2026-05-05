@@ -10,3 +10,5 @@ export { Modal } from "./modal/modal.component";
 export { Select } from "./select/select.component";
 export { EmptyState } from "./empty-state/empty-state.component";
 export { Tabs } from "./tab/tab.component";
+export { Drawer } from "./drawer/drawer.component";
+export { Popover } from "./popover/popover.component";

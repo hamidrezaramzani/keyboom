@@ -5,22 +5,22 @@ import {
   handleOnCacheEntryAdded,
   handleOnCacheEntryCountAdded,
 } from "./api-notification.on-cache";
+import { ERD } from "../api.type";
+import { transformResponse } from "../api.helper";
 
 export const notificationEndpoints = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getNotifications: builder.query<
-      NotificationActions["getMany"]["response"]["ok"],
-      void
-    >({
+    getNotifications: builder.query<ERD<NotificationActions["getMany"]>, void>({
       query: () => ({
         url: NOTIFICATION_ENDPOINTS.base,
         method: "GET",
       }),
       providesTags: ["Notification"],
       onCacheEntryAdded: handleOnCacheEntryAdded,
+      transformResponse
     }),
     getRecentNotifications: builder.query<
-      NotificationActions["getRecent"]["response"]["ok"]["data"],
+      ERD<NotificationActions["getRecent"]>,
       void
     >({
       query: () => ({
@@ -29,9 +29,10 @@ export const notificationEndpoints = baseApi.injectEndpoints({
       }),
       providesTags: ["Notification"],
       onCacheEntryAdded: handleOnCacheEntryAdded,
+      transformResponse
     }),
     getUnreadCount: builder.query<
-      NotificationActions["getUnreadCount"]["response"]["ok"]['data'],
+      ERD<NotificationActions["getUnreadCount"]>,
       void
     >({
       query: () => ({
@@ -40,9 +41,10 @@ export const notificationEndpoints = baseApi.injectEndpoints({
       }),
       providesTags: ["Notification"],
       onCacheEntryAdded: handleOnCacheEntryCountAdded,
+      transformResponse
     }),
     markAsRead: builder.mutation<
-      NotificationActions["markAsRead"]["response"]["ok"],
+      ERD<NotificationActions["markAsRead"]>,
       { id: string }
     >({
       query: ({ id }) => ({
@@ -50,9 +52,10 @@ export const notificationEndpoints = baseApi.injectEndpoints({
         method: "PATCH",
       }),
       invalidatesTags: ["Notification"],
+      transformResponse
     }),
     markAllAsRead: builder.mutation<
-      NotificationActions["markAllAsRead"]["response"]["ok"],
+      ERD<NotificationActions["markAllAsRead"]>,
       void
     >({
       query: () => ({
@@ -60,6 +63,7 @@ export const notificationEndpoints = baseApi.injectEndpoints({
         method: "PATCH",
       }),
       invalidatesTags: ["Notification"],
+      transformResponse
     }),
   }),
   overrideExisting: false,

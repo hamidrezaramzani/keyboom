@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-param-reassign */
+import { NotificationActions } from "@keyboom/contracts/client";
+import { ERD } from "../api.type";
 import { getSocket } from "../socket";
 import { Notification } from "./api-notification.type";
 
@@ -12,52 +14,33 @@ export const handleOnCacheEntryAdded = async (
   const socket = await getSocket();
 
   const handleNotificationNew = (data: { notification: Notification }) => {
-    updateCachedData(
-      (draft: {
-        data: {
-          id: string;
-          userId: string;
-          workspaceId: string | null;
-          type: string;
-          title: string;
-          message: string;
-          metadata: string | null;
-          isRead: boolean;
-          createdAt: Date;
-          readAt: Date | null;
-        }[];
-      }) => {
-        draft.data.unshift(data.notification);
-        if (draft.data.length > 20) {
-          draft.data.pop();
-        }
-      },
-    );
+    updateCachedData((draft: ERD<NotificationActions["getMany"]>) => {
+      draft.data.unshift(data.notification);
+      if (draft.data.length > 20) {
+        draft.data.pop();
+      }
+    });
   };
 
   const handleNotificationRead = (data: { notificationId: string }) => {
-    updateCachedData((draft: { data: any[] }) => {
+    updateCachedData((draft: ERD<NotificationActions["getMany"]>) => {
       const notification = draft.data.find(
         (n: { id: string }) => n.id === data.notificationId,
       );
       if (notification) {
         notification.isRead = true;
-        notification.readAt = new Date().toISOString();
+        notification.readAt = new Date();
       }
     });
   };
 
   const handleAllNotificationsRead = () => {
-    updateCachedData(
-      (draft: { data: { isRead: boolean; readAt: string }[] }) => {
-        draft.data.forEach(
-          (notification: { isRead: boolean; readAt: string }) => {
-            notification.isRead = true;
-            notification.readAt = new Date().toISOString();
-          },
-        );
-      },
-    );
+    updateCachedData((draft: ERD<NotificationActions["getMany"]>) => {
+      draft.data.forEach((notification) => {
+        notification.isRead = true;
+        notification.readAt = new Date();
+      });
+    });
   };
 
   socket.on("notification:new", handleNotificationNew);
@@ -80,7 +63,7 @@ export const handleOnCacheEntryCountAdded = async (
   const socket = await getSocket();
 
   const handleNotificationNew = () => {
-    updateCachedData((draft: { data: { count: number } }) => {
+    updateCachedData((draft: ERD<NotificationActions["getUnreadCount"]>) => {
       const audio = new Audio("/notif.mp3");
       audio.play().catch((error) => {
         console.error("Audio playback failed:", error);
@@ -90,7 +73,7 @@ export const handleOnCacheEntryCountAdded = async (
   };
 
   const handleNotificationRead = () => {
-    updateCachedData((draft: { data: { count: number } }) => {
+    updateCachedData((draft: ERD<NotificationActions["getUnreadCount"]>) => {
       if (draft.data.count > 0) {
         draft.data.count -= 1;
       }
@@ -98,7 +81,7 @@ export const handleOnCacheEntryCountAdded = async (
   };
 
   const handleAllNotificationsRead = () => {
-    updateCachedData((draft: { data: { count: number } }) => {
+    updateCachedData((draft: ERD<NotificationActions["getUnreadCount"]>) => {
       draft.data.count = 0;
     });
   };

@@ -1,56 +1,37 @@
 import { WorkspaceActions } from "@keyboom/contracts/client";
 import { baseApi } from "../api";
-import { RequestParams } from "../api.type";
 import { WORKSPACE_ENDPOINTS } from "./api-workspace.constant";
-import { handleWorkspaceCacheUpdate } from "./api-workspace.on-cache";
+import { ERD, QueryArgsNew } from "../api.type";
+import { transformResponse } from "../api.helper";
 
 export const workspaceEndpoints = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createWorkspace: builder.mutation<
-      WorkspaceActions["create"]["response"]["ok"],
-      RequestParams<
-        WorkspaceActions["create"]["payload"],
-        WorkspaceActions["create"]["payload"]
-      >
+      ERD<WorkspaceActions["create"]>,
+      QueryArgsNew<WorkspaceActions["create"]>
     >({
-      query: ({ payload }) => {
-        console.log("payload", payload);
-        return {
-          url: WORKSPACE_ENDPOINTS.create,
-          method: "POST",
-          body: payload,
-        };
-      },
+      query: ({ payload }) => ({
+        url: WORKSPACE_ENDPOINTS.create,
+        method: "POST",
+        body: payload,
+      }),
       invalidatesTags: ["Workspace"],
+      transformResponse,
     }),
     readManyWorkspaces: builder.query<
-      WorkspaceActions["readMany"]["response"]["ok"],
-      RequestParams<WorkspaceActions["readMany"]["payload"], void>
+      ERD<WorkspaceActions["readMany"]>,
+      QueryArgsNew<WorkspaceActions["readMany"]>
     >({
       query: () => ({
         url: WORKSPACE_ENDPOINTS.readMany,
         method: "GET",
       }),
       providesTags: ["Workspace"],
-      onCacheEntryAdded: async (
-        _arg,
-        { cacheDataLoaded, updateCachedData, cacheEntryRemoved },
-      ) => {
-        await cacheDataLoaded;
-
-        const cleanup = handleWorkspaceCacheUpdate(updateCachedData);
-
-        await cacheEntryRemoved;
-
-        cleanup();
-      },
+      transformResponse,
     }),
     updateCurrentWorkspace: builder.mutation<
-      WorkspaceActions["updateCurrent"]["response"]["ok"],
-      RequestParams<
-        WorkspaceActions["updateCurrent"]["payload"],
-        WorkspaceActions["updateCurrent"]["payload"]
-      >
+      ERD<WorkspaceActions["updateCurrent"]>,
+      QueryArgsNew<WorkspaceActions["updateCurrent"]>
     >({
       query: ({ payload }) => ({
         url: WORKSPACE_ENDPOINTS.updateCurrent,
@@ -58,13 +39,11 @@ export const workspaceEndpoints = baseApi.injectEndpoints({
         body: payload,
       }),
       invalidatesTags: ["Workspace"],
+      transformResponse,
     }),
     updateWorkspaceSetting: builder.mutation<
-      WorkspaceActions["updateSetting"]["response"]["ok"],
-      RequestParams<
-        WorkspaceActions["updateSetting"]["payload"],
-        WorkspaceActions["updateSetting"]["params"]
-      >
+      ERD<WorkspaceActions["updateSetting"]>,
+      QueryArgsNew<WorkspaceActions["updateSetting"]>
     >({
       query: ({ payload, params }) => ({
         url: WORKSPACE_ENDPOINTS.updateSettings(params),
@@ -72,16 +51,18 @@ export const workspaceEndpoints = baseApi.injectEndpoints({
         body: payload,
       }),
       invalidatesTags: ["Workspace"],
+      transformResponse,
     }),
 
     getWorkspaceMembers: builder.query<
-      WorkspaceActions["readManyMembers"]["response"]["ok"],
-      RequestParams<void, WorkspaceActions["readManyMembers"]["params"]>
+      ERD<WorkspaceActions["readManyMembers"]>,
+      QueryArgsNew<WorkspaceActions["readManyMembers"]>
     >({
       query: ({ params }) => ({
-        url: WORKSPACE_ENDPOINTS.readManyMembers(params?.workspaceId || ""),
+        url: WORKSPACE_ENDPOINTS.readManyMembers(params.workspaceId),
         method: "GET",
       }),
+      transformResponse,
     }),
   }),
   overrideExisting: false,

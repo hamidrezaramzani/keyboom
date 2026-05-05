@@ -29,7 +29,7 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   async getMe(@UserId() userId: string): Promise<UserGetMeResponseOkDTO> {
     const me = await this.usersService.getMe(userId);
-    return { data: me, message: 'User created', statusCode: 201 };
+    return { data: me, message: 'My user', statusCode: 200 };
   }
 
   @Public()

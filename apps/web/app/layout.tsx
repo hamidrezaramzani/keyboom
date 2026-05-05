@@ -19,14 +19,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl">
-      <Toaster
-        position="bottom-right"
-        closeButton
-        richColors={false}
-        expand={false}
-        duration={4000}
-      />
       <body className="min-h-full flex flex-col">
+        <Toaster
+          position="bottom-right"
+          closeButton
+          richColors={false}
+          expand={false}
+          duration={4000}
+        />
         <StoreProvider>
           <AuthInitializer />
           {children}

@@ -39,7 +39,7 @@ export const Tabs = ({ tabs, defaultTab }: TabsProps) => {
   const activeTabContent = tabs.find((tab) => tab.id === activeTab)?.content;
 
   return (
-    <div>
+    <div className="w-full">
       <div className="border-b border-gray-800">
         <div className="flex gap-1 overflow-x-auto">
           {tabs.map((tab) => {
@@ -68,7 +68,7 @@ export const Tabs = ({ tabs, defaultTab }: TabsProps) => {
         </div>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 md:w-3/4 w-full">
         {activeTabContent || (
           <div className="text-center text-gray-400 py-8">محتوایی یافت نشد</div>
         )}

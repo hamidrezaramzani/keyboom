@@ -14,7 +14,7 @@ interface WorkspaceMembersSettingTabProps {
 export const WorkspaceMembersSettingTab = ({
   workspaceId,
 }: WorkspaceMembersSettingTabProps) => {
-  const { data: membersData, refetch } = useGetWorkspaceMembersQuery({
+  const { data: members = [], refetch } = useGetWorkspaceMembersQuery({
     params: {
       workspaceId,
     },
@@ -25,20 +25,16 @@ export const WorkspaceMembersSettingTab = ({
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<"admin" | "member">("member");
 
-  const members = membersData?.data || [];
-
   const handleInvite = async () => {
     if (!inviteEmail) return;
 
     try {
       const invition = await createInvitation({
-        email: inviteEmail,
-        workspaceId,
-        role: inviteRole,
+        payload: { email: inviteEmail, workspaceId, role: inviteRole },
       }).unwrap();
 
-      if (invition?.data.error && Object.keys(invition?.data?.error).length) {
-        const code = invition?.data.error.code;
+      if (invition?.error && Object.keys(invition?.error).length) {
+        const code = invition?.error.code;
 
         switch (code) {
           case "ALREADY_INVITE":

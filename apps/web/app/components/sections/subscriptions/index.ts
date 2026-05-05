@@ -2,6 +2,7 @@ export { SubscriptionsHeader } from "./subscription-header/subscription-header.c
 export { Board } from "./board/board.component";
 export { BoardColumn } from "./board-column/board-column.component";
 export { SubscriptionCard } from "./subscription-card/subscription-card.component";
+export { SubscriptionModal } from "./subscription-modal/subscription-modal.component";
 export { AddGroupColumn } from "./add-group-column/add-group-column.component";
 export { AddSubscriptionModal } from "./add-subscription-modal/add-subscription-modal.component";
 export { GroupSettingsModal } from "./group-setting-modal/group-setting-modal.component";

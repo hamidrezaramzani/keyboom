@@ -4,7 +4,7 @@ import Link from "next/link";
 import { LogIn } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input, Button, AuthCard, Navbar, Footer } from "@/app/components";
+import { Input, Button, AuthCard } from "@/app/components";
 import { LoginFormData } from "./login.type";
 import { loginSchema } from "./login.schema";
 import { useLoginUserMutation } from "@/app/services";

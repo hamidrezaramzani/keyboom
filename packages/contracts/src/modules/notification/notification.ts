@@ -1,4 +1,3 @@
-// packages/contracts/src/server/notification.contract.ts
 import { z } from "zod";
 import { createZodDto } from "nestjs-zod";
 import type { Actions } from "../../types";

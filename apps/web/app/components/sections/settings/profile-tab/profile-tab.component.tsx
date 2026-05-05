@@ -87,7 +87,7 @@ export const ProfileTab = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <Card>
         <div className="flex items-center gap-4 mb-6">
           <Avatar name={mockUser.fullName} src={mockUser.avatar} size="lg" />

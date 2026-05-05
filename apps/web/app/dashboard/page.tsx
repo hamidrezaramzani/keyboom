@@ -9,8 +9,7 @@ import {
   ExpiringSoon,
   MonthlyChart,
 } from "@/app/components/sections/dashboard";
-import { AddSubscriptionModal } from "../components/sections/subscriptions/add-subscription-modal/add-subscription-modal.component";
-import { SubscriptionModal } from "../components/sections/subscriptions/subscription-modal/subscription-modal.component";
+import { AddSubscriptionModal, SubscriptionModal } from "../components";
 
 const mockStats = {
   totalSubscriptions: 12,

@@ -4,12 +4,12 @@ import type {
   FetchArgs,
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query";
+import { getBaseUrl } from "../lib/helpers";
 
 const rawBaseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
+  baseUrl: getBaseUrl(),
   credentials: "include",
 });
-
 export const baseQueryWithAuth: BaseQueryFn<
   string | FetchArgs,
   unknown,
@@ -24,6 +24,5 @@ export const baseQueryWithAuth: BaseQueryFn<
       window.location.href = "/login";
     }
   }
-
   return result;
 };

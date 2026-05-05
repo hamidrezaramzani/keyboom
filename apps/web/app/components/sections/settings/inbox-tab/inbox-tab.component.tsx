@@ -24,7 +24,10 @@ export const InboxTab = () => {
 
   const handleAccept = async (id: string) => {
     try {
-      await respondInvitation({ id, accept: true }).unwrap();
+      await respondInvitation({
+        params: { id },
+        payload: { accept: true },
+      }).unwrap();
     } catch (error) {
       console.error("Accept failed:", error);
     }
@@ -32,14 +35,17 @@ export const InboxTab = () => {
 
   const handleReject = async (id: string) => {
     try {
-      await respondInvitation({ id, accept: false }).unwrap();
+      await respondInvitation({
+        params: { id },
+        payload: { accept: false },
+      }).unwrap();
     } catch (error) {
       console.error("Reject failed:", error);
     }
   };
 
-  const pendingInvitations = data?.data.pending || [];
-  const historyInvitations = data?.data.history || [];
+  const pendingInvitations = data?.pending || [];
+  const historyInvitations = data?.history || [];
 
   if (!pendingInvitations.length && !historyInvitations.length) {
     return (
@@ -52,7 +58,7 @@ export const InboxTab = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       {pendingInvitations.length > 0 ? (
         <Card>
           <h3 className="text-white font-semibold mb-4">دعوت‌های جدید</h3>

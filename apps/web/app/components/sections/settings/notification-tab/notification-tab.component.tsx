@@ -64,7 +64,7 @@ export const NotificationsTab = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <Card>
         <h3 className="text-white font-semibold mb-4">دریافت نوتیفیکیشن</h3>
         <div className="space-y-4">

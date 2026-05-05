@@ -23,6 +23,7 @@ interface SidebarProps {
   activeWorkspace?: { id: string; name: string };
   user?: Me;
   onLogout?: () => void;
+  isMobile?: boolean; // اضافه شد
 }
 
 const navItems = [
@@ -37,31 +38,35 @@ export const Sidebar = ({
   onCloseMobile,
   user,
   onLogout,
+  isMobile = false,
 }: SidebarProps) => {
   const pathname = usePathname();
+  const { data: workspaceData } = useReadManyWorkspacesQuery({});
+  const currentWorkspace = workspaceData?.defaultWorkspace;
 
   const handleLinkClick = () => {
     if (onCloseMobile) onCloseMobile();
   };
 
-  const { data: workspaceData } = useReadManyWorkspacesQuery({});
-  const currentWorkspace = workspaceData?.data.defaultWorkspace;
+  const isCollapsed = isMobile ? false : collapsed;
+  const widthClass = isMobile ? "w-full" : isCollapsed ? "w-20" : "w-full";
 
   return (
     <aside
       className={cn(
-        "w-2/12 md:flex hidden h-screen bg-gray-900/90 backdrop-blur-md border-l border-gray-800 z-50 flex flex-col transition-all duration-300",
-        collapsed ? "w-20" : "w-2/12",
+        "h-screen bg-gray-900/90 backdrop-blur-md border-l border-gray-800 flex flex-col transition-all duration-300",
+        widthClass,
+        !isMobile && "hidden md:flex",
       )}
     >
       <div
         className={cn(
           "flex items-center border-b border-gray-800 py-4",
-          collapsed ? "justify-center px-2" : "justify-between px-4",
+          isCollapsed ? "justify-center px-2" : "justify-between px-4",
         )}
       >
-        {!collapsed && (
-          <div className="flex items-center gap-2">
+        {!isCollapsed && (
+          <div className={`flex items-center gap-2 ${isMobile ? "mr-11" : ""}`}>
             <div className="p-1.5 bg-indigo-500/10 rounded-lg">
               <Zap className="w-5 h-5 text-indigo-400" />
             </div>
@@ -71,25 +76,27 @@ export const Sidebar = ({
           </div>
         )}
 
-        {collapsed && (
+        {isCollapsed && (
           <div className="p-1.5 bg-indigo-500/10 rounded-lg">
             <Zap className="w-5 h-5 text-indigo-400" />
           </div>
         )}
 
-        <button
-          onClick={onToggleCollapse}
-          className="hidden md:block text-gray-400 hover:text-white transition-colors"
-        >
-          {collapsed ? (
-            <ChevronLeft className="w-5 h-5" />
-          ) : (
-            <ChevronRight className="w-5 h-5" />
-          )}
-        </button>
+        {!isMobile && (
+          <button
+            onClick={onToggleCollapse}
+            className="hidden md:block text-gray-400 hover:text-white transition-colors"
+          >
+            {isCollapsed ? (
+              <ChevronLeft className="w-5 h-5" />
+            ) : (
+              <ChevronRight className="w-5 h-5" />
+            )}
+          </button>
+        )}
       </div>
 
-      {!collapsed && currentWorkspace && (
+      {!isCollapsed && currentWorkspace && (
         <div className="mx-4 mt-4 p-2 bg-gray-800/50 rounded-lg border border-gray-700">
           <p className="text-xs text-gray-500">فضای کاری فعلی</p>
           <p className="text-sm text-white font-medium truncate">
@@ -98,7 +105,7 @@ export const Sidebar = ({
         </div>
       )}
 
-      {!collapsed && user && (
+      {!isCollapsed && user && (
         <div className="mx-4 mt-4 p-3 bg-gray-800/30 rounded-xl flex items-center gap-3">
           <Avatar name={user.fullName} size="sm" />
           <div className="flex-1 min-w-0">
@@ -124,12 +131,12 @@ export const Sidebar = ({
                 isActive
                   ? "bg-indigo-500/10 text-indigo-400"
                   : "text-gray-400 hover:bg-gray-800 hover:text-white",
-                collapsed && "justify-center",
+                isCollapsed && "justify-center",
               )}
-              title={collapsed ? item.name : undefined}
+              title={isCollapsed ? item.name : undefined}
             >
               <item.icon className="w-5 h-5 shrink-0" />
-              {!collapsed && <span className="text-sm">{item.name}</span>}
+              {!isCollapsed && <span className="text-sm">{item.name}</span>}
             </Link>
           );
         })}
@@ -137,16 +144,19 @@ export const Sidebar = ({
 
       <div className="p-3 border-t border-gray-800">
         <button
-          onClick={onLogout}
+          onClick={() => {
+            onLogout?.();
+            handleLinkClick();
+          }}
           className={cn(
             "flex items-center gap-3 px-3 py-2.5 rounded-xl w-full transition-all duration-200",
             "text-gray-400 hover:bg-red-500/10 hover:text-red-400",
-            collapsed && "justify-center",
+            isCollapsed && "justify-center",
           )}
-          title={collapsed ? "خروج" : undefined}
+          title={isCollapsed ? "خروج" : undefined}
         >
           <LogOut className="w-5 h-5 shrink-0" />
-          {!collapsed && <span className="text-sm">خروج</span>}
+          {!isCollapsed && <span className="text-sm">خروج</span>}
         </button>
       </div>
     </aside>
