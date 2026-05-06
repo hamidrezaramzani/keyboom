@@ -33,7 +33,6 @@ export class InvitationService {
     inviterId: string,
     workspaceId: string,
     inviteeEmail: string,
-    role: 'admin' | 'member',
   ) {
     const user = await this.userRepo.findByEmail(inviteeEmail);
     if (!user) {
@@ -48,16 +47,6 @@ export class InvitationService {
     const workspace = await this.workspaceRepo.findWorkspaceById(workspaceId);
     if (!workspace) {
       throw new NotFoundException('Workspace not found');
-    }
-
-    const inviterRole = await this.workspaceRepo.getUserRoleInWorkspace(
-      inviterId,
-      workspaceId,
-    );
-    if (inviterRole !== 'owner' && inviterRole !== 'admin') {
-      throw new ForbiddenException(
-        'You do not have permission to invite members',
-      );
     }
 
     const isMember = await this.workspaceRepo.isUserMemberOfWorkspaceByEmail(
@@ -95,7 +84,6 @@ export class InvitationService {
       workspaceId,
       inviterId,
       inviteeEmail,
-      role,
       status: 'pending',
       expiresAt,
       id: this.generateId(),
@@ -110,7 +98,7 @@ export class InvitationService {
         type: 'invitation',
         title: 'دعوت به فضای کاری',
         message: `${workspace.name}: شما توسط ${inviterUser?.fullName} به این فضای کاری دعوت شده‌اید`,
-        metadata: JSON.stringify({ invitationId: invitation.id, role }),
+        metadata: JSON.stringify({ invitationId: invitation.id }),
         id: this.generateId(),
       });
 
@@ -128,17 +116,7 @@ export class InvitationService {
     return invitation;
   }
 
-  async getWorkspaceInvitations(userId: string, workspaceId: string) {
-    const userRole = await this.workspaceRepo.getUserRoleInWorkspace(
-      userId,
-      workspaceId,
-    );
-    if (userRole !== 'owner' && userRole !== 'admin') {
-      throw new ForbiddenException(
-        'You do not have permission to view invitations',
-      );
-    }
-
+  async getWorkspaceInvitations(workspaceId: string) {
     return this.invitationRepo.findByWorkspaceId(workspaceId);
   }
 
@@ -178,7 +156,6 @@ export class InvitationService {
       await this.workspaceRepo.addMemberToWorkspace(
         userId,
         invitation.workspaceId,
-        invitation.role as 'admin' | 'member',
       );
 
       await this.invitationRepo.updateStatus(invitationId, 'accepted');

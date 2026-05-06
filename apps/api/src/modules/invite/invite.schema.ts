@@ -10,7 +10,6 @@ export const invitations = pgTable(
     workspaceId: varchar('workspace_id', { length: 36 }).notNull(),
     inviterId: varchar('inviter_id', { length: 36 }).notNull(),
     inviteeEmail: varchar('invitee_email', { length: 255 }).notNull(),
-    role: varchar('role', { length: 20 }).notNull().default('member'), // admin, member
     status: varchar('status', { length: 20 }).notNull().default('pending'), // pending, accepted, rejected, expired
     invitedAt: timestamp('invited_at').defaultNow().notNull(),
     respondedAt: timestamp('responded_at'),

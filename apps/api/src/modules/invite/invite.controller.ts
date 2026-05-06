@@ -32,21 +32,14 @@ export class InvitationController {
       userId,
       body.workspaceId,
       body.email,
-      body.role,
     );
     return { data: invitation, message: 'Invitation sent', statusCode: 200 };
   }
 
   @Get('workspace/:workspaceId')
-  async getWorkspaceInvitations(
-    @Req() req: Request,
-    @Param('workspaceId') workspaceId: string,
-  ) {
-    const userId = req.userId!;
-    const invitations = await this.invitationService.getWorkspaceInvitations(
-      userId,
-      workspaceId,
-    );
+  async getWorkspaceInvitations(@Param('workspaceId') workspaceId: string) {
+    const invitations =
+      await this.invitationService.getWorkspaceInvitations(workspaceId);
     return { data: invitations, message: 'Invitations list', statusCode: 200 };
   }
 

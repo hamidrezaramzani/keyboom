@@ -1,4 +1,3 @@
-// packages/contracts/src/server/invitation.contract.ts
 import { z } from "zod";
 import { createZodDto } from "nestjs-zod";
 import type { Actions } from "../../types";
@@ -11,7 +10,6 @@ const invitation = z.object({
   inviterId: z.string(),
   inviterName: z.string().optional(),
   inviteeEmail: z.string(),
-  role: z.enum(["admin", "member"]),
   status: z.enum(["pending", "accepted", "rejected", "expired"]),
   invitedAt: z.date(),
   respondedAt: z.date().nullable(),
@@ -21,14 +19,12 @@ const invitation = z.object({
 const createInvitationPayload = z.object({
   workspaceId: z.string().min(1, "Workspace ID is required"),
   email: z.string().email("Invalid email format"),
-  role: z.enum(["admin", "member"]),
 });
 
 const createInvitationResponse = z.object({
   id: z.string(),
   workspaceId: z.string(),
   inviteeEmail: z.string(),
-  role: z.enum(["admin", "member"]),
   status: z.enum(["pending", "accepted", "rejected", "expired"]),
   invitedAt: z.date(),
   expiresAt: z.date(),
@@ -72,7 +68,6 @@ const invite = z.object({
   inviterName: z.string(),
   inviterEmail: z.string(),
   inviteeEmail: z.string(),
-  role: z.string(),
   status: z.string(),
   invitedAt: z.date(),
   respondedAt: z.date().nullable(),

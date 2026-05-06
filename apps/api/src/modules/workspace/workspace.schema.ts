@@ -185,10 +185,6 @@ export type NewGroup = typeof groups.$inferInsert;
 export type GroupMember = typeof groupMembers.$inferSelect;
 export type NewGroupMember = typeof groupMembers.$inferInsert;
 
-// ==================== Enums ====================
-
-export type WorkspaceRole = 'owner' | 'admin' | 'member' | 'viewer';
-
 // ==================== Migration Key ====================
 
 export const WorkspaceMigrationKey = 'workspaces';

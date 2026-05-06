@@ -4,7 +4,7 @@ import { Button, EmptyState, Input } from "@/app/components/ui";
 import { toast } from "@/app/lib";
 import { useCreateInvitationMutation } from "@/app/services/invite/api-invite.endpoint";
 import { useGetWorkspaceMembersQuery } from "@/app/services/workspace";
-import { UserIcon } from "lucide-react";
+import { Trash2, UserIcon } from "lucide-react";
 import { useState } from "react";
 
 interface WorkspaceMembersSettingTabProps {
@@ -23,14 +23,13 @@ export const WorkspaceMembersSettingTab = ({
   const [createInvitation, { isLoading: isInviting }] =
     useCreateInvitationMutation();
   const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState<"admin" | "member">("member");
 
   const handleInvite = async () => {
     if (!inviteEmail) return;
 
     try {
       const invition = await createInvitation({
-        payload: { email: inviteEmail, workspaceId, role: inviteRole },
+        payload: { email: inviteEmail, workspaceId },
       }).unwrap();
 
       if (invition?.error && Object.keys(invition?.error).length) {
@@ -70,10 +69,6 @@ export const WorkspaceMembersSettingTab = ({
     console.log("Remove member", memberId);
   };
 
-  const handleChangeRole = (memberId: string, newRole: "admin" | "member") => {
-    console.log("Change role", memberId, newRole);
-  };
-
   return (
     <div className="space-y-4">
       <div className="bg-gray-800/30 rounded-xl p-4">
@@ -86,16 +81,6 @@ export const WorkspaceMembersSettingTab = ({
             className="flex-1"
             containerClassName="flex-1"
           />
-          <select
-            value={inviteRole}
-            onChange={(e) =>
-              setInviteRole(e.target.value as "admin" | "member")
-            }
-            className="px-3 py-2.5 bg-gray-800/50 border border-gray-700 rounded-xl text-white text-sm"
-          >
-            <option value="admin">مدیر</option>
-            <option value="member">عضو</option>
-          </select>
           <Button onClick={handleInvite} loading={isInviting}>
             دعوت
           </Button>
@@ -119,29 +104,16 @@ export const WorkspaceMembersSettingTab = ({
               <div className="flex items-center gap-2">
                 {member.role !== "owner" && (
                   <>
-                    <select
-                      value={member.role}
-                      onChange={(e) =>
-                        handleChangeRole(
-                          member.id,
-                          e.target.value as "admin" | "member",
-                        )
-                      }
-                      className="px-2 py-1 bg-gray-800 border border-gray-700 rounded-lg text-xs text-white"
-                    >
-                      <option value="admin">مدیر</option>
-                      <option value="member">عضو</option>
-                    </select>
                     <button
                       onClick={() => handleRemoveMember(member.id)}
                       className="p-1 text-gray-500 hover:text-red-400 transition-colors"
                     >
-                      حذف
+                      <Trash2 size="17" />
                     </button>
                   </>
                 )}
                 {member.role === "owner" && (
-                  <span className="text-xs text-amber-400">مالک</span>
+                  <span className=" text-amber-400 text-sm">مالک</span>
                 )}
               </div>
             </div>

@@ -51,7 +51,6 @@ export class WorkspaceRepository {
       id: crypto.randomUUID(),
       workspaceId: workspace.id,
       userId: userId,
-      role: 'owner',
       isActive: true,
     };
 
@@ -119,7 +118,6 @@ export class WorkspaceRepository {
       id: crypto.randomUUID(),
       workspaceId: workspace.id,
       userId: userId,
-      role: 'owner',
       isActive: true,
     };
 
@@ -201,24 +199,6 @@ export class WorkspaceRepository {
     return result[0]?.defaultWorkspaceId || null;
   }
 
-  async getUserRoleInWorkspace(
-    userId: string,
-    workspaceId: string,
-  ): Promise<string | null> {
-    const result = await this.db
-      .select({ role: workspaceMembers.role })
-      .from(workspaceMembers)
-      .where(
-        and(
-          eq(workspaceMembers.userId, userId),
-          eq(workspaceMembers.workspaceId, workspaceId),
-          eq(workspaceMembers.isActive, true),
-        ),
-      )
-      .limit(1);
-    return result[0]?.role || null;
-  }
-
   async isUserMemberOfWorkspaceByEmail(
     email: string,
     workspaceId: string,
@@ -241,13 +221,11 @@ export class WorkspaceRepository {
   async addMemberToWorkspace(
     userId: string,
     workspaceId: string,
-    role: 'admin' | 'member',
   ): Promise<void> {
     await this.db.insert(workspaceMembers).values({
       id: crypto.randomUUID(),
       workspaceId,
       userId,
-      role,
       isActive: true,
       invitedAt: new Date(),
       joinedAt: new Date(),

@@ -73,9 +73,6 @@ export const InboxTab = () => {
                     <p className="text-white font-medium">
                       {inv.workspaceName}
                     </p>
-                    <span className="text-xs bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded-full">
-                      {roleLabels[inv.role as "admin" | "member"]}
-                    </span>
                   </div>
                   <p className="text-gray-400 text-sm mt-1">
                     دعوت کننده: {inv.inviterName} ({inv.inviterEmail})
@@ -126,9 +123,6 @@ export const InboxTab = () => {
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="text-white text-sm">{inv.workspaceName}</p>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-300">
-                      {roleLabels[inv.role as "admin" | "member"]}
-                    </span>
                     <span
                       className={`text-xs px-2 py-0.5 rounded-full ${
                         inv.status === "accepted"
