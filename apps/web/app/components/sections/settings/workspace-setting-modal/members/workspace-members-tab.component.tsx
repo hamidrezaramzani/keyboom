@@ -3,33 +3,64 @@
 import { Button, EmptyState, Input } from "@/app/components/ui";
 import { toast } from "@/app/lib";
 import { useCreateInvitationMutation } from "@/app/services/invite/api-invite.endpoint";
-import { useGetWorkspaceMembersQuery } from "@/app/services/workspace";
+import {
+  useGetWorkspaceMembersQuery,
+  Workspace,
+} from "@/app/services/workspace";
+import { skipToken } from "@reduxjs/toolkit/query";
 import { Trash2, UserIcon } from "lucide-react";
 import { useState } from "react";
 
 interface WorkspaceMembersSettingTabProps {
-  workspaceId: string;
+  workspace: Workspace | null;
 }
 
 export const WorkspaceMembersSettingTab = ({
-  workspaceId,
+  workspace,
 }: WorkspaceMembersSettingTabProps) => {
-  const { data: members = [], refetch } = useGetWorkspaceMembersQuery({
-    params: {
-      workspaceId,
-    },
-  });
+  const { data: members = [], refetch } = useGetWorkspaceMembersQuery(
+    workspace && workspace.id
+      ? {
+          params: {
+            workspaceId: workspace?.id,
+          },
+        }
+      : skipToken,
+  );
 
   const [createInvitation, { isLoading: isInviting }] =
     useCreateInvitationMutation();
   const [inviteEmail, setInviteEmail] = useState("");
 
+  const handleInviteUser = () => {
+    const inviteLink = `${window.location.origin}/register`;
+    const message = `🎉 به کی‌بوم خوش آمدید!
+
+شما به فضای کاری «${workspace?.name}» دعوت کرده است.
+
+برای پیوستن به این فضای کاری و مدیریت اشتراک‌های تیم، روی لینک زیر کلیک کنید:
+
+${inviteLink}
+
+کی‌بوم: مدیریت هوشمند اشتراک‌های تیم‌ها و سازمان‌ها
+
+---
+`;
+
+    navigator.clipboard.writeText(message);
+    toast.success(
+      "متن دعوت کپی شد",
+      "می‌توانید آن را برای کاربر مورد نظر ارسال کنید",
+    );
+  };
+
   const handleInvite = async () => {
     if (!inviteEmail) return;
+    if (!workspace) return;
 
     try {
       const invition = await createInvitation({
-        payload: { email: inviteEmail, workspaceId },
+        payload: { email: inviteEmail, workspaceId: workspace?.id },
       }).unwrap();
 
       if (invition?.error && Object.keys(invition?.error).length) {
@@ -43,7 +74,12 @@ export const WorkspaceMembersSettingTab = ({
             toast.error("این کاربر از قبل در این فضای کاری حضور دارد");
             break;
           case "USER_NOT_FOUND":
-            toast.error("همچین کاربری وجود ندارد");
+            toast.error("همچین کاربری وجود ندارد", {
+              action: {
+                label: "دعوت از کاربر",
+                onClick: handleInviteUser,
+              },
+            });
             break;
           default:
             toast.error("خطای نامشخص - لطفا به پشتیبان مراجعه کنید");

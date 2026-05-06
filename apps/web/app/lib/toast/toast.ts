@@ -1,5 +1,5 @@
 "use client";
-import { toast as toastLib } from "sonner";
+import { Action, toast as toastLib } from "sonner";
 
 export const toast = {
   success: (message: string, description?: string) => {
@@ -17,9 +17,13 @@ export const toast = {
     });
   },
 
-  error: (message: string, description?: string) => {
+  error: (
+    message: string,
+    options?: { description?: string; action?: Action },
+  ) => {
     toastLib.error(message, {
-      description,
+      description: options?.description,
+      action: options?.action,
       className:
         "!bg-red-500/10 !backdrop-blur-xl !border !border-red-500/20 !shadow-xl !rounded-2xl",
       style: {

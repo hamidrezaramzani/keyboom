@@ -131,7 +131,7 @@ export const WorkspaceSettingsModal = ({
         )}
 
         {activeTab === "members" && (
-          <WorkspaceMembersSettingTab workspaceId={workspace.id} />
+          <WorkspaceMembersSettingTab workspace={workspace} />
         )}
 
         {activeTab === "danger" && (
