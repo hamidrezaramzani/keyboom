@@ -251,4 +251,18 @@ export class WorkspaceRepository {
       );
     return members;
   }
+
+  async removeUserFromWorkspace(
+    userId: string,
+    workspaceId: string,
+  ): Promise<void> {
+    await this.db
+      .delete(workspaceMembers)
+      .where(
+        and(
+          eq(workspaceMembers.userId, userId),
+          eq(workspaceMembers.workspaceId, workspaceId),
+        ),
+      );
+  }
 }

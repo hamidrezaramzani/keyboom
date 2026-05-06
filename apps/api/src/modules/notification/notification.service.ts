@@ -12,7 +12,6 @@ export class NotificationService {
 
   async create(data: NewNotification): Promise<Notification> {
     const notification = await this.notificationRepo.create(data);
-
     this.websocketGateway.emitToUser(data.userId, 'notification:new', {
       notification,
     });

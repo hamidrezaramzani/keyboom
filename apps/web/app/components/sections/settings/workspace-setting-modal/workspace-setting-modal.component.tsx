@@ -72,7 +72,13 @@ export const WorkspaceSettingsModal = ({
 
   const handleDeleteWorkspace = async () => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Delete workspace:", workspace?.id);
+    console.info("Delete workspace:", workspace?.id);
+    onClose();
+  };
+
+  const handleArchiveWorkspace = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.info("Archive workspace:", workspace?.id);
     onClose();
   };
 
@@ -146,6 +152,19 @@ export const WorkspaceSettingsModal = ({
               </p>
               <Button variant="danger" onClick={handleDeleteWorkspace}>
                 حذف فضای کاری
+              </Button>
+            </div>
+
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
+              <h4 className="text-amber-400 text-sm font-medium mb-2">
+                آرشیو فضای کاری
+              </h4>
+              <p className="text-gray-400 text-sm mb-4">
+                با آرشیو این فضای کاری، از لیست فعال شما مخفی می‌شود اما داده‌ها
+                حفظ می‌شوند. در صورت نیاز می‌توانید بعداً آن را بازیابی کنید.
+              </p>
+              <Button variant="outline" onClick={handleArchiveWorkspace}>
+                آرشیو فضای کاری
               </Button>
             </div>
           </div>

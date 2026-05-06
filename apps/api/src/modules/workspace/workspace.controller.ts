@@ -8,10 +8,13 @@ import {
   Patch,
   Put,
   Param,
+  Delete,
 } from '@nestjs/common';
 import {
   WorkspaceCreatePayloadDto,
   WorkspaceCreateResponseOkDto,
+  WorkspaceLeaveParamsDto,
+  WorkspaceLeaveResponseOkDto,
   WorkspaceReadManyResponseOkDto,
   WorkspaceUpdateCurrentPayloadDto,
   WorkspaceUpdateCurrentResponseOkDto,
@@ -98,5 +101,20 @@ export class WorkspaceController {
       workspaceId,
     );
     return { data: members, message: 'Workspace members', statusCode: 200 };
+  }
+
+  // DELETE
+  @Delete(':workspaceId/leave')
+  @HttpCode(HttpStatus.OK)
+  async leaveWorkspace(
+    @UserId() userId: string,
+    @Param() params: WorkspaceLeaveParamsDto,
+  ): Promise<WorkspaceLeaveResponseOkDto> {
+    await this.workspaceService.leaveWorkspace(userId, params.workspaceId);
+    return {
+      data: { success: true },
+      message: 'Left workspace successfully',
+      statusCode: 200,
+    };
   }
 }

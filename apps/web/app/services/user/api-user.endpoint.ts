@@ -44,7 +44,7 @@ export const userEndpoints = baseApi.injectEndpoints({
       transformResponse,
     }),
   }),
-  overrideExisting: false,
+  overrideExisting: true,
 });
 
 export const {

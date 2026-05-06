@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/app/lib/utils";
-import { Calendar, Bell, AlertTriangle, CreditCard, Users } from "lucide-react";
+import { Calendar, Bell, AlertTriangle, CreditCard, Users, LogOut } from "lucide-react";
 
 export type NotificationType =
   | "expiring"
@@ -52,6 +52,11 @@ const typeConfig = {
   },
   reminder: {
     icon: Calendar,
+    color: "text-indigo-400",
+    bg: "bg-indigo-500/10",
+  },
+  workspace_leave: {
+    icon: LogOut,
     color: "text-indigo-400",
     bg: "bg-indigo-500/10",
   },

@@ -11,16 +11,10 @@ import {
   useGetNotificationsQuery,
   useMarkAsReadMutation,
 } from "@/app/services/notification";
-import { ERD } from "@/app/services/api.type";
-import { NotificationActions } from "@keyboom/contracts/client";
 
 export const NotificationList = () => {
-  const { data: notificationsData = [], refetch } = useGetNotificationsQuery();
+  const { data: notifications = [], refetch } = useGetNotificationsQuery();
   const [markAsRead] = useMarkAsReadMutation();
-
-  const notifications = (
-    notificationsData as ERD<NotificationActions["getMany"]>
-  )?.data;
 
   const handleRead = async (id: string) => {
     await markAsRead({ id });

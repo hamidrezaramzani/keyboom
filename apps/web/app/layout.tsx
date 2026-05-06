@@ -3,6 +3,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import StoreProvider from "./lib/store/store/store.provider";
 import { AuthInitializer } from "./components";
+import { ConfirmProvider } from "./lib/store/context";
 
 export const metadata: Metadata = {
   title: "Keyboom",
@@ -28,8 +29,10 @@ export default function RootLayout({
           duration={4000}
         />
         <StoreProvider>
-          <AuthInitializer />
-          {children}
+          <ConfirmProvider>
+            <AuthInitializer />
+            {children}
+          </ConfirmProvider>
         </StoreProvider>
       </body>
     </html>

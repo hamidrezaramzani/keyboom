@@ -14,33 +14,29 @@ export const handleInviteCacheEntryAdded = async (
   const handleInviteCreated = (data: {
     invite: ERD<InvitationActions["readMany"]>["pending"][number];
   }) => {
-    updateCachedData((draft: { data: ERD<InvitationActions["readMany"]> }) => {
-      draft.data.pending.unshift(data.invite);
+    updateCachedData((draft: ERD<InvitationActions["readMany"]>) => {
+      draft.pending.unshift(data.invite);
     });
   };
 
   const handleInviteAccepted = (data: { inviteId: string; userId: string }) => {
-    updateCachedData((draft: { data: ERD<InvitationActions["readMany"]> }) => {
-      const invite = draft.data.pending.find((i) => i.id === data.inviteId);
+    updateCachedData((draft: ERD<InvitationActions["readMany"]>) => {
+      const invite = draft.pending.find((i) => i.id === data.inviteId);
       if (invite) {
         invite.status = "accepted";
-        draft.data.pending = draft.data.pending.filter(
-          (i) => i.id !== data.inviteId,
-        );
-        draft.data.history.unshift(invite);
+        draft.pending = draft.pending.filter((i) => i.id !== data.inviteId);
+        draft.history.unshift(invite);
       }
     });
   };
 
   const handleInviteRejected = (data: { inviteId: string }) => {
-    updateCachedData((draft: { data: ERD<InvitationActions["readMany"]> }) => {
-      const invite = draft.data.pending.find((i) => i.id === data.inviteId);
+    updateCachedData((draft: ERD<InvitationActions["readMany"]>) => {
+      const invite = draft.pending.find((i) => i.id === data.inviteId);
       if (invite) {
         invite.status = "rejected";
-        draft.data.pending = draft.data.pending.filter(
-          (i) => i.id !== data.inviteId,
-        );
-        draft.data.history.unshift(invite);
+        draft.pending = draft.pending.filter((i) => i.id !== data.inviteId);
+        draft.history.unshift(invite);
       }
     });
   };

@@ -21,8 +21,8 @@ export const NotificationPopover = () => {
   const [markAsRead] = useMarkAsReadMutation();
   const [markAllAsRead] = useMarkAllAsReadMutation();
 
-  const notifications = recentData?.data || [];
-  const unreadCount = unreadCountData?.data?.count || 0;
+  const notifications = recentData || [];
+  const unreadCount = unreadCountData?.count || 0;
 
   const handleRead = async (id: string) => {
     await markAsRead({ id });

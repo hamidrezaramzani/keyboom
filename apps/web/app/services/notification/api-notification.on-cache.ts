@@ -14,7 +14,7 @@ export const handleOnCacheEntryAdded = async (
   const socket = await getSocket();
 
   const handleNotificationNew = (data: { notification: Notification }) => {
-    updateCachedData((draft: ERD<NotificationActions["getMany"]>) => {
+    updateCachedData((draft: { data: ERD<NotificationActions["getMany"]>}) => {
       draft.data.unshift(data.notification);
       if (draft.data.length > 20) {
         draft.data.pop();
@@ -24,7 +24,7 @@ export const handleOnCacheEntryAdded = async (
 
   const handleNotificationRead = (data: { notificationId: string }) => {
     updateCachedData((draft: ERD<NotificationActions["getMany"]>) => {
-      const notification = draft.data.find(
+      const notification = draft.find(
         (n: { id: string }) => n.id === data.notificationId,
       );
       if (notification) {
@@ -36,7 +36,7 @@ export const handleOnCacheEntryAdded = async (
 
   const handleAllNotificationsRead = () => {
     updateCachedData((draft: ERD<NotificationActions["getMany"]>) => {
-      draft.data.forEach((notification) => {
+      draft.forEach((notification) => {
         notification.isRead = true;
         notification.readAt = new Date();
       });
@@ -68,22 +68,24 @@ export const handleOnCacheEntryCountAdded = async (
       audio.play().catch((error) => {
         console.error("Audio playback failed:", error);
       });
-      draft.data.count += 1;
+      draft.count += 1;
     });
   };
 
   const handleNotificationRead = () => {
     updateCachedData((draft: ERD<NotificationActions["getUnreadCount"]>) => {
-      if (draft.data.count > 0) {
-        draft.data.count -= 1;
+      if (draft.count > 0) {
+        draft.count -= 1;
       }
     });
   };
 
   const handleAllNotificationsRead = () => {
-    updateCachedData((draft: ERD<NotificationActions["getUnreadCount"]>) => {
-      draft.data.count = 0;
-    });
+    updateCachedData(
+      (draft: { data: ERD<NotificationActions["getUnreadCount"]> }) => {
+        draft.data.count = 0;
+      },
+    );
   };
 
   socket.on("notification:new", handleNotificationNew);

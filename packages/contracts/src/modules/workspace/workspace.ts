@@ -81,6 +81,14 @@ const workspaceActions = {
       ok: cdtoSuccess(updateCurrentWorkspaceResponse),
     },
   },
+  leave: {
+    params: z.object({
+      workspaceId: z.string(),
+    }),
+    response: {
+      ok: cdtoSuccess(z.object({ success: z.boolean() })),
+    },
+  },
 } as const;
 
 export type WorkspaceActions = Actions<typeof workspaceActions>;
@@ -123,4 +131,12 @@ export class WorkspaceReadManyMembersParamsDto extends createZodDto(
 
 export class WorkspaceReadManyMembersResponseOkDto extends createZodDto(
   workspaceActions.readManyMembers.response.ok,
+) {}
+
+export class WorkspaceLeaveParamsDto extends createZodDto(
+  workspaceActions.leave.params,
+) {}
+
+export class WorkspaceLeaveResponseOkDto extends createZodDto(
+  workspaceActions.leave.response.ok,
 ) {}

@@ -16,31 +16,19 @@ const notification = z.object({
   readAt: z.date().nullable(),
 });
 
-const getNotificationsResponse = z.object({
-  data: z.array(notification),
-  success: z.boolean(),
-});
+const getNotificationsResponse = z.array(notification);
 
-const getRecentNotificationsResponse = z.object({
-  data: z.array(notification),
-  success: z.boolean(),
-});
+const getRecentNotificationsResponse = z.array(notification);
 
 const getUnreadCountResponse = z.object({
-  data: z.object({
-    count: z.number(),
-  }),
-  success: z.boolean(),
+  count: z.number(),
 });
 
 const markAsReadParams = z.object({
   id: z.string(),
 });
 
-const markAsReadResponse = z.object({
-  data: notification,
-  success: z.boolean(),
-});
+const markAsReadResponse = notification;
 
 const markAllAsReadResponse = z.object({
   success: z.boolean(),

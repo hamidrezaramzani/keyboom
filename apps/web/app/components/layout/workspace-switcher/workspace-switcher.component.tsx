@@ -1,15 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, Plus, Check, Settings, Building } from "lucide-react";
+import {
+  ChevronDown,
+  Plus,
+  Check,
+  Settings,
+  Building,
+  LogOut,
+} from "lucide-react";
 import { Popover } from "@/app/components/ui/popover/popover.component";
 import { WorkspaceSettingsModal } from "@/app/components/sections/settings";
 import {
+  useLeaveWorkspaceMutation,
   useReadManyWorkspacesQuery,
   useUpdateCurrentWorkspaceMutation,
   Workspace,
 } from "@/app/services/workspace";
 import { toast } from "@/app/lib";
+import { useConfirm } from "@/app/lib/store/context";
 
 interface WorkspaceSwitcherProps {
   onAddWorkspace: () => void;
@@ -19,7 +28,7 @@ export const WorkspaceSwitcher = ({
   onAddWorkspace,
 }: WorkspaceSwitcherProps) => {
   const [updateCurrentWorkspace] = useUpdateCurrentWorkspaceMutation();
-
+  const [leaveWorkspace] = useLeaveWorkspaceMutation();
   const { data: workspacesData } = useReadManyWorkspacesQuery({});
   const workspaces = workspacesData?.list;
   const currentWorkspace = workspacesData?.defaultWorkspace;
@@ -28,6 +37,8 @@ export const WorkspaceSwitcher = ({
   const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(
     null,
   );
+
+  const { confirm } = useConfirm();
 
   const handleSettingsClick = (workspace: Workspace, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -57,6 +68,35 @@ export const WorkspaceSwitcher = ({
     </button>
   );
 
+  const handleWorkspaceLeave = async (
+    workspace: Workspace,
+    e: React.MouseEvent,
+  ) => {
+    try {
+      e.stopPropagation();
+      const confirmed = await confirm({
+        title: "خروج فضای کاری",
+        description: `آیا از خروج از این فضای کاری مطمئن هستید؟ این عمل غیرقابل بازگشت است.`,
+        confirmText: "خروج",
+        variant: "danger",
+      });
+
+      if (!confirmed) {
+        return;
+      }
+      await leaveWorkspace({
+        params: {
+          workspaceId: workspace.id,
+        },
+      });
+
+      toast.success(`خروج از فضای کاربری ${workspace.name} با موفقیت انجام شد`);
+    } catch (error) {
+      console.error(error);
+      toast.error("خط در خروج از فضای از کاربری");
+    }
+  };
+
   const content = (
     <div className="w-64">
       <div className="p-2">
@@ -64,25 +104,32 @@ export const WorkspaceSwitcher = ({
         {workspaces?.map((workspace) => (
           <div
             key={workspace.id}
-            className="flex items-center justify-between group"
+            className="flex items-center justify-between hover:bg-gray-700 rounded-lg "
           >
             <button
               onClick={() =>
                 handleWorkspaceChange(workspace.id, workspace.name)
               }
-              className="flex-1 flex items-center justify-between px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded-lg transition-colors"
+              className="flex-1 flex items-center justify-between px-3 py-2 text-sm text-gray-300 transition-colors"
             >
               <span className="truncate">{workspace.name}</span>
               {workspace.isCurrent && (
                 <Check className="w-4 h-4 text-indigo-400 shrink-0" />
               )}
             </button>
-            {workspace.isOwner && (
+            {workspace.isOwner ? (
               <button
                 onClick={(e) => handleSettingsClick(workspace, e)}
-                className="opacity-0 group-hover:opacity-100 p-2 text-gray-500 hover:text-gray-300 transition-all"
+                className="p-2 text-gray-500 hover:text-gray-300 transition-all"
               >
                 <Settings className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                onClick={(e) => handleWorkspaceLeave(workspace, e)}
+                className="p-2 text-gray-500 hover:text-red-300 transition-all"
+              >
+                <LogOut className="w-4 h-4 rotate-180" />
               </button>
             )}
           </div>

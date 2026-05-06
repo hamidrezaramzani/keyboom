@@ -64,8 +64,19 @@ export const workspaceEndpoints = baseApi.injectEndpoints({
       }),
       transformResponse,
     }),
+
+    leaveWorkspace: builder.mutation<
+      ERD<WorkspaceActions["leave"]>,
+      QueryArgsNew<WorkspaceActions["leave"]>
+    >({
+      query: ({ params }) => ({
+        url: WORKSPACE_ENDPOINTS.leave(params.workspaceId),
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Workspace", "User"],
+    }),
   }),
-  overrideExisting: false,
+  overrideExisting: true,
 });
 
 export const {
@@ -74,4 +85,5 @@ export const {
   useGetWorkspaceMembersQuery,
   useUpdateCurrentWorkspaceMutation,
   useUpdateWorkspaceSettingMutation,
+  useLeaveWorkspaceMutation,
 } = workspaceEndpoints;

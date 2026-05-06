@@ -16,7 +16,7 @@ export default function NotificationsPage() {
   const { data: unreadCountData } = useGetUnreadCountQuery();
   const [markAllAsRead] = useMarkAllAsReadMutation();
 
-  const unreadCount = unreadCountData?.data?.count || 0;
+  const unreadCount = unreadCountData?.count || 0;
 
   const [refreshKey, setRefreshKey] = useState(0);
 

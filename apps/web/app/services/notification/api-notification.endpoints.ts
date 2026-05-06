@@ -66,7 +66,7 @@ export const notificationEndpoints = baseApi.injectEndpoints({
       transformResponse
     }),
   }),
-  overrideExisting: false,
+  overrideExisting: true,
 });
 
 export const {

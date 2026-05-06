@@ -7,4 +7,5 @@ export const WORKSPACE_ENDPOINTS = {
   updateCurrent: "workspaces/current",
   updateSettings: (params?: WorkspaceActions["updateSetting"]["params"]) =>
     `workspaces/update-settings/${params?.workspaceId}`,
+  leave: (workspaceId: string) => `/workspaces/${workspaceId}/leave`,
 };

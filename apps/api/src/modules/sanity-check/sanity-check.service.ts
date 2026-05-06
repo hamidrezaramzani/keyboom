@@ -1,4 +1,9 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { DRIZZLE } from 'src/core/db/drizzle.provider';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { WorkspaceRepository } from '../workspace/workspace.repository';
@@ -41,5 +46,16 @@ export class SanityCheckService {
         'Workspace not found or you are not a member',
       );
     }
+  }
+
+  async checkWorkspaceOwnerCanNotLeave(userId: string, workspaceId: string) {
+    const workspace =
+      await this.workspaceRepository.findWorkspaceById(workspaceId);
+    if (workspace?.ownerId === userId) {
+      throw new BadRequestException(
+        'Owner cannot leave workspace. Delete it instead.',
+      );
+    }
+    return workspace;
   }
 }

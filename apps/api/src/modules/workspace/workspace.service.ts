@@ -5,6 +5,8 @@ import { WorkspaceRepository } from './workspace.repository';
 import { UsersRepository } from '../user/user.repository';
 import { SanityCheckService } from '../sanity-check/sanity-check.service';
 import { WorkspaceUpdateSettingPayloadDto } from '@keyboom/contracts/server';
+import { customAlphabet } from 'nanoid';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class WorkspaceService {
@@ -13,7 +15,14 @@ export class WorkspaceService {
     private readonly workspaceRepository: WorkspaceRepository,
     private readonly userRepository: UsersRepository,
     private readonly sanityCheckService: SanityCheckService,
+    private readonly notificationService: NotificationService,
   ) {}
+
+  private generateId(): string {
+    const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 21);
+    return nanoid();
+  }
+
   async readMany(userId: string) {
     const workspaces =
       await this.workspaceRepository.findWorkspacesByUserId(userId);
@@ -139,5 +148,46 @@ export class WorkspaceService {
       await this.workspaceRepository.getWorkspaceMembers(workspaceId);
 
     return members;
+  }
+
+  async leaveWorkspace(userId: string, workspaceId: string) {
+    const user = await this.sanityCheckService.checkUserIsExists(userId);
+
+    const workspace =
+      await this.sanityCheckService.checkWorkspaceIsExists(workspaceId);
+
+    await this.sanityCheckService.checkWorkspaceOwnerCanNotLeave(
+      userId,
+      workspaceId,
+    );
+
+    await this.sanityCheckService.checkUserIsWorkspaceMember(
+      userId,
+      workspaceId,
+    );
+
+    await this.workspaceRepository.removeUserFromWorkspace(userId, workspaceId);
+
+    await this.notificationService.create({
+      userId: workspace.ownerId,
+      workspaceId: workspaceId,
+      type: 'workspace_leave',
+      title: `خروج از فضای کاربری`,
+      message: `کاربر ${user.fullName} از فضای کاربری ${workspace.name} خارج شد`,
+      metadata: JSON.stringify({ userId }),
+      id: this.generateId(),
+    });
+
+    const defaultWorkspaceId =
+      await this.workspaceRepository.getUserDefaultWorkspaceId(userId);
+    if (defaultWorkspaceId && defaultWorkspaceId === workspaceId) {
+      const otherWorkspaces =
+        await this.workspaceRepository.findWorkspacesByUserId(userId);
+      const newDefaultWorkspaceId = otherWorkspaces[0]?.id;
+      await this.workspaceRepository.updateUserDefaultWorkspace(
+        userId,
+        newDefaultWorkspaceId,
+      );
+    }
   }
 }
