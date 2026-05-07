@@ -176,6 +176,8 @@ export class WorkspaceService {
       workspaceId,
     );
 
+    await this.workspaceRepository.checkWorkspaceIsAllowToInactive(userId);
+
     await this.workspaceRepository.removeUserFromWorkspace(userId, workspaceId);
 
     await this.notificationService.create({
@@ -204,6 +206,8 @@ export class WorkspaceService {
   async deleteWorkspace(userId: string, workspaceId: string) {
     await this.sanityCheckService.checkWorkspaceIsExists(workspaceId);
 
+    await this.workspaceRepository.checkWorkspaceIsAllowToInactive(userId);
+
     await this.workspaceRepository.deleteWorkspace(workspaceId);
 
     const remainingWorkspaces =
@@ -222,6 +226,8 @@ export class WorkspaceService {
     if (workspace.ownerId !== userId) {
       throw new ForbiddenException('Only owner can archive workspace');
     }
+
+    await this.workspaceRepository.checkWorkspaceIsAllowToInactive(userId);
 
     await this.workspaceRepository.archiveWorkspace(workspaceId);
 

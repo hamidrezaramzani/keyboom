@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { DRIZZLE } from 'src/core/db/drizzle.provider';
 import {
@@ -294,5 +294,30 @@ export class WorkspaceRepository {
       )
       .limit(1);
     return result[0];
+  }
+
+  async findActiveWorkspacesByUserId(userId: string): Promise<Workspace[]> {
+    const workspaceMembersList = await this.db
+      .select()
+      .from(workspaceMembers)
+      .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
+      .where(
+        and(
+          eq(workspaceMembers.userId, userId),
+          eq(workspaceMembers.isActive, true),
+          eq(workspaces.isArchived, false),
+        ),
+      );
+    return workspaceMembersList.map((item) => item.workspaces);
+  }
+
+  async checkWorkspaceIsAllowToInactive(userId: string) {
+    const activeWorkspaces = await this.findActiveWorkspacesByUserId(userId);
+
+    if (activeWorkspaces.length === 1) {
+      throw new BadRequestException(
+        'Cannot leave from the last workspace. You must have at least one active workspace.',
+      );
+    }
   }
 }
