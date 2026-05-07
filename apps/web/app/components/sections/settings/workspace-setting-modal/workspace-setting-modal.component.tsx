@@ -7,11 +7,13 @@ import { z } from "zod";
 import { Modal, Input, Button } from "@/app/components";
 import { cn } from "@/app/lib/utils";
 import {
+  useDeleteWorkspaceMutation,
   useUpdateWorkspaceSettingMutation,
   Workspace,
 } from "@/app/services/workspace";
 import { toast } from "@/app/lib";
 import { WorkspaceMembersSettingTab } from "./members/workspace-members-tab.component";
+import { useConfirm } from "@/app/lib/store/context";
 
 const workspaceSettingsSchema = z.object({
   name: z.string().min(1, "نام فضای کاری الزامی است"),
@@ -23,6 +25,7 @@ interface WorkspaceSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   workspace: Workspace | null;
+  isLastWorkspace: boolean;
 }
 
 type TabType = "general" | "members" | "danger";
@@ -31,8 +34,12 @@ export const WorkspaceSettingsModal = ({
   isOpen,
   onClose,
   workspace,
+  isLastWorkspace,
 }: WorkspaceSettingsModalProps) => {
+  const [deleteWorkspace] = useDeleteWorkspaceMutation();
   const [updateWorkspaceSetting] = useUpdateWorkspaceSettingMutation();
+
+  const { confirm } = useConfirm();
 
   const [activeTab, setActiveTab] = useState<TabType>("general");
 
@@ -71,9 +78,27 @@ export const WorkspaceSettingsModal = ({
   };
 
   const handleDeleteWorkspace = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.info("Delete workspace:", workspace?.id);
-    onClose();
+    if (isLastWorkspace) {
+      toast.error("شما باید حداقل یک فضای کاری فعال داشته باشید");
+      return;
+    }
+    if (!workspace) return;
+
+    const confirmed = await confirm({
+      title: "حذف فضای کاری",
+      description: `آیا از حذف فضای کاری "${workspace?.name}" مطمئن هستید؟ این عمل غیرقابل بازگشت است و تمام گروه‌ها، اشتراک‌ها و داده‌های مرتبط برای همیشه حذف می‌شوند.`,
+      confirmText: "حذف",
+      variant: "danger",
+    });
+
+    if (confirmed) {
+      await deleteWorkspace({
+        params: { workspaceId: workspace?.id },
+      }).unwrap();
+
+      toast.success("فضای کاری با موفقیت حذف شد");
+      onClose();
+    }
   };
 
   const handleArchiveWorkspace = async () => {

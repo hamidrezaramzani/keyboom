@@ -265,4 +265,8 @@ export class WorkspaceRepository {
         ),
       );
   }
+
+  async deleteWorkspace(workspaceId: string): Promise<void> {
+    await this.db.delete(workspaces).where(eq(workspaces.id, workspaceId));
+  }
 }

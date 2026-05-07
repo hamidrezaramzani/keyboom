@@ -8,6 +8,8 @@ import {
   Settings,
   Building,
   LogOut,
+  CheckCircle,
+  Circle,
 } from "lucide-react";
 import { Popover } from "@/app/components/ui/popover/popover.component";
 import { WorkspaceSettingsModal } from "@/app/components/sections/settings";
@@ -100,40 +102,53 @@ export const WorkspaceSwitcher = ({
   const content = (
     <div className="w-64">
       <div className="p-2">
-        <div className="text-xs text-gray-500 px-3 py-2">فضاهای کاری شما</div>
-        {workspaces?.map((workspace) => (
-          <div
-            key={workspace.id}
-            className="flex items-center justify-between hover:bg-gray-700 rounded-lg "
-          >
-            <button
-              onClick={() =>
-                handleWorkspaceChange(workspace.id, workspace.name)
-              }
-              className="flex-1 flex items-center justify-between px-3 py-2 text-sm text-gray-300 transition-colors"
+        <div className="flex justify-between  px-3 py-2">
+          <span className="text-gray-500 text-xs">فضاهای کاری شما</span>
+          <Circle
+            size="13"
+            className="text-xs cursor-pointer"
+            color="#6b7280"
+          />
+        </div>
+        {workspaces?.length ? (
+          workspaces?.map((workspace) => (
+            <div
+              key={workspace.id}
+              className="flex items-center justify-between hover:bg-gray-700 rounded-lg "
             >
-              <span className="truncate">{workspace.name}</span>
-              {workspace.isCurrent && (
-                <Check className="w-4 h-4 text-indigo-400 shrink-0" />
+              <button
+                onClick={() =>
+                  handleWorkspaceChange(workspace.id, workspace.name)
+                }
+                className="flex-1 flex items-center justify-between px-3 py-2 text-sm text-gray-300 transition-colors"
+              >
+                <span className="truncate">{workspace.name}</span>
+                {workspace.isCurrent && (
+                  <Check className="w-4 h-4 text-indigo-400 shrink-0" />
+                )}
+              </button>
+              {workspace.isOwner ? (
+                <button
+                  onClick={(e) => handleSettingsClick(workspace, e)}
+                  className="p-2 text-gray-500 hover:text-gray-300 transition-all"
+                >
+                  <Settings className="w-4 h-4" />
+                </button>
+              ) : (
+                <button
+                  onClick={(e) => handleWorkspaceLeave(workspace, e)}
+                  className="p-2 text-gray-500 hover:text-red-300 transition-all"
+                >
+                  <LogOut className="w-4 h-4 rotate-180" />
+                </button>
               )}
-            </button>
-            {workspace.isOwner ? (
-              <button
-                onClick={(e) => handleSettingsClick(workspace, e)}
-                className="p-2 text-gray-500 hover:text-gray-300 transition-all"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
-            ) : (
-              <button
-                onClick={(e) => handleWorkspaceLeave(workspace, e)}
-                className="p-2 text-gray-500 hover:text-red-300 transition-all"
-              >
-                <LogOut className="w-4 h-4 rotate-180" />
-              </button>
-            )}
+            </div>
+          ))
+        ) : (
+          <div className="w-full h-32 flex justify-center items-center text-gray-500">
+            چیزی یافت نشد
           </div>
-        ))}
+        )}
         <div className="border-t border-gray-700 my-1" />
         <button
           onClick={() => {
@@ -147,6 +162,9 @@ export const WorkspaceSwitcher = ({
       </div>
     </div>
   );
+
+  const workspacesLength = workspaces ? workspaces.length : 0;
+  const isLastWorkspace = workspacesLength <= 1;
 
   return (
     <>
@@ -162,6 +180,7 @@ export const WorkspaceSwitcher = ({
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         workspace={selectedWorkspace}
+        isLastWorkspace={isLastWorkspace}
       />
     </>
   );

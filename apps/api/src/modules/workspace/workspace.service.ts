@@ -190,4 +190,18 @@ export class WorkspaceService {
       );
     }
   }
+
+  async deleteWorkspace(userId: string, workspaceId: string) {
+    await this.sanityCheckService.checkWorkspaceIsExists(workspaceId);
+
+    await this.workspaceRepository.deleteWorkspace(workspaceId);
+
+    const remainingWorkspaces =
+      await this.workspaceRepository.findWorkspacesByUserId(userId);
+    const newDefaultWorkspaceId = remainingWorkspaces[0]?.id;
+    await this.workspaceRepository.updateUserDefaultWorkspace(
+      userId,
+      newDefaultWorkspaceId,
+    );
+  }
 }

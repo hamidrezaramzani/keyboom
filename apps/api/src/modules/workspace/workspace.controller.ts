@@ -13,6 +13,8 @@ import {
 import {
   WorkspaceCreatePayloadDto,
   WorkspaceCreateResponseOkDto,
+  WorkspaceDeleteParamsDto,
+  WorkspaceDeleteResponseOkDto,
   WorkspaceLeaveParamsDto,
   WorkspaceLeaveResponseOkDto,
   WorkspaceReadManyResponseOkDto,
@@ -103,7 +105,6 @@ export class WorkspaceController {
     return { data: members, message: 'Workspace members', statusCode: 200 };
   }
 
-  // DELETE
   @Delete(':workspaceId/leave')
   @HttpCode(HttpStatus.OK)
   async leaveWorkspace(
@@ -114,6 +115,20 @@ export class WorkspaceController {
     return {
       data: { success: true },
       message: 'Left workspace successfully',
+      statusCode: 200,
+    };
+  }
+
+  @Delete(':workspaceId')
+  @HttpCode(HttpStatus.OK)
+  async deleteWorkspace(
+    @UserId() userId: string,
+    @Param() params: WorkspaceDeleteParamsDto,
+  ): Promise<WorkspaceDeleteResponseOkDto> {
+    await this.workspaceService.deleteWorkspace(userId, params.workspaceId);
+    return {
+      data: { success: true },
+      message: 'Workspace deleted successfully',
       statusCode: 200,
     };
   }

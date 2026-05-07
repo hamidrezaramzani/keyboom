@@ -89,6 +89,14 @@ const workspaceActions = {
       ok: cdtoSuccess(z.object({ success: z.boolean() })),
     },
   },
+  delete: {
+    params: z.object({
+      workspaceId: z.string(),
+    }),
+    response: {
+      ok: cdtoSuccess(z.object({ success: z.boolean() })),
+    },
+  },
 } as const;
 
 export type WorkspaceActions = Actions<typeof workspaceActions>;
@@ -139,4 +147,12 @@ export class WorkspaceLeaveParamsDto extends createZodDto(
 
 export class WorkspaceLeaveResponseOkDto extends createZodDto(
   workspaceActions.leave.response.ok,
+) {}
+
+export class WorkspaceDeleteParamsDto extends createZodDto(
+  workspaceActions.delete.params,
+) {}
+
+export class WorkspaceDeleteResponseOkDto extends createZodDto(
+  workspaceActions.delete.response.ok,
 ) {}
