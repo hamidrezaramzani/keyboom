@@ -11,4 +11,6 @@ export const WORKSPACE_ENDPOINTS = {
   leave: (workspaceId: string) => `/workspaces/${workspaceId}/leave`,
   archive: (workspaceId: string) => `/workspaces/${workspaceId}/archive`,
   restore: (workspaceId: string) => `/workspaces/${workspaceId}/restore`,
+  removeUserFromWorkspace: (workspaceId: string, userId: string) =>
+    `/workspaces/${workspaceId}/users/${userId}`,
 };

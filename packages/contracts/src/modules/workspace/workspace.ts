@@ -114,6 +114,15 @@ const workspaceActions = {
       ok: cdtoSuccess(z.object({ success: z.boolean() })),
     },
   },
+  removeUserFromWorkspace: {
+    params: z.object({
+      workspaceId: z.string(),
+      userId: z.string(),
+    }),
+    response: {
+      ok: cdtoSuccess(z.object({ success: z.boolean() })),
+    },
+  },
 } as const;
 
 export type WorkspaceActions = Actions<typeof workspaceActions>;
@@ -188,4 +197,12 @@ export class WorkspaceRestoreParamsDto extends createZodDto(
 
 export class WorkspaceRestoreResponseOkDto extends createZodDto(
   workspaceActions.restore.response.ok,
+) {}
+
+export class WorkspaceRemoveUserParamsDto extends createZodDto(
+  workspaceActions.removeUserFromWorkspace.params,
+) {}
+
+export class WorkspaceRemoveUserResponseOkDto extends createZodDto(
+  workspaceActions.removeUserFromWorkspace.response.ok,
 ) {}

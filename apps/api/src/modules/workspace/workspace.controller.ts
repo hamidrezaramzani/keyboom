@@ -20,6 +20,8 @@ import {
   WorkspaceLeaveParamsDto,
   WorkspaceLeaveResponseOkDto,
   WorkspaceReadManyResponseOkDto,
+  WorkspaceRemoveUserParamsDto,
+  WorkspaceRemoveUserResponseOkDto,
   WorkspaceRestoreParamsDto,
   WorkspaceRestoreResponseOkDto,
   WorkspaceUpdateCurrentPayloadDto,
@@ -119,6 +121,24 @@ export class WorkspaceController {
     return {
       data: { success: true },
       message: 'Left workspace successfully',
+      statusCode: 200,
+    };
+  }
+
+  @Delete(':workspaceId/users/:userId')
+  @HttpCode(HttpStatus.OK)
+  async removeUserFromWorkspace(
+    @UserId() currentUserId: string,
+    @Param() params: WorkspaceRemoveUserParamsDto,
+  ): Promise<WorkspaceRemoveUserResponseOkDto> {
+    await this.workspaceService.removeUserFromWorkspace(
+      currentUserId,
+      params.workspaceId,
+      params.userId,
+    );
+    return {
+      data: { success: true },
+      message: 'User removed from workspace successfully',
       statusCode: 200,
     };
   }

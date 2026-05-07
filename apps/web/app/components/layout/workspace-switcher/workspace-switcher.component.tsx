@@ -180,7 +180,7 @@ export const WorkspaceSwitcher = ({
           <EmptyState icon={Building2} title="چیزی یافت نشد" />
         )}
 
-        {archiveWorkspace?.length && (
+        {archiveWorkspace?.length ? (
           <>
             <div className="border-t border-gray-700 my-2" />
             <div className="text-xs text-gray-500 px-3 py-2">
@@ -209,7 +209,7 @@ export const WorkspaceSwitcher = ({
               </div>
             ))}
           </>
-        )}
+        ) : null}
         <div className="border-t border-gray-700 my-1" />
         <button
           onClick={() => {

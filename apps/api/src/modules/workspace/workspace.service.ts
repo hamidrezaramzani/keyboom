@@ -3,6 +3,7 @@ import {
   Inject,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { DRIZZLE } from 'src/core/db/drizzle.provider';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
@@ -251,5 +252,50 @@ export class WorkspaceService {
     }
 
     await this.workspaceRepository.restoreWorkspace(workspaceId);
+  }
+
+  async removeUserFromWorkspace(
+    currentUserId: string,
+    workspaceId: string,
+    targetUserId: string,
+  ) {
+    const workspace =
+      await this.workspaceRepository.findWorkspaceById(workspaceId);
+    if (!workspace) {
+      throw new NotFoundException('Workspace not found');
+    }
+
+    if (workspace.ownerId !== currentUserId) {
+      throw new ForbiddenException('Only workspace owner can remove users');
+    }
+
+    if (workspace.ownerId === targetUserId) {
+      throw new BadRequestException('Cannot remove workspace owner');
+    }
+
+    const isMember = await this.workspaceRepository.isUserMemberOfWorkspace(
+      targetUserId,
+      workspaceId,
+    );
+    if (!isMember) {
+      throw new NotFoundException('User is not a member of this workspace');
+    }
+
+    await this.workspaceRepository.removeUserFromWorkspace(
+      targetUserId,
+      workspaceId,
+    );
+
+    const userDefaultWorkspace =
+      await this.workspaceRepository.getUserDefaultWorkspaceId(targetUserId);
+    if (userDefaultWorkspace === workspaceId) {
+      const otherWorkspaces =
+        await this.workspaceRepository.findWorkspacesByUserId(targetUserId);
+      const newDefaultWorkspaceId = otherWorkspaces[0]?.id;
+      await this.workspaceRepository.updateUserDefaultWorkspace(
+        targetUserId,
+        newDefaultWorkspaceId,
+      );
+    }
   }
 }

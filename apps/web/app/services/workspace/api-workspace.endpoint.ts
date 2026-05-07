@@ -75,7 +75,19 @@ export const workspaceEndpoints = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Workspace", "User"],
     }),
-
+    removeUserFromWorkspace: builder.mutation<
+      ERD<WorkspaceActions["removeUserFromWorkspace"]>,
+      QueryArgsNew<WorkspaceActions["removeUserFromWorkspace"]>
+    >({
+      query: ({ params }) => ({
+        url: WORKSPACE_ENDPOINTS.removeUserFromWorkspace(
+          params.workspaceId,
+          params.userId,
+        ),
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Workspace", "User"],
+    }),
     deleteWorkspace: builder.mutation<
       ERD<WorkspaceActions["delete"]>,
       QueryArgsNew<WorkspaceActions["delete"]>
@@ -120,4 +132,5 @@ export const {
   useRestoreWorkspaceMutation,
   useDeleteWorkspaceMutation,
   useLeaveWorkspaceMutation,
+  useRemoveUserFromWorkspaceMutation,
 } = workspaceEndpoints;

@@ -2,9 +2,11 @@
 
 import { Button, EmptyState, Input } from "@/app/components/ui";
 import { toast } from "@/app/lib";
+import { useConfirm } from "@/app/lib/store/context";
 import { useCreateInvitationMutation } from "@/app/services/invite/api-invite.endpoint";
 import {
   useGetWorkspaceMembersQuery,
+  useRemoveUserFromWorkspaceMutation,
   Workspace,
 } from "@/app/services/workspace";
 import { skipToken } from "@reduxjs/toolkit/query";
@@ -18,6 +20,9 @@ interface WorkspaceMembersSettingTabProps {
 export const WorkspaceMembersSettingTab = ({
   workspace,
 }: WorkspaceMembersSettingTabProps) => {
+  const [removeUserFromWorkspace] = useRemoveUserFromWorkspaceMutation();
+  const { confirm } = useConfirm();
+
   const { data: members = [], refetch } = useGetWorkspaceMembersQuery(
     workspace && workspace.id
       ? {
@@ -101,8 +106,30 @@ ${inviteLink}
     }
   };
 
-  const handleRemoveMember = (memberId: string) => {
-    console.log("Remove member", memberId);
+  const handleMemberRemove = async (memberId: string, memberName: string) => {
+    if (!workspace) return;
+
+    const confirmed = await confirm({
+      title: "حذف کاربر از فضای کاری",
+      description: `آیا از حذف "${memberName}" از این فضای کاری مطمئن هستید؟ این کاربر به تمام گروه‌ها و اشتراک‌های مرتبط دسترسی نخواهد داشت.`,
+      confirmText: "حذف",
+      variant: "danger",
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await removeUserFromWorkspace({
+        params: {
+          workspaceId: workspace.id,
+          userId: memberId,
+        },
+      }).unwrap();
+      toast.success(`${memberName} از فضای کاری حذف شد`);
+    } catch (error) {
+      toast.error("خطا در حذف کاربر");
+      console.error("Remove member error:", error);
+    }
   };
 
   return (
@@ -141,7 +168,7 @@ ${inviteLink}
                 {member.role !== "owner" && (
                   <>
                     <button
-                      onClick={() => handleRemoveMember(member.id)}
+                      onClick={() => handleMemberRemove(member.id, member.name)}
                       className="p-1 text-gray-500 hover:text-red-400 transition-colors"
                     >
                       <Trash2 size="17" />
