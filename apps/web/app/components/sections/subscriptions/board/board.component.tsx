@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   DndContext,
   closestCenter,
@@ -18,48 +17,41 @@ import {
 } from "@dnd-kit/sortable";
 import { BoardColumn } from "../board-column/board-column.component";
 import { AddGroupColumn } from "../add-group-column/add-group-column.component";
-
-interface Subscription {
-  id: string;
-  name: string;
-  price: number;
-  status: "active" | "expiring" | "expired";
-  endDate: string;
-}
-
-interface Group {
-  id: string;
-  name: string;
-  supervisorId?: string;
-  subscriptions: Subscription[];
-}
+import { Group, Subscription } from "@/app/services/group";
 
 interface BoardProps {
   groups: Group[];
   onGroupsReorder: (groups: Group[]) => void;
   onAddGroup: () => void;
-  onGroupSettings: (groupId: string) => void;
+  onGroupSettings: (groupId: string, groupName: string) => void;
   onSubscriptionClick: (subscriptionId: string) => void;
-  onSubscriptionMove?: (subscriptionId: string, fromGroupId: string, toGroupId: string) => void;
-  onSubscriptionReorder: (groupId: string, newSubscriptions: Subscription[]) => void;
+  onSubscriptionMove?: (
+    subscriptionId: string,
+    fromGroupId: string,
+    toGroupId: string,
+  ) => void;
+  onSubscriptionReorder: (
+    groupId: string,
+    newSubscriptions: Subscription[],
+  ) => void;
+  onAddSubscription: (groupId: string) => void;
 }
 
 export const Board = ({
-  groups: initialGroups,
+  groups,
   onGroupsReorder,
   onAddGroup,
   onGroupSettings,
   onSubscriptionClick,
   onSubscriptionMove,
   onSubscriptionReorder,
+  onAddSubscription,
 }: BoardProps) => {
-  const [groups, setGroups] = useState(initialGroups);
-
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -70,8 +62,12 @@ export const Board = ({
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    const activeGroup = groups.find((g) => g.subscriptions.some((s) => s.id === activeId));
-    const overGroup = groups.find((g) => g.subscriptions.some((s) => s.id === overId));
+    const activeGroup = groups.find((g) =>
+      g.subscriptions.some((s) => s.id === activeId),
+    );
+    const overGroup = groups.find((g) =>
+      g.subscriptions.some((s) => s.id === overId),
+    );
     const activeIsGroup = groups.some((g) => g.id === activeId);
     const overIsGroup = groups.some((g) => g.id === overId);
 
@@ -79,17 +75,24 @@ export const Board = ({
       const oldIndex = groups.findIndex((g) => g.id === activeId);
       const newIndex = groups.findIndex((g) => g.id === overId);
       const newGroups = arrayMove(groups, oldIndex, newIndex);
-      setGroups(newGroups);
       onGroupsReorder(newGroups);
       return;
     }
 
     if (!activeIsGroup && !overIsGroup && activeGroup && overGroup) {
-      const activeSubIndex = activeGroup.subscriptions.findIndex((s) => s.id === activeId);
-      const overSubIndex = overGroup.subscriptions.findIndex((s) => s.id === overId);
+      const activeSubIndex = activeGroup.subscriptions.findIndex(
+        (s) => s.id === activeId,
+      );
+      const overSubIndex = overGroup.subscriptions.findIndex(
+        (s) => s.id === overId,
+      );
 
       if (activeGroup.id === overGroup.id) {
-        const newSubscriptions = arrayMove(activeGroup.subscriptions, activeSubIndex, overSubIndex);
+        const newSubscriptions = arrayMove(
+          activeGroup.subscriptions,
+          activeSubIndex,
+          overSubIndex,
+        );
         onSubscriptionReorder(activeGroup.id, newSubscriptions);
       } else if (onSubscriptionMove) {
         onSubscriptionMove(activeId, activeGroup.id, overGroup.id);
@@ -113,9 +116,9 @@ export const Board = ({
             <BoardColumn
               key={group.id}
               group={group}
-              onSettings={() => onGroupSettings(group.id)}
+              onSettings={() => onGroupSettings(group.id, group.name)}
               onSubscriptionClick={onSubscriptionClick}
-              onAddSubscriptionClick={() => {}}
+              onAddSubscriptionClick={onAddSubscription}
             />
           ))}
         </SortableContext>

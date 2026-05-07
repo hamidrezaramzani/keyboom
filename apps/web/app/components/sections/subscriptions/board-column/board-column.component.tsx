@@ -1,28 +1,16 @@
-// app/components/sections/subscriptions/board-column/board-column.component.tsx
 "use client";
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { GripVertical, Settings } from "lucide-react";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { GripVertical, Settings, Wallet } from "lucide-react";
 import { SubscriptionCard } from "../subscription-card/subscription-card.component";
-import { Button } from "@/app/components";
+import { Button, EmptyState } from "@/app/components";
 import { cn } from "@/app/lib/utils";
-
-interface Subscription {
-  id: string;
-  name: string;
-  price: number;
-  status: "active" | "expiring" | "expired";
-  endDate: string;
-}
-
-interface Group {
-  id: string;
-  name: string;
-  supervisorId?: string;
-  subscriptions: Subscription[];
-}
+import { Group } from "@/app/services/group";
 
 interface BoardColumnProps {
   group: Group;
@@ -35,7 +23,7 @@ export const BoardColumn = ({
   group,
   onSettings,
   onSubscriptionClick,
-  onAddSubscriptionClick
+  onAddSubscriptionClick,
 }: BoardColumnProps) => {
   const {
     attributes,
@@ -117,7 +105,9 @@ export const BoardColumn = ({
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                <span className="text-xs text-emerald-400 font-medium">فعال</span>
+                <span className="text-xs text-emerald-400 font-medium">
+                  فعال
+                </span>
               </div>
               <div className="space-y-2">
                 {activeSubscriptions.map((sub) => (
@@ -133,8 +123,8 @@ export const BoardColumn = ({
         </SortableContext>
 
         {group.subscriptions.length === 0 && (
-          <div className="text-center py-8 text-gray-500 text-sm">
-            هیچ اشتراکی در این گروه نیست
+          <div className="w-full h-full flex justify-center items-center">
+            <EmptyState icon={Wallet} title="هیچ اشتراکی در این گروه نیست" />
           </div>
         )}
       </div>

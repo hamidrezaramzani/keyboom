@@ -8,6 +8,8 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { InvitationModule } from './modules/invite/invite.module';
 import { WebSocketModule } from './modules/websocket/websocket.module';
+import { CategoriesModule } from './modules/category/category.module';
+import { GroupModule } from './modules/group/group.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { WebSocketModule } from './modules/websocket/websocket.module';
     NotificationModule,
     InvitationModule,
     WebSocketModule,
+    CategoriesModule,
+    GroupModule,
   ],
   providers: [
     {

@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Modal, Input, Button, Select } from "@/app/components";
+import { useReadManyCategoriesQuery } from "@/app/services/category";
 
 const addSubscriptionSchema = z.object({
   name: z.string().min(1, "نام اشتراک الزامی است"),
@@ -18,20 +19,6 @@ const addSubscriptionSchema = z.object({
 });
 
 type AddSubscriptionForm = z.infer<typeof addSubscriptionSchema>;
-
-const categories = [
-  { value: "entertainment", label: "🎬 سرگرمی" },
-  { value: "work", label: "💼 کاری" },
-  { value: "cloud", label: "☁️ ذخیره‌سازی ابری" },
-  { value: "development", label: "🛠️ ابزار توسعه" },
-  { value: "education", label: "📚 آموزشی" },
-  { value: "security", label: "🔒 امنیت" },
-  { value: "health", label: "🏥 سلامت" },
-  { value: "productivity", label: "🧠 بهره‌وری" },
-  { value: "communication", label: "📧 ارتباطات" },
-  { value: "shopping", label: "🛍️ خرید" },
-  { value: "other", label: "📁 سایر" },
-];
 
 const groups = [
   { value: "", label: "بدون گروه" },
@@ -49,6 +36,8 @@ export const AddSubscriptionModal = ({
   isOpen,
   onClose,
 }: AddSubscriptionModalProps) => {
+  const { data: categories } = useReadManyCategoriesQuery({});
+
   const {
     register,
     handleSubmit,
@@ -74,6 +63,12 @@ export const AddSubscriptionModal = ({
     onClose();
   };
 
+  const categoriesOptions =
+    categories?.map((c) => ({
+      value: c.id,
+      label: c.name,
+    })) || [];
+
   return (
     <Modal
       isOpen={isOpen}
@@ -92,7 +87,7 @@ export const AddSubscriptionModal = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Select
             label="دسته‌بندی"
-            options={categories}
+            options={categoriesOptions}
             error={errors.category?.message}
             {...register("category")}
           />

@@ -6,14 +6,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Calendar } from "lucide-react";
 import { Badge } from "@/app/components";
 import { cn } from "@/app/lib/utils";
-
-interface Subscription {
-  id: string;
-  name: string;
-  price: number;
-  status: "active" | "expiring" | "expired";
-  endDate: string;
-}
+import { Subscription } from "@/app/services/group";
 
 interface SubscriptionCardProps {
   subscription: Subscription;
@@ -52,7 +45,8 @@ export const SubscriptionCard = ({
     transition,
   };
 
-  const status = statusConfig[subscription.status];
+  const status =
+    statusConfig[subscription.status as "active" | "expiring" | "expired"];
 
   return (
     <div
@@ -85,7 +79,7 @@ export const SubscriptionCard = ({
               {subscription.status === "expiring" && (
                 <span className="text-amber-400 text-xs flex items-center gap-1">
                   <Calendar className="w-3 h-3" />
-                  {formatDate(subscription.endDate)}
+                  {formatDate(subscription.endDate.toDateString())}
                 </span>
               )}
             </div>
