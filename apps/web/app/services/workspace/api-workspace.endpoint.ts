@@ -86,6 +86,26 @@ export const workspaceEndpoints = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Workspace", "User"],
     }),
+    archiveWorkspace: builder.mutation<
+      ERD<WorkspaceActions["archive"]>,
+      QueryArgsNew<WorkspaceActions["archive"]>
+    >({
+      query: ({ params }) => ({
+        url: WORKSPACE_ENDPOINTS.archive(params.workspaceId),
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Workspace", "User"],
+    }),
+    restoreWorkspace: builder.mutation<
+      ERD<WorkspaceActions["restore"]>,
+      QueryArgsNew<WorkspaceActions["restore"]>
+    >({
+      query: ({ params }) => ({
+        url: WORKSPACE_ENDPOINTS.restore(params.workspaceId),
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Workspace", "User"],
+    }),
   }),
   overrideExisting: true,
 });
@@ -96,6 +116,8 @@ export const {
   useGetWorkspaceMembersQuery,
   useUpdateCurrentWorkspaceMutation,
   useUpdateWorkspaceSettingMutation,
+  useArchiveWorkspaceMutation,
+  useRestoreWorkspaceMutation,
   useDeleteWorkspaceMutation,
   useLeaveWorkspaceMutation,
 } = workspaceEndpoints;

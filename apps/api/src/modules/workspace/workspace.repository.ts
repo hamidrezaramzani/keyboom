@@ -86,7 +86,6 @@ export class WorkspaceRepository {
         and(
           eq(workspaceMembers.userId, userId),
           eq(workspaceMembers.isActive, true),
-          eq(workspaces.isArchived, false),
         ),
       );
 
@@ -268,5 +267,32 @@ export class WorkspaceRepository {
 
   async deleteWorkspace(workspaceId: string): Promise<void> {
     await this.db.delete(workspaces).where(eq(workspaces.id, workspaceId));
+  }
+
+  async archiveWorkspace(workspaceId: string): Promise<void> {
+    await this.db
+      .update(workspaces)
+      .set({ isArchived: true, archivedAt: new Date() })
+      .where(eq(workspaces.id, workspaceId));
+  }
+
+  async restoreWorkspace(workspaceId: string): Promise<void> {
+    await this.db
+      .update(workspaces)
+      .set({ isArchived: false, archivedAt: null })
+      .where(eq(workspaces.id, workspaceId));
+  }
+
+  async findArchivedWorkspaceById(
+    workspaceId: string,
+  ): Promise<Workspace | undefined> {
+    const result = await this.db
+      .select()
+      .from(workspaces)
+      .where(
+        and(eq(workspaces.id, workspaceId), eq(workspaces.isArchived, true)),
+      )
+      .limit(1);
+    return result[0];
   }
 }

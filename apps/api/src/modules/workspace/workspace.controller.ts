@@ -11,6 +11,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import {
+  WorkspaceArchiveParamsDto,
+  WorkspaceArchiveResponseOkDto,
   WorkspaceCreatePayloadDto,
   WorkspaceCreateResponseOkDto,
   WorkspaceDeleteParamsDto,
@@ -18,6 +20,8 @@ import {
   WorkspaceLeaveParamsDto,
   WorkspaceLeaveResponseOkDto,
   WorkspaceReadManyResponseOkDto,
+  WorkspaceRestoreParamsDto,
+  WorkspaceRestoreResponseOkDto,
   WorkspaceUpdateCurrentPayloadDto,
   WorkspaceUpdateCurrentResponseOkDto,
   WorkspaceUpdateSettingParamsDto,
@@ -129,6 +133,34 @@ export class WorkspaceController {
     return {
       data: { success: true },
       message: 'Workspace deleted successfully',
+      statusCode: 200,
+    };
+  }
+
+  @Patch(':workspaceId/archive')
+  @HttpCode(HttpStatus.OK)
+  async archiveWorkspace(
+    @UserId() userId: string,
+    @Param() params: WorkspaceArchiveParamsDto,
+  ): Promise<WorkspaceArchiveResponseOkDto> {
+    await this.workspaceService.archiveWorkspace(userId, params.workspaceId);
+    return {
+      data: { success: true },
+      message: 'Workspace archived successfully',
+      statusCode: 200,
+    };
+  }
+
+  @Patch(':workspaceId/restore')
+  @HttpCode(HttpStatus.OK)
+  async restoreWorkspace(
+    @UserId() userId: string,
+    @Param() params: WorkspaceRestoreParamsDto,
+  ): Promise<WorkspaceRestoreResponseOkDto> {
+    await this.workspaceService.restoreWorkspace(userId, params.workspaceId);
+    return {
+      data: { success: true },
+      message: 'Workspace restored successfully',
       statusCode: 200,
     };
   }

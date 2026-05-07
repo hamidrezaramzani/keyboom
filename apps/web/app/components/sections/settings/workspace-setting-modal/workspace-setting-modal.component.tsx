@@ -7,6 +7,7 @@ import { z } from "zod";
 import { Modal, Input, Button } from "@/app/components";
 import { cn } from "@/app/lib/utils";
 import {
+  useArchiveWorkspaceMutation,
   useDeleteWorkspaceMutation,
   useUpdateWorkspaceSettingMutation,
   Workspace,
@@ -36,6 +37,7 @@ export const WorkspaceSettingsModal = ({
   workspace,
   isLastWorkspace,
 }: WorkspaceSettingsModalProps) => {
+  const [archiveWorkspace] = useArchiveWorkspaceMutation();
   const [deleteWorkspace] = useDeleteWorkspaceMutation();
   const [updateWorkspaceSetting] = useUpdateWorkspaceSettingMutation();
 
@@ -102,9 +104,31 @@ export const WorkspaceSettingsModal = ({
   };
 
   const handleArchiveWorkspace = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.info("Archive workspace:", workspace?.id);
-    onClose();
+    if (isLastWorkspace) {
+      toast.error("شما باید حداقل یک فضای کاری فعال داشته باشید");
+      return;
+    }
+    if (!workspace) return;
+
+    const confirmed = await confirm({
+      title: "آرشیو فضای کاری",
+      description: `آیا از آرشیو فضای کاری "${workspace?.name}" مطمئن هستید؟ فضای کاری از لیست فعال شما مخفی می‌شود اما بعداً قابل بازیابی است.`,
+      confirmText: "آرشیو",
+      variant: "warning",
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await archiveWorkspace({
+        params: { workspaceId: workspace?.id },
+      }).unwrap();
+      toast.success("فضای کاری با موفقیت آرشیو شد");
+      onClose();
+    } catch (error) {
+      toast.error("خطا در آرشیو فضای کاری");
+      console.error("Archive workspace error:", error);
+    }
   };
 
   const tabs: { id: TabType; label: string }[] = [

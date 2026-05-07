@@ -1,4 +1,9 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { DRIZZLE } from 'src/core/db/drizzle.provider';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { WorkspaceRepository } from './workspace.repository';
@@ -42,12 +47,14 @@ export class WorkspaceService {
         name: defaultWorkspace.name,
         isOwner: defaultWorkspace.ownerId === userId,
         isCurrent: defaultWorkspace.id === defaultWorkspace.id,
+        isArchive: defaultWorkspace.isArchived,
       },
       list: workspaces.map((ws) => ({
         id: ws.id,
         name: ws.name,
         isOwner: ws.ownerId === userId,
         isCurrent: ws.id === defaultWorkspace.id,
+        isArchive: ws.isArchived,
       })),
     };
   }
@@ -61,6 +68,7 @@ export class WorkspaceService {
     ownerId: string;
     isOwner: boolean;
     isCurrent: boolean;
+    isArchive: boolean;
     createdAt: Date;
   }> {
     const { workspace } = await this.workspaceRepository.createWorkspace(
@@ -79,6 +87,7 @@ export class WorkspaceService {
       ownerId: workspace.ownerId,
       isOwner: true,
       isCurrent: true,
+      isArchive: false,
       createdAt: workspace.createdAt,
     };
   }
@@ -203,5 +212,44 @@ export class WorkspaceService {
       userId,
       newDefaultWorkspaceId,
     );
+  }
+
+  async archiveWorkspace(userId: string, workspaceId: string) {
+    const workspace =
+      await this.sanityCheckService.checkWorkspaceIsExists(workspaceId);
+
+    if (workspace.ownerId !== userId) {
+      throw new ForbiddenException('Only owner can archive workspace');
+    }
+
+    await this.workspaceRepository.archiveWorkspace(workspaceId);
+
+    const defaultWorkspaceId =
+      await this.workspaceRepository.getUserDefaultWorkspaceId(userId);
+    if (defaultWorkspaceId === workspaceId) {
+      const remainingWorkspaces =
+        await this.workspaceRepository.findWorkspacesByUserId(userId);
+      const newDefaultWorkspaceId = remainingWorkspaces.find(
+        (w) => w.id !== workspaceId,
+      )?.id as string;
+      await this.workspaceRepository.updateUserDefaultWorkspace(
+        userId,
+        newDefaultWorkspaceId,
+      );
+    }
+  }
+
+  async restoreWorkspace(userId: string, workspaceId: string) {
+    const workspace =
+      await this.workspaceRepository.findArchivedWorkspaceById(workspaceId);
+    if (!workspace) {
+      throw new NotFoundException('Archived workspace not found');
+    }
+
+    if (workspace.ownerId !== userId) {
+      throw new ForbiddenException('Only owner can restore workspace');
+    }
+
+    await this.workspaceRepository.restoreWorkspace(workspaceId);
   }
 }
