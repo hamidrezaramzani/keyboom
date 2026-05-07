@@ -165,7 +165,7 @@ ${inviteLink}
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                {member.role !== "owner" && (
+                {!workspace?.isOwner && (
                   <>
                     <button
                       onClick={() => handleMemberRemove(member.id, member.name)}
@@ -175,7 +175,7 @@ ${inviteLink}
                     </button>
                   </>
                 )}
-                {member.role === "owner" && (
+                {workspace?.isOwner && (
                   <span className=" text-amber-400 text-sm">مالک</span>
                 )}
               </div>

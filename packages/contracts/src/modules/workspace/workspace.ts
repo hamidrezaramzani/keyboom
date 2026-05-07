@@ -60,7 +60,6 @@ const workspaceActions = {
             id: z.string(),
             name: z.string(),
             email: z.string(),
-            role: z.string(),
             joinedAt: z.date(),
           }),
         ),

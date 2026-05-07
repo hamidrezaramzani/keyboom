@@ -1,4 +1,3 @@
-// app/components/sections/subscriptions/board/board.component.tsx
 "use client";
 
 import { useState } from "react";
@@ -71,13 +70,11 @@ export const Board = ({
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    // پیدا کردن گروه و اشتراک مبدا و مقصد
     const activeGroup = groups.find((g) => g.subscriptions.some((s) => s.id === activeId));
     const overGroup = groups.find((g) => g.subscriptions.some((s) => s.id === overId));
     const activeIsGroup = groups.some((g) => g.id === activeId);
     const overIsGroup = groups.some((g) => g.id === overId);
 
-    // جابه‌جایی ستون‌ها (گروه‌ها)
     if (activeIsGroup && overIsGroup) {
       const oldIndex = groups.findIndex((g) => g.id === activeId);
       const newIndex = groups.findIndex((g) => g.id === overId);
@@ -87,17 +84,14 @@ export const Board = ({
       return;
     }
 
-    // جابه‌جایی اشتراک‌ها
     if (!activeIsGroup && !overIsGroup && activeGroup && overGroup) {
       const activeSubIndex = activeGroup.subscriptions.findIndex((s) => s.id === activeId);
       const overSubIndex = overGroup.subscriptions.findIndex((s) => s.id === overId);
 
       if (activeGroup.id === overGroup.id) {
-        // جابه‌جایی داخل یک گروه
         const newSubscriptions = arrayMove(activeGroup.subscriptions, activeSubIndex, overSubIndex);
         onSubscriptionReorder(activeGroup.id, newSubscriptions);
       } else if (onSubscriptionMove) {
-        // جابه‌جایی بین گروه‌ها
         onSubscriptionMove(activeId, activeGroup.id, overGroup.id);
       }
       return;

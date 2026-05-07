@@ -39,7 +39,7 @@ export const workspaceMembers = pgTable(
     userId: varchar('user_id', { length: 36 })
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    role: varchar('role', { length: 20 }).notNull().default('member'), // owner, admin, member, viewer
+    role: varchar('role', { length: 20 }).notNull().default('owner'),
     invitedBy: varchar('invited_by', { length: 36 }).references(() => users.id),
     invitedAt: timestamp('invited_at').defaultNow().notNull(),
     joinedAt: timestamp('joined_at'),

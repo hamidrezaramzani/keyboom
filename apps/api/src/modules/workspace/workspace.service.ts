@@ -157,7 +157,10 @@ export class WorkspaceService {
     const members =
       await this.workspaceRepository.getWorkspaceMembers(workspaceId);
 
-    return members;
+    return members.map((m) => ({
+      ...m,
+      isOwner: m.id === userId,
+    }));
   }
 
   async leaveWorkspace(userId: string, workspaceId: string) {
