@@ -8,6 +8,8 @@ import { DRIZZLE } from 'src/core/db/drizzle.provider';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { WorkspaceRepository } from '../workspace/workspace.repository';
 import { UsersRepository } from '../user/user.repository';
+import { GroupRepository } from '../group/group.repository';
+import { SubscriptionRepository } from '../subscription/subscription.repository';
 
 @Injectable()
 export class SanityCheckService {
@@ -15,6 +17,8 @@ export class SanityCheckService {
     @Inject(DRIZZLE) private db: NodePgDatabase,
     private readonly workspaceRepository: WorkspaceRepository,
     private readonly userRepository: UsersRepository,
+    private readonly groupRepository: GroupRepository,
+    private readonly subscriptionRepository: SubscriptionRepository,
   ) {}
 
   async checkUserIsExists(userId: string) {
@@ -57,5 +61,24 @@ export class SanityCheckService {
       );
     }
     return workspace;
+  }
+
+  async checkGroupIsExists(groupId: string) {
+    const group = await this.groupRepository.findById(groupId);
+    if (!group) {
+      throw new NotFoundException('Group not found');
+    }
+
+    return group;
+  }
+
+  async checkSubscriptionIsExists(subscriptionId: string) {
+    const subscription =
+      await this.subscriptionRepository.findById(subscriptionId);
+    if (!subscription) {
+      throw new NotFoundException('Subscription not found');
+    }
+
+    return subscription;
   }
 }

@@ -1,4 +1,3 @@
-// app/components/sections/subscriptions/subscription-card/subscription-card.component.tsx
 "use client";
 
 import { useSortable } from "@dnd-kit/sortable";
@@ -6,7 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Calendar } from "lucide-react";
 import { Badge } from "@/app/components";
 import { cn } from "@/app/lib/utils";
-import { Subscription } from "@/app/services/group";
+import { Subscription } from "@/app/services/subscription";
 
 interface SubscriptionCardProps {
   subscription: Subscription;
@@ -79,7 +78,7 @@ export const SubscriptionCard = ({
               {subscription.status === "expiring" && (
                 <span className="text-amber-400 text-xs flex items-center gap-1">
                   <Calendar className="w-3 h-3" />
-                  {formatDate(subscription.endDate.toDateString())}
+                  {formatDate(subscription.endDate as unknown as string)}
                 </span>
               )}
             </div>

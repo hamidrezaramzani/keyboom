@@ -1,4 +1,3 @@
-// app/components/subscriptions/AddSubscriptionModal.tsx
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -6,11 +5,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Modal, Input, Button, Select } from "@/app/components";
 import { useReadManyCategoriesQuery } from "@/app/services/category";
+import { toast } from "@/app/lib";
+import { useCreateSubscriptionMutation } from "@/app/services/subscription/api-subscription.endpoint";
+import { Group } from "@/app/services/group";
 
 const addSubscriptionSchema = z.object({
   name: z.string().min(1, "نام اشتراک الزامی است"),
-  category: z.string().min(1, "دسته‌بندی الزامی است"),
-  groupId: z.string(),
+  categoryId: z.string().min(1, "دسته‌بندی الزامی است"),
+  groupId: z.string().min(1, "گروه الزامی است"),
   price: z.string().min(1, "قیمت الزامی است"),
   startDate: z.string().min(1, "تاریخ شروع الزامی است"),
   endDate: z.string().min(1, "تاریخ پایان الزامی است"),
@@ -20,23 +22,26 @@ const addSubscriptionSchema = z.object({
 
 type AddSubscriptionForm = z.infer<typeof addSubscriptionSchema>;
 
-const groups = [
-  { value: "", label: "بدون گروه" },
-  { value: "1", label: "واحد نرم‌افزار" },
-  { value: "2", label: "واحد فروش" },
-  { value: "3", label: "واحد مالی" },
-];
-
 interface AddSubscriptionModalProps {
   isOpen: boolean;
   onClose: () => void;
+  workspaceId?: string;
+  defaultGroupId?: string | null;
+  onSuccess?: () => void;
+  groups: Group[];
 }
 
 export const AddSubscriptionModal = ({
   isOpen,
   onClose,
+  defaultGroupId,
+  onSuccess,
+  groups,
 }: AddSubscriptionModalProps) => {
   const { data: categories } = useReadManyCategoriesQuery({});
+
+  const [createSubscription, { isLoading: isCreating }] =
+    useCreateSubscriptionMutation();
 
   const {
     register,
@@ -47,8 +52,8 @@ export const AddSubscriptionModal = ({
     resolver: zodResolver(addSubscriptionSchema),
     defaultValues: {
       name: "",
-      category: "",
-      groupId: "",
+      categoryId: "",
+      groupId: defaultGroupId || "",
       price: "",
       startDate: "",
       endDate: "",
@@ -58,15 +63,40 @@ export const AddSubscriptionModal = ({
   });
 
   const onSubmit = async (data: AddSubscriptionForm) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    reset();
-    onClose();
+    try {
+      await createSubscription({
+        payload: {
+          name: data.name,
+          price: parseInt(data.price),
+          categoryId: data.categoryId,
+          groupId: data.groupId,
+          startDate: new Date(data.startDate).toISOString(),
+          endDate: new Date(data.endDate).toISOString(),
+          website: data.website || null,
+          description: data.description || null,
+          reminderDays: 3,
+        },
+      }).unwrap();
+      toast.success("اشتراک با موفقیت اضافه شد");
+      reset();
+      onSuccess?.();
+      onClose();
+    } catch (error) {
+      toast.error("خطا در اضافه کردن اشتراک");
+      console.error("Create subscription error:", error);
+    }
   };
 
   const categoriesOptions =
     categories?.map((c) => ({
       value: c.id,
       label: c.name,
+    })) || [];
+
+  const groupsOptions =
+    groups?.map((g) => ({
+      value: g.id,
+      label: g.name,
     })) || [];
 
   return (
@@ -88,10 +118,15 @@ export const AddSubscriptionModal = ({
           <Select
             label="دسته‌بندی"
             options={categoriesOptions}
-            error={errors.category?.message}
-            {...register("category")}
+            error={errors.categoryId?.message}
+            {...register("categoryId")}
           />
-          <Select label="گروه" options={groups} {...register("groupId")} />
+          <Select
+            label="گروه"
+            options={groupsOptions}
+            error={errors.groupId?.message}
+            {...register("groupId")}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -133,7 +168,11 @@ export const AddSubscriptionModal = ({
         />
 
         <div className="flex gap-3 pt-4">
-          <Button type="submit" variant="primary" loading={isSubmitting}>
+          <Button
+            type="submit"
+            variant="primary"
+            loading={isSubmitting || isCreating}
+          >
             ذخیره اشتراک
           </Button>
           <Button type="button" variant="outline" onClick={onClose}>

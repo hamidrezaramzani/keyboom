@@ -1,16 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Modal, Input, Button, Select, Badge } from "@/app/components";
 import { Calendar, Link as LinkIcon } from "lucide-react";
+import { useReadManyCategoriesQuery } from "@/app/services/category";
+import { useGetGroupsQuery } from "@/app/services/group";
+import { useConfirm } from "@/app/lib/store/context";
+import {
+  useDeleteSubscriptionMutation,
+  useUpdateSubscriptionMutation,
+} from "@/app/services/subscription/api-subscription.endpoint";
+import { toast } from "@/app/lib";
+import { Subscription } from "@/app/services/subscription";
 
 const editSubscriptionSchema = z.object({
   name: z.string().min(1, "نام اشتراک الزامی است"),
-  category: z.string().min(1, "دسته‌بندی الزامی است"),
-  groupId: z.string(),
+  categoryId: z.string().min(1, "دسته‌بندی الزامی است"),
+  groupId: z.string().min(1, "گروه الزامی است"),
   price: z.string().min(1, "قیمت الزامی است"),
   startDate: z.string().min(1, "تاریخ شروع الزامی است"),
   endDate: z.string().min(1, "تاریخ پایان الزامی است"),
@@ -20,27 +29,6 @@ const editSubscriptionSchema = z.object({
 });
 
 type EditSubscriptionForm = z.infer<typeof editSubscriptionSchema>;
-
-const categories = [
-  { value: "entertainment", label: "🎬 سرگرمی" },
-  { value: "work", label: "💼 کاری" },
-  { value: "cloud", label: "☁️ ذخیره‌سازی ابری" },
-  { value: "development", label: "🛠️ ابزار توسعه" },
-  { value: "education", label: "📚 آموزشی" },
-  { value: "security", label: "🔒 امنیت" },
-  { value: "health", label: "🏥 سلامت" },
-  { value: "productivity", label: "🧠 بهره‌وری" },
-  { value: "communication", label: "📧 ارتباطات" },
-  { value: "shopping", label: "🛍️ خرید" },
-  { value: "other", label: "📁 سایر" },
-];
-
-const groups = [
-  { value: "", label: "بدون گروه" },
-  { value: "1", label: "واحد نرم‌افزار" },
-  { value: "2", label: "واحد فروش" },
-  { value: "3", label: "واحد مالی" },
-];
 
 const reminderOptions = [
   { value: "1", label: "۱ روز قبل" },
@@ -52,24 +40,10 @@ const reminderOptions = [
 interface SubscriptionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  subscriptionId: string | null;
+  subscription?: Subscription;
+  workspaceId?: string;
+  onSuccess?: () => void;
 }
-
-const mockSubscription = {
-  id: "1",
-  name: "فیلیمو",
-  category: "entertainment",
-  categoryLabel: "🎬 سرگرمی",
-  groupId: "1",
-  groupLabel: "واحد نرم‌افزار",
-  price: "59000",
-  startDate: "1403-07-01",
-  endDate: "1403-08-01",
-  status: "expiring" as const,
-  website: "https://filimo.com",
-  description: "برای دیدن سریال جوکر",
-  reminderDays: "3",
-};
 
 const statusConfig = {
   active: { label: "فعال", variant: "success" as const },
@@ -80,9 +54,24 @@ const statusConfig = {
 export const SubscriptionModal = ({
   isOpen,
   onClose,
-  subscriptionId,
+  subscription,
+  workspaceId,
+  onSuccess,
 }: SubscriptionModalProps) => {
   const [isEditing, setIsEditing] = useState(false);
+  const { confirm } = useConfirm();
+
+  const { data: categories } = useReadManyCategoriesQuery({});
+  const { data: groupsData } = useGetGroupsQuery(
+    { params: { workspaceId: workspaceId! } },
+    { skip: !workspaceId },
+  );
+  const [updateSubscription, { isLoading: isUpdating }] =
+    useUpdateSubscriptionMutation();
+  const [deleteSubscription, { isLoading: isDeleting }] =
+    useDeleteSubscriptionMutation();
+
+  const groups = groupsData || [];
 
   const {
     register,
@@ -92,58 +81,126 @@ export const SubscriptionModal = ({
   } = useForm<EditSubscriptionForm>({
     resolver: zodResolver(editSubscriptionSchema),
     defaultValues: {
-      name: mockSubscription.name,
-      category: mockSubscription.category,
-      groupId: mockSubscription.groupId,
-      price: mockSubscription.price,
-      startDate: mockSubscription.startDate,
-      endDate: mockSubscription.endDate,
-      website: mockSubscription.website,
-      description: mockSubscription.description,
-      reminderDays: mockSubscription.reminderDays,
+      name: "",
+      categoryId: "",
+      groupId: "",
+      price: "",
+      startDate: "",
+      endDate: "",
+      website: "",
+      description: "",
+      reminderDays: "3",
     },
   });
 
+  useEffect(() => {
+    if (subscription) {
+      reset({
+        name: subscription.name,
+        categoryId: subscription.category,
+        groupId: subscription.groupId,
+        price: subscription.price.toString(),
+        startDate: subscription.startDate,
+        endDate: subscription.endDate,
+        website: subscription.website || "",
+        description: subscription.description || "",
+        reminderDays: subscription?.reminderDays?.toString(),
+      });
+    }
+  }, [subscription, reset]);
+
   const onSubmit = async (data: EditSubscriptionForm) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log(data);
-    setIsEditing(false);
-    onClose();
+    if (!subscription) return;
+
+    try {
+      await updateSubscription({
+        params: { subscriptionId: subscription.id },
+        payload: {
+          name: data.name,
+          price: parseInt(data.price),
+          categoryId: data.categoryId,
+          startDate: new Date(data.startDate).toISOString(),
+          endDate: new Date(data.endDate).toISOString(),
+          website: data.website || null,
+          description: data.description || null,
+          reminderDays: parseInt(data.reminderDays),
+        },
+      }).unwrap();
+      toast.success("اشتراک با موفقیت ویرایش شد");
+      setIsEditing(false);
+      onSuccess?.();
+      onClose();
+    } catch (error) {
+      toast.error("خطا در ویرایش اشتراک");
+      console.error("Update subscription error:", error);
+    }
   };
 
-  const handleDelete = () => {
-    console.log("Delete subscription", subscriptionId);
-    onClose();
+  const handleDelete = async () => {
+    if (!subscription) return;
+
+    const confirmed = await confirm({
+      title: "حذف اشتراک",
+      description: `آیا از حذف اشتراک "${subscription.name}" مطمئن هستید؟ این عمل غیرقابل بازگشت است.`,
+      confirmText: "حذف",
+      variant: "danger",
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await deleteSubscription({
+        params: { subscriptionId: subscription.id },
+      }).unwrap();
+      toast.success("اشتراک با موفقیت حذف شد");
+      onSuccess?.();
+      onClose();
+    } catch (error) {
+      toast.error("خطا در حذف اشتراک");
+      console.error("Delete subscription error:", error);
+    }
   };
 
-  const handleRenew = () => {
-    console.log("Renew subscription", subscriptionId);
-  };
+  const categoriesOptions =
+    categories?.map((c) => ({
+      value: c.id,
+      label: c.name,
+    })) || [];
+
+  const groupsOptions =
+    groups?.map((g) => ({
+      value: g.id,
+      label: g.name,
+    })) || [];
 
   const getStatusBadge = () => {
-    const config = statusConfig[mockSubscription.status];
+    if (!subscription) return null;
+    const config =
+      statusConfig[subscription.status as "active" | "expiring" | "expired"];
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
+  if (!subscription) return null;
+
   if (!isEditing) {
+    const isArchived = subscription.isArchived;
+
     return (
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        title={mockSubscription.name}
+        title={subscription.name}
         size="lg"
       >
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="text-gray-500 text-sm">دسته‌بندی</p>
-              <p className="text-white">{mockSubscription.categoryLabel}</p>
+              <p className="text-white">{subscription.category}</p>
             </div>
             <div>
               <p className="text-gray-500 text-sm">گروه</p>
-              <p className="text-white">
-                {mockSubscription.groupLabel || "بدون گروه"}
-              </p>
+              <p className="text-white">{subscription.groupId}</p>
             </div>
           </div>
 
@@ -151,7 +208,7 @@ export const SubscriptionModal = ({
             <div>
               <p className="text-gray-500 text-sm">هزینه ماهانه</p>
               <p className="text-white text-lg font-semibold">
-                {parseInt(mockSubscription.price).toLocaleString("fa-IR")} تومان
+                {subscription.price.toLocaleString("fa-IR")} تومان
               </p>
             </div>
             <div>
@@ -165,37 +222,41 @@ export const SubscriptionModal = ({
               <p className="text-gray-500 text-sm flex items-center gap-1">
                 <Calendar className="w-3 h-3" /> تاریخ شروع
               </p>
-              <p className="text-white">{mockSubscription.startDate}</p>
+              <p className="text-white">
+                {new Date(subscription.startDate).toLocaleDateString("fa-IR")}
+              </p>
             </div>
             <div>
               <p className="text-gray-500 text-sm flex items-center gap-1">
                 <Calendar className="w-3 h-3" /> تاریخ پایان
               </p>
-              <p className="text-white">{mockSubscription.endDate}</p>
+              <p className="text-white">
+                {new Date(subscription.endDate).toLocaleDateString("fa-IR")}
+              </p>
             </div>
           </div>
 
-          {mockSubscription.website && (
+          {subscription.website && (
             <div>
               <p className="text-gray-500 text-sm flex items-center gap-1">
                 <LinkIcon className="w-3 h-3" /> لینک وب‌سایت
               </p>
               <a
-                href={mockSubscription.website}
+                href={subscription.website}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-indigo-400 hover:underline text-sm"
               >
-                {mockSubscription.website}
+                {subscription.website}
               </a>
             </div>
           )}
 
-          {mockSubscription.description && (
+          {subscription.description && (
             <div>
               <p className="text-gray-500 text-sm">توضیحات</p>
               <p className="text-gray-300 text-sm">
-                {mockSubscription.description}
+                {subscription.description}
               </p>
             </div>
           )}
@@ -205,13 +266,13 @@ export const SubscriptionModal = ({
             <p className="text-white">
               یادآوری{" "}
               {reminderOptions.find(
-                (o) => o.value === mockSubscription.reminderDays,
+                (o) => o.value === subscription?.reminderDays?.toString(),
               )?.label || "۳ روز قبل"}{" "}
               از اتمام
             </p>
           </div>
 
-          {mockSubscription.status === "expiring" && (
+          {subscription.status === "expiring" && !isArchived && (
             <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3">
               <p className="text-amber-400 text-sm">
                 ⏰ این اشتراک به زودی منقضی می‌شود. برای تمدید اقدام کنید.
@@ -219,20 +280,16 @@ export const SubscriptionModal = ({
             </div>
           )}
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-4 flex-wrap">
             <Button variant="primary" onClick={() => setIsEditing(true)}>
               ویرایش
             </Button>
-            {mockSubscription.status === "expiring" && (
-              <Button variant="primary" onClick={handleRenew}>
-                تمدید اشتراک
-              </Button>
-            )}
-            <Button variant="danger" onClick={handleDelete}>
+            <Button
+              variant="danger"
+              onClick={handleDelete}
+              loading={isDeleting}
+            >
               حذف
-            </Button>
-            <Button variant="outline" onClick={onClose}>
-              بستن
             </Button>
           </div>
         </div>
@@ -253,11 +310,16 @@ export const SubscriptionModal = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Select
             label="دسته‌بندی"
-            options={categories}
-            error={errors.category?.message}
-            {...register("category")}
+            options={categoriesOptions}
+            error={errors.categoryId?.message}
+            {...register("categoryId")}
           />
-          <Select label="گروه" options={groups} {...register("groupId")} />
+          <Select
+            label="گروه"
+            options={groupsOptions}
+            error={errors.groupId?.message}
+            {...register("groupId")}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -305,7 +367,11 @@ export const SubscriptionModal = ({
         />
 
         <div className="flex gap-3 pt-4">
-          <Button type="submit" variant="primary" loading={isSubmitting}>
+          <Button
+            type="submit"
+            variant="primary"
+            loading={isSubmitting || isUpdating}
+          >
             ذخیره تغییرات
           </Button>
           <Button

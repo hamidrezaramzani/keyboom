@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { WorkspaceModule } from '../workspace/workspace.module';
 import { NotificationModule } from '../notification/notification.module';
 import { UsersModule } from '../user/user.module';
@@ -10,10 +10,10 @@ import { WebSocketModule } from '../websocket/websocket.module';
 
 @Module({
   imports: [
-    WorkspaceModule,
-    UsersModule,
+    forwardRef(() => WorkspaceModule),
+    forwardRef(() => UsersModule),
     NotificationModule,
-    SanityCheckModule,
+    forwardRef(() => SanityCheckModule),
     WebSocketModule,
   ],
   controllers: [InvitationController],

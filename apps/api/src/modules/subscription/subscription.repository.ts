@@ -1,0 +1,44 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { eq } from 'drizzle-orm';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { DRIZZLE } from 'src/core/db/drizzle.provider';
+import {
+  NewSubscription,
+  Subscription,
+  subscriptions,
+} from './subscription.schema';
+
+@Injectable()
+export class SubscriptionRepository {
+  constructor(@Inject(DRIZZLE) private db: NodePgDatabase<any>) {}
+
+  async findById(id: string): Promise<Subscription | undefined> {
+    const result = await this.db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.id, id))
+      .limit(1);
+    return result[0];
+  }
+
+  async create(data: NewSubscription): Promise<Subscription> {
+    const result = await this.db.insert(subscriptions).values(data).returning();
+    return result[0];
+  }
+
+  async update(
+    id: string,
+    data: Partial<Omit<NewSubscription, 'id' | 'userId'>>,
+  ): Promise<Subscription> {
+    const result = await this.db
+      .update(subscriptions)
+      .set(data)
+      .where(eq(subscriptions.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.db.delete(subscriptions).where(eq(subscriptions.id, id));
+  }
+}

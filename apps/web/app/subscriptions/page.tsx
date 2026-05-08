@@ -18,6 +18,7 @@ import {
   useReorderGroupsMutation,
 } from "../services/group";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { Subscription } from "../services/subscription";
 
 export default function SubscriptionsPage() {
   const { data: workspace } = useReadManyWorkspacesQuery({});
@@ -34,18 +35,16 @@ export default function SubscriptionsPage() {
   const [isGroupSettingsOpen, setIsGroupSettingsOpen] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [selectedGroupName, setSelectedGroupName] = useState<string>();
+  const [selectedSubscription, setSelectedSubscription] =
+    useState<Subscription>();
   const [isAddSubscriptionOpen, setIsAddSubscriptionOpen] = useState(false);
-  const [selectedSubscriptionId, setSelectedSubscriptionId] = useState<
-    string | null
-  >(null);
   const [isSubscriptionDetailOpen, setIsSubscriptionDetailOpen] =
     useState(false);
 
   const groups = groupsData || [];
-  console.log(groups);
 
   const handleGroupsReorder = async (newGroups: typeof groups) => {
-    const groupIds = newGroups.map((g) => g.id);
+    const groupIds = newGroups?.map((g) => g.id);
     await reorderGroups({ payload: { groupIds } });
   };
 
@@ -64,8 +63,8 @@ export default function SubscriptionsPage() {
     setIsGroupSettingsOpen(true);
   };
 
-  const handleSubscriptionClick = (subscriptionId: string) => {
-    setSelectedSubscriptionId(subscriptionId);
+  const handleSubscriptionClick = (subscription: Subscription) => {
+    setSelectedSubscription(subscription);
     setIsSubscriptionDetailOpen(true);
   };
 
@@ -103,12 +102,14 @@ export default function SubscriptionsPage() {
       <AddSubscriptionModal
         isOpen={isAddSubscriptionOpen}
         onClose={() => setIsAddSubscriptionOpen(false)}
+        defaultGroupId={selectedGroupId}
+        groups={groups}
       />
 
       <SubscriptionModal
         isOpen={isSubscriptionDetailOpen}
         onClose={() => setIsSubscriptionDetailOpen(false)}
-        subscriptionId={selectedSubscriptionId}
+        subscription={selectedSubscription}
       />
 
       <GroupSettingsModal

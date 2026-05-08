@@ -17,14 +17,15 @@ import {
 } from "@dnd-kit/sortable";
 import { BoardColumn } from "../board-column/board-column.component";
 import { AddGroupColumn } from "../add-group-column/add-group-column.component";
-import { Group, Subscription } from "@/app/services/group";
+import { Group } from "@/app/services/group";
+import { Subscription } from "@/app/services/subscription";
 
 interface BoardProps {
   groups: Group[];
   onGroupsReorder: (groups: Group[]) => void;
   onAddGroup: () => void;
   onGroupSettings: (groupId: string, groupName: string) => void;
-  onSubscriptionClick: (subscriptionId: string) => void;
+  onSubscriptionClick: (subscription: Subscription) => void;
   onSubscriptionMove?: (
     subscriptionId: string,
     fromGroupId: string,
@@ -93,7 +94,10 @@ export const Board = ({
           activeSubIndex,
           overSubIndex,
         );
-        onSubscriptionReorder(activeGroup.id, newSubscriptions);
+        onSubscriptionReorder(
+          activeGroup.id,
+          newSubscriptions as unknown as Subscription[],
+        );
       } else if (onSubscriptionMove) {
         onSubscriptionMove(activeId, activeGroup.id, overGroup.id);
       }
@@ -109,7 +113,7 @@ export const Board = ({
     >
       <div className="flex gap-4 overflow-x-auto pb-4 min-h-[500px]">
         <SortableContext
-          items={groups.map((g) => g.id)}
+          items={groups?.map((g) => g.id)}
           strategy={horizontalListSortingStrategy}
         >
           {groups.map((group) => (

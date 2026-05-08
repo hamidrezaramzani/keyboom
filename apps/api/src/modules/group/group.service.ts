@@ -51,7 +51,6 @@ export class GroupService {
   }
 
   async readMany(userId: string, workspaceId: string) {
-    console.log(workspaceId);
     await this.sanityCheckService.checkUserIsWorkspaceMember(
       userId,
       workspaceId,
@@ -60,7 +59,6 @@ export class GroupService {
     const groups =
       await this.groupRepository.findByWorkspaceIdWithSubscriptions(
         workspaceId,
-        userId,
       );
 
     return groups;

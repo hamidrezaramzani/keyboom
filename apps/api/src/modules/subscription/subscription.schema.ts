@@ -3,12 +3,12 @@ import {
   varchar,
   integer,
   timestamp,
-  boolean,
   text,
 } from 'drizzle-orm/pg-core';
 import { users } from '../user/user.schema';
 import { groups } from '../workspace/workspace.schema';
 import { categories } from '../category/category.schema';
+import { relations } from 'drizzle-orm';
 
 export const subscriptions = pgTable('subscriptions', {
   id: varchar('id', { length: 36 }).primaryKey(),
@@ -28,10 +28,16 @@ export const subscriptions = pgTable('subscriptions', {
   website: varchar('website', { length: 500 }),
   description: text('description'),
   reminderDays: integer('reminder_days').default(3),
-  isArchived: boolean('is_archived').default(false),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
+  category: one(categories, {
+    fields: [subscriptions.category],
+    references: [categories.id],
+  }),
+}));
 
 export type Subscription = typeof subscriptions.$inferSelect;
 export type NewSubscription = typeof subscriptions.$inferInsert;

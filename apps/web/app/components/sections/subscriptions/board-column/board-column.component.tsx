@@ -11,11 +11,12 @@ import { SubscriptionCard } from "../subscription-card/subscription-card.compone
 import { Button, EmptyState } from "@/app/components";
 import { cn } from "@/app/lib/utils";
 import { Group } from "@/app/services/group";
+import { Subscription } from "@/app/services/subscription";
 
 interface BoardColumnProps {
   group: Group;
   onSettings: () => void;
-  onSubscriptionClick: (subscriptionId: string) => void;
+  onSubscriptionClick: (subscription: Subscription) => void;
   onAddSubscriptionClick: (groupId: string) => void;
 }
 
@@ -94,7 +95,9 @@ export const BoardColumn = ({
                   <SubscriptionCard
                     key={sub.id}
                     subscription={sub}
-                    onClick={() => onSubscriptionClick(sub.id)}
+                    onClick={() =>
+                      onSubscriptionClick(sub as unknown as Subscription)
+                    }
                   />
                 ))}
               </div>
@@ -114,7 +117,9 @@ export const BoardColumn = ({
                   <SubscriptionCard
                     key={sub.id}
                     subscription={sub}
-                    onClick={() => onSubscriptionClick(sub.id)}
+                    onClick={() =>
+                      onSubscriptionClick(sub as unknown as Subscription)
+                    }
                   />
                 ))}
               </div>

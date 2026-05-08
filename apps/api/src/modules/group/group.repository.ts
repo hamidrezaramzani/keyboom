@@ -45,21 +45,10 @@ export class GroupRepository {
       );
   }
 
-  async findByWorkspaceIdWithSubscriptions(
-    workspaceId: string,
-    userId: string,
-  ) {
+  async findByWorkspaceIdWithSubscriptions(workspaceId: string) {
     const groupsList = await this.findByWorkspaceId(workspaceId);
 
-    const subscriptionsList = await this.db
-      .select()
-      .from(subscriptions)
-      .where(
-        and(
-          eq(subscriptions.userId, userId),
-          eq(subscriptions.isArchived, false),
-        ),
-      );
+    const subscriptionsList = await this.db.select().from(subscriptions);
 
     const now = new Date();
     const subscriptionsWithStatus = subscriptionsList.map((sub) => ({
