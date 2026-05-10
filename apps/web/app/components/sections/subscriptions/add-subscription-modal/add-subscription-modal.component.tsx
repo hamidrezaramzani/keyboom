@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Modal, Input, Button, Select } from "@/app/components";
@@ -8,6 +8,9 @@ import { useReadManyCategoriesQuery } from "@/app/services/category";
 import { toast } from "@/app/lib";
 import { useCreateSubscriptionMutation } from "@/app/services/subscription/api-subscription.endpoint";
 import { Group } from "@/app/services/group";
+import DatePicker from "react-multi-date-picker";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
 
 const addSubscriptionSchema = z.object({
   name: z.string().min(1, "نام اشتراک الزامی است"),
@@ -48,6 +51,7 @@ export const AddSubscriptionModal = ({
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    control,
   } = useForm<AddSubscriptionForm>({
     resolver: zodResolver(addSubscriptionSchema),
     defaultValues: {
@@ -129,7 +133,7 @@ export const AddSubscriptionModal = ({
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <Input
             label="هزینه ماهانه (تومان)"
             type="number"
@@ -137,28 +141,70 @@ export const AddSubscriptionModal = ({
             error={errors.price?.message}
             {...register("price")}
           />
-          <Input
-            label="تاریخ شروع"
-            type="date"
-            error={errors.startDate?.message}
-            {...register("startDate")}
-          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="تاریخ پایان"
-            type="date"
-            error={errors.endDate?.message}
-            {...register("endDate")}
+          <Controller
+            control={control}
+            name="startDate"
+            render={({ field: { onChange, value }, formState: { errors } }) => (
+              <>
+                <DatePicker
+                  value={value || ""}
+                  onChange={(date) => {
+                    onChange(date?.isValid ? date.toString() : "");
+                  }}
+                  calendarPosition="bottom-right"
+                  calendar={persian}
+                  locale={persian_fa}
+                  render={
+                    <Input
+                      type="text"
+                      label="تاریخ شروع"
+                      placeholder="1380/11/05"
+                      value={value}
+                      error={errors?.startDate?.message}
+                    />
+                  }
+                />
+              </>
+            )}
           />
-          <Input
-            label="لینک وب‌سایت (اختیاری)"
-            placeholder="https://filimo.com"
-            error={errors.website?.message}
-            {...register("website")}
+
+          <Controller
+            control={control}
+            name="endDate"
+            render={({ field: { onChange, value }, formState: { errors } }) => (
+              <>
+                <DatePicker
+                  value={value || ""}
+                  onChange={(date) => {
+                    onChange(date?.isValid ? date.toString() : "");
+                  }}
+                  calendarPosition="bottom-right"
+                  calendar={persian}
+                  locale={persian_fa}
+                  render={
+                    <Input
+                      type="text"
+                      label="تاریخ پایان"
+                      placeholder="1406/11/05"
+                      value={value}
+                      error={errors?.endDate?.message}
+                    />
+                  }
+                />
+              </>
+            )}
           />
         </div>
+
+        <Input
+          label="لینک وب‌سایت (اختیاری)"
+          placeholder="https://filimo.com"
+          error={errors.website?.message}
+          {...register("website")}
+        />
 
         <textarea
           className="w-full px-4 py-2.5 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"

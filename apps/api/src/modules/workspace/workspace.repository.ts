@@ -161,7 +161,7 @@ export class WorkspaceRepository {
   }
 
   async updateWorkspaceSetting(workspaceId: string, body: { name: string }) {
-    await this.db
+    return await this.db
       .update(workspaces)
       .set({
         name: body.name,

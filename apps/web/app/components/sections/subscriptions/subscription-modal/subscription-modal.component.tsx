@@ -107,7 +107,7 @@ export const SubscriptionModal = ({
         reminderDays: subscription?.reminderDays?.toString(),
       });
     }
-  }, [subscription, reset]);
+  }, [subscription, isEditing, reset]);
 
   const onSubmit = async (data: EditSubscriptionForm) => {
     if (!subscription) return;

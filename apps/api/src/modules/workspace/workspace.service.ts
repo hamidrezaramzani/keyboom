@@ -13,6 +13,7 @@ import { SanityCheckService } from '../sanity-check/sanity-check.service';
 import { WorkspaceUpdateSettingPayloadDto } from '@keyboom/contracts/server';
 import { customAlphabet } from 'nanoid';
 import { NotificationService } from '../notification/notification.service';
+import { WebSocketGateway } from '../websocket/websocket.gateway';
 
 @Injectable()
 export class WorkspaceService {
@@ -22,6 +23,7 @@ export class WorkspaceService {
     private readonly userRepository: UsersRepository,
     private readonly sanityCheckService: SanityCheckService,
     private readonly notificationService: NotificationService,
+    private readonly websocketGateway: WebSocketGateway,
   ) {}
 
   private generateId(): string {
@@ -138,6 +140,14 @@ export class WorkspaceService {
 
     await this.workspaceRepository.updateWorkspaceSetting(workspaceId, {
       name: body.name,
+    });
+
+    const members = await this.getWorkspaceMembers(userId, workspace.id);
+
+    members.forEach((member) => {
+      return this.websocketGateway.emitToUser(member.id, 'workspace:updated', {
+        workspace: { ...body, id: workspace.id },
+      });
     });
 
     return {

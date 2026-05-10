@@ -3,6 +3,7 @@ import { baseApi } from "../api";
 import { WORKSPACE_ENDPOINTS } from "./api-workspace.constant";
 import { ERD, QueryArgsNew } from "../api.type";
 import { transformResponse } from "../api.helper";
+import { handleWorkspaceCacheEntryAdded } from "./api-workspace.on-cache";
 
 export const workspaceEndpoints = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -28,6 +29,7 @@ export const workspaceEndpoints = baseApi.injectEndpoints({
       }),
       providesTags: ["Workspace"],
       transformResponse,
+      onCacheEntryAdded: handleWorkspaceCacheEntryAdded,
     }),
     updateCurrentWorkspace: builder.mutation<
       ERD<WorkspaceActions["updateCurrent"]>,

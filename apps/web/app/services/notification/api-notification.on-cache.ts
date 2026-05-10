@@ -6,7 +6,7 @@ import { getSocket } from "../socket";
 import { Notification } from "./api-notification.type";
 
 export const handleOnCacheEntryAdded = async (
-  _arg: void,
+  arg: void,
   { cacheDataLoaded, updateCachedData, cacheEntryRemoved }: any,
 ) => {
   await cacheDataLoaded;

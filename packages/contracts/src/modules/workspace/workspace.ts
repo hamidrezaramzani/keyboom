@@ -124,7 +124,12 @@ const workspaceActions = {
   },
 } as const;
 
+const workspaceEvents = {
+  workspaceUpdated: workspace,
+};
+
 export type WorkspaceActions = Actions<typeof workspaceActions>;
+export type WorkspaceEvents = Events<typeof workspaceEvents>;
 
 export class WorkspaceReadManyResponseOkDto extends createZodDto(
   workspaceActions.readMany.response.ok,

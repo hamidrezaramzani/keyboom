@@ -1,12 +1,8 @@
-// apps/api/src/modules/websocket/websocket.gateway.ts
 import {
   WebSocketGateway as WebSocketGateway2,
   WebSocketServer,
-  SubscribeMessage,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  ConnectedSocket,
-  MessageBody,
   OnGatewayInit,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -71,7 +67,6 @@ export class WebSocketGateway
       this.userSockets.set(userId, []);
     }
     this.userSockets.get(userId)!.push(client.id);
-    console.log(`✅ Connected: `, client.id);
   }
 
   handleDisconnect(client: Socket) {
@@ -85,30 +80,8 @@ export class WebSocketGateway
     }
   }
 
-  @SubscribeMessage('workspace:join')
-  async handleJoinWorkspace(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { workspaceId: string },
-  ) {
-    const previousWorkspace = client.data.workspaceId as string;
-    if (previousWorkspace) {
-      await client.leave(`workspace:${previousWorkspace}`);
-    }
-    await client.join(`workspace:${data.workspaceId}`);
-    client.data.workspaceId = data.workspaceId;
-    return {
-      event: 'workspace:joined',
-      data: { workspaceId: data.workspaceId },
-    };
-  }
-
-  emitToWorkspace(workspaceId: string, event: string, data: any) {
-    this.server.to(`workspace:${workspaceId}`).emit(event, data);
-  }
-
   emitToUser(userId: string, event: string, data: any) {
     const sockets = this.userSockets.get(userId);
-
     if (!sockets || sockets.length === 0) {
       return;
     }
