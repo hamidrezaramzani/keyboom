@@ -11,6 +11,7 @@
 
 body {
   background-color: black;
+  /* overflow-x: hidden; */
 }
 
 .vazir {
@@ -157,7 +158,6 @@ body {
     background: #4f46e5;
     border-radius: 3px;
   }
-
 }
 
 @keyframes fadeInUp {
