@@ -10,6 +10,7 @@ import { SanityCheckService } from '../sanity-check/sanity-check.service';
 import { customAlphabet } from 'nanoid';
 import { SubscriptionRepository } from './subscription.repository';
 import {
+  SubscriptionCancelResponseOkDto,
   SubscriptionCreatePayloadDto,
   SubscriptionUpdatePayloadDto,
 } from '@keyboom/contracts/server';
@@ -237,6 +238,58 @@ export class SubscriptionService {
       endDate: updated.endDate.toISOString(),
       categoryKey: category?.key,
       categoryName: category?.name,
+    };
+  }
+
+  async cancel(
+    userId: string,
+    subscriptionId: string,
+    title: string,
+  ): Promise<SubscriptionCancelResponseOkDto['data']> {
+    const subscription =
+      await this.sanityCheckService.checkSubscriptionIsExists(subscriptionId);
+
+    await this.sanityCheckService.checkUserIsExists(userId);
+
+    if (subscription.userId !== userId) {
+      throw new ForbiddenException(
+        'You can only cancel your own subscriptions',
+      );
+    }
+
+    const group = await this.sanityCheckService.checkGroupIsExists(
+      subscription.groupId,
+    );
+    await this.sanityCheckService.checkUserIsWorkspaceMember(
+      userId,
+      group.workspaceId,
+    );
+
+    if (subscription.endDate < new Date()) {
+      throw new BadRequestException('Subscription is already expired');
+    }
+
+    const cancelled = await this.subscriptionRepository.cancel(subscriptionId);
+
+    await this.subscriptionRepository.createSubscriptionHistory({
+      id: this.generateId(),
+      subscriptionId,
+      userId,
+      action: 'CANCELLED',
+      title,
+      metadata: JSON.stringify({
+        cancelledAt: new Date(),
+        previousEndDate: subscription.endDate,
+      }),
+    });
+
+    const status = 'cancelled';
+
+    return {
+      ...cancelled,
+      status,
+      startDate: cancelled.startDate.toISOString(),
+      endDate: cancelled.endDate.toISOString(),
     };
   }
 }

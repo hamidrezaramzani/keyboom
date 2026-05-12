@@ -28,6 +28,7 @@ export const subscriptions = pgTable('subscriptions', {
   website: varchar('website', { length: 500 }),
   description: text('description'),
   reminderDays: integer('reminder_days').default(3),
+  status: varchar('status', { length: 20 }).default('active'), // active, cancelled, expired
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

@@ -8,4 +8,5 @@ export { AddSubscriptionModal } from "./add-subscription-modal/add-subscription-
 export { GroupSettingsModal } from "./group-setting-modal/group-setting-modal.component";
 export { AddWorkspaceModal } from "./add-workspace-modal/add-workspace-modal.component";
 export { AddGroupModal } from "./add-group-modal/add-group-modal.component";
-export { RenewSubscriptionModal } from "./renewal-subscription/renewal-subscription.component";
+export { RenewSubscriptionModal } from "./renewal-subscription-modal/renewal-subscription.component";
+export { CancelSubscriptionModal } from "./cancel-subscription-modal/cancel-subscription-modal.component";

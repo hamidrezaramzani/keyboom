@@ -24,6 +24,9 @@ import {
   SubscriptionRenewParamsDto,
   SubscriptionRenewPayloadDto,
   SubscriptionRenewResponseOkDto,
+  SubscriptionCancelParamsDto,
+  SubscriptionCancelPayloadDto,
+  SubscriptionCancelResponseOkDto,
 } from '@keyboom/contracts/server';
 import { SubscriptionService } from './subscription.service';
 
@@ -100,6 +103,25 @@ export class SubscriptionController {
       data: subscription,
       message: 'Subscription renewed successfully',
       statusCode: 201,
+    };
+  }
+
+  @Post(':subscriptionId/cancel')
+  @HttpCode(HttpStatus.OK)
+  async cancel(
+    @UserId() userId: string,
+    @Param() params: SubscriptionCancelParamsDto,
+    @Body() body: SubscriptionCancelPayloadDto,
+  ): Promise<SubscriptionCancelResponseOkDto> {
+    const subscription = await this.subscriptionService.cancel(
+      userId,
+      params.subscriptionId,
+      body.title,
+    );
+    return {
+      data: subscription,
+      message: 'Subscription cancelled successfully',
+      statusCode: 200,
     };
   }
 

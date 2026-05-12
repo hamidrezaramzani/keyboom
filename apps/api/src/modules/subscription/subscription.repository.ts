@@ -58,4 +58,17 @@ export class SubscriptionRepository {
   async createSubscriptionHistory(data: NewSubscriptionHistory): Promise<void> {
     await this.db.insert(subscriptionHistory).values(data);
   }
+
+  async cancel(id: string): Promise<Subscription> {
+    const result = await this.db
+      .update(subscriptions)
+      .set({
+        status: 'cancelled',
+        endDate: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(subscriptions.id, id))
+      .returning();
+    return result[0];
+  }
 }

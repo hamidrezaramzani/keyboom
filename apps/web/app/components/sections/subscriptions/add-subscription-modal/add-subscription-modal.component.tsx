@@ -17,8 +17,8 @@ const addSubscriptionSchema = z.object({
   categoryId: z.string().min(1, "دسته‌بندی الزامی است"),
   groupId: z.string().min(1, "گروه الزامی است"),
   price: z.string().min(1, "قیمت الزامی است"),
-  startDate: z.string().min(1, "تاریخ شروع الزامی است"),
-  endDate: z.string().min(1, "تاریخ پایان الزامی است"),
+  startDate: z.date().min(new Date(), "تاریخ شروع الزامی است"),
+  endDate: z.date().min(new Date(), "تاریخ پایان الزامی است"),
   website: z.string().url("لینک معتبر وارد کنید").or(z.literal("")),
   description: z.string(),
 });
@@ -59,8 +59,8 @@ export const AddSubscriptionModal = ({
       categoryId: "",
       groupId: defaultGroupId || "",
       price: "",
-      startDate: "",
-      endDate: "",
+      startDate: new Date(),
+      endDate: new Date(),
       website: "",
       description: "",
     },
@@ -152,7 +152,7 @@ export const AddSubscriptionModal = ({
                 <DatePicker
                   value={value || ""}
                   onChange={(date) => {
-                    onChange(date?.isValid ? date.toString() : "");
+                    onChange(date);
                   }}
                   calendarPosition="bottom-right"
                   calendar={persian}
@@ -162,7 +162,7 @@ export const AddSubscriptionModal = ({
                       type="text"
                       label="تاریخ شروع"
                       placeholder="1380/11/05"
-                      value={value}
+                      value={value.toISOString()}
                       error={errors?.startDate?.message}
                     />
                   }
@@ -174,12 +174,14 @@ export const AddSubscriptionModal = ({
           <Controller
             control={control}
             name="endDate"
-            render={({ field: { onChange, value }, formState: { errors } }) => (
+            render={({ field, formState: { errors } }) => (
               <>
                 <DatePicker
-                  value={value || ""}
+                  value={field.value || ""}
                   onChange={(date) => {
-                    onChange(date?.isValid ? date.toString() : "");
+                    if (date && date.isValid) {
+                      field.onChange(date.toDate());
+                    }
                   }}
                   calendarPosition="bottom-right"
                   calendar={persian}
@@ -189,7 +191,6 @@ export const AddSubscriptionModal = ({
                       type="text"
                       label="تاریخ پایان"
                       placeholder="1406/11/05"
-                      value={value}
                       error={errors?.endDate?.message}
                     />
                   }

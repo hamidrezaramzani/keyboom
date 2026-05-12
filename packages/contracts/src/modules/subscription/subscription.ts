@@ -79,6 +79,17 @@ const subscriptionActions = {
       ok: cdtoSuccess(subscription),
     },
   },
+  cancel: {
+    params: z.object({
+      subscriptionId: z.string(),
+    }),
+    payload: z.object({
+      title: z.string().min(1, "Title is required"),
+    }),
+    response: {
+      ok: cdtoSuccess(subscription),
+    },
+  },
   delete: {
     params: deleteSubscriptionParams,
     response: {
@@ -128,4 +139,14 @@ export class SubscriptionRenewPayloadDto extends createZodDto(
 ) {}
 export class SubscriptionRenewResponseOkDto extends createZodDto(
   subscriptionActions.renew.response.ok,
+) {}
+
+export class SubscriptionCancelParamsDto extends createZodDto(
+  subscriptionActions.cancel.params,
+) {}
+export class SubscriptionCancelPayloadDto extends createZodDto(
+  subscriptionActions.cancel.payload,
+) {}
+export class SubscriptionCancelResponseOkDto extends createZodDto(
+  subscriptionActions.cancel.response.ok,
 ) {}

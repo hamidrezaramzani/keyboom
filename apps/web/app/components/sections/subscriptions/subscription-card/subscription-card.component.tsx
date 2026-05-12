@@ -2,8 +2,12 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Calendar, MoreVertical } from "lucide-react";
-import { Badge, RenewSubscriptionModal } from "@/app/components";
+import { Calendar, MoreVertical } from "lucide-react";
+import {
+  Badge,
+  CancelSubscriptionModal,
+  RenewSubscriptionModal,
+} from "@/app/components";
 import { cn } from "@/app/lib/utils";
 import { Subscription } from "@/app/services/subscription";
 import { useState, useRef, useEffect } from "react";
@@ -11,8 +15,6 @@ import { useState, useRef, useEffect } from "react";
 interface SubscriptionCardProps {
   subscription: Subscription;
   onClick: () => void;
-  onRenew?: () => void;
-  onCancel?: () => void;
   onPriceChange?: () => void;
 }
 
@@ -33,11 +35,11 @@ const formatDate = (dateString: string) => {
 export const SubscriptionCard = ({
   subscription,
   onClick,
-  onCancel,
   onPriceChange,
 }: SubscriptionCardProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRenewModalOpen, setIsRenewModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const { setNodeRef, transform, transition, isDragging } = useSortable({
@@ -71,7 +73,7 @@ export const SubscriptionCard = ({
   const handleMenuAction = (action: string) => {
     setIsMenuOpen(false);
     if (action === "renew") onToggleRenewModal();
-    if (action === "cancel" && onCancel) onCancel();
+    if (action === "cancel") onToggleCancelModal();
     if (action === "price-change" && onPriceChange) onPriceChange();
   };
 
@@ -79,11 +81,20 @@ export const SubscriptionCard = ({
     setIsRenewModalOpen((prevState) => !prevState);
   };
 
+  const onToggleCancelModal = () => {
+    setIsCancelModalOpen((prevState) => !prevState);
+  };
+
   return (
     <>
       <RenewSubscriptionModal
         isOpen={isRenewModalOpen}
         onClose={onToggleRenewModal}
+        subscription={subscription}
+      />
+      <CancelSubscriptionModal
+        isOpen={isCancelModalOpen}
+        onClose={onToggleCancelModal}
         subscription={subscription}
       />
       <div

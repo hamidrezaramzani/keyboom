@@ -4,4 +4,5 @@ export const SUBSCRIPTION_ENDPOINTS = {
   move: (subscriptionId: string) => `/subscriptions/${subscriptionId}/move`,
   delete: (subscriptionId: string) => `/subscriptions/${subscriptionId}`,
   renew: (subscriptionId: string) => `/subscriptions/${subscriptionId}/renew`,
+  cancel: (subscriptionId: string) => `/subscriptions/${subscriptionId}/cancel`,
 };
