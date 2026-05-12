@@ -48,7 +48,6 @@ export const BoardColumn = ({
   const activeSubscriptions = group.subscriptions.filter(
     (sub) => sub.status === "active",
   );
-
   return (
     <div
       ref={setNodeRef}

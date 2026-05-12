@@ -39,6 +39,24 @@ export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
   }),
 }));
 
+export const subscriptionHistory = pgTable('subscription_history', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  subscriptionId: varchar('subscription_id', { length: 36 })
+    .notNull()
+    .references(() => subscriptions.id, { onDelete: 'cascade' }),
+  userId: varchar('user_id', { length: 36 })
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  action: varchar('action', { length: 50 }).notNull(),
+  title: varchar('title', { length: 255 }),
+  metadata: text('metadata'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export type SubscriptionHistory = typeof subscriptionHistory.$inferSelect;
+export type NewSubscriptionHistory = typeof subscriptionHistory.$inferInsert;
+export const SubscriptionHistoryMigrationKey = 'subscription_history';
+
 export type Subscription = typeof subscriptions.$inferSelect;
 export type NewSubscription = typeof subscriptions.$inferInsert;
 export const SubscriptionMigrationKey = 'subscriptions';

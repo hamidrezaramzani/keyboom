@@ -4,9 +4,12 @@ import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { DRIZZLE } from 'src/core/db/drizzle.provider';
 import {
   NewSubscription,
+  NewSubscriptionHistory,
   Subscription,
+  subscriptionHistory,
   subscriptions,
 } from './subscription.schema';
+import { categories } from '../category/category.schema';
 
 @Injectable()
 export class SubscriptionRepository {
@@ -40,5 +43,19 @@ export class SubscriptionRepository {
 
   async delete(id: string): Promise<void> {
     await this.db.delete(subscriptions).where(eq(subscriptions.id, id));
+  }
+
+  async findCategoryBySubscriptionId(categoryId: string) {
+    const category = await this.db
+      .select()
+      .from(categories)
+      .where(eq(categories.id, categoryId))
+      .limit(1);
+
+    return category[0];
+  }
+
+  async createSubscriptionHistory(data: NewSubscriptionHistory): Promise<void> {
+    await this.db.insert(subscriptionHistory).values(data);
   }
 }

@@ -165,4 +165,78 @@ export class SubscriptionService {
 
     await this.subscriptionRepository.delete(subscriptionId);
   }
+
+  async renew(
+    userId: string,
+    subscriptionId: string,
+    title: string,
+    renewDate: Date,
+  ) {
+    const subscription =
+      await this.sanityCheckService.checkSubscriptionIsExists(subscriptionId);
+
+    const group = await this.sanityCheckService.checkGroupIsExists(
+      subscription.groupId,
+    );
+
+    const workspace = await this.sanityCheckService.checkWorkspaceIsExists(
+      group.workspaceId,
+    );
+
+    if (subscription.userId !== userId) {
+      throw new ForbiddenException('You can only renew your own subscriptions');
+    }
+
+    if (renewDate <= subscription.endDate) {
+      throw new BadRequestException(
+        'Renew date must be after current end date',
+      );
+    }
+
+    const isMember = await this.workspaceRepository.isUserMemberOfWorkspace(
+      userId,
+      workspace.id,
+    );
+    if (!isMember) {
+      throw new ForbiddenException('You are not a member of this workspace');
+    }
+
+    const oldEndDate = subscription.endDate;
+    const updated = await this.subscriptionRepository.update(subscriptionId, {
+      endDate: renewDate,
+    });
+
+    await this.subscriptionRepository.createSubscriptionHistory({
+      id: this.generateId(),
+      subscriptionId,
+      userId,
+      action: 'RENEWED',
+      title,
+      metadata: JSON.stringify({
+        oldEndDate,
+        newEndDate: renewDate,
+      }),
+    });
+
+    const now = new Date();
+    const status =
+      updated.endDate < now
+        ? 'expired'
+        : updated.endDate.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000
+          ? 'expiring'
+          : 'active';
+
+    const category =
+      await this.subscriptionRepository.findCategoryBySubscriptionId(
+        subscription.id,
+      );
+    return {
+      ...updated,
+      status,
+      startDate: updated.startDate.toISOString(),
+      endDate: updated.endDate.toISOString(),
+      categoryKey: category?.key,
+      categoryName: category?.name,
+    };
+  }
 }

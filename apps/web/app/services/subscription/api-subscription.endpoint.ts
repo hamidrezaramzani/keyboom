@@ -38,6 +38,17 @@ export const subscriptionEndpoints = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Group"],
     }),
+    renewSubscription: builder.mutation<
+      ERD<SubscriptionActions["renew"]>,
+      QueryArgsNew<SubscriptionActions["renew"]>
+    >({
+      query: ({ params, payload }) => ({
+        url: SUBSCRIPTION_ENDPOINTS.renew(params.subscriptionId),
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: ["Group", "Subscription"],
+    }),
     deleteSubscription: builder.mutation<
       ERD<SubscriptionActions["delete"]>,
       QueryArgsNew<SubscriptionActions["delete"]>
@@ -56,5 +67,6 @@ export const {
   useCreateSubscriptionMutation,
   useUpdateSubscriptionMutation,
   useMoveSubscriptionMutation,
+  useRenewSubscriptionMutation,
   useDeleteSubscriptionMutation,
 } = subscriptionEndpoints;
