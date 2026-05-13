@@ -9,29 +9,59 @@ import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import {
+  SubscriptionPeriod,
   useCreatePeriodMutation,
+  useGetPeriodsQuery,
   useUpdatePeriodMutation,
 } from "@/app/services/subscription-period";
 import { toast } from "@/app/lib";
 
-const periodSchema = z
-  .object({
-    title: z.string().min(1, "عنوان الزامی است"),
-    startDate: z.date(),
-    endDate: z.date(),
-    monthlyPrice: z.string().min(1, "قیمت باید بیشتر از 0 باشد"),
-  })
-  .superRefine((data, ctx) => {
-    if (data.startDate >= data.endDate) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "تاریخ پایان باید بعد از تاریخ شروع باشد",
-        path: ["endDate"],
-      });
-    }
-  });
+const getPeriodSchema = (
+  isEditing: boolean,
+  periods?: SubscriptionPeriod[],
+  period?: SubscriptionPeriod | null,
+) =>
+  z
+    .object({
+      title: z.string().min(1, "عنوان الزامی است"),
+      startDate: z.date(),
+      endDate: z.date(),
+      monthlyPrice: z.string().min(1, "قیمت باید بیشتر از 0 باشد"),
+    })
+    .superRefine((data, ctx) => {
+      if (data.startDate >= data.endDate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "تاریخ پایان باید بعد از تاریخ شروع باشد",
+          path: ["endDate"],
+        });
+      }
 
-type PeriodFormValues = z.infer<typeof periodSchema>;
+      const hasOverlap = periods?.some((p) => {
+        if (isEditing && p.id === period?.id) return false;
+
+        const existingStart = new Date(p.startDate);
+        const existingEnd = new Date(p.endDate);
+        const newStart = new Date(data.startDate);
+        const newEnd = new Date(data.endDate);
+
+        if (newStart >= existingStart && newStart < existingEnd) return true;
+        if (newEnd > existingStart && newEnd <= existingEnd) return true;
+        if (newStart <= existingStart && newEnd >= existingEnd) return true;
+
+        return false;
+      });
+
+      if (hasOverlap) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "این بازه با یکی از بازه‌های موجود تداخل دارد",
+          path: ["startDate"],
+        });
+      }
+    });
+
+type PeriodFormValues = z.infer<ReturnType<typeof getPeriodSchema>>;
 
 interface PricePeriodModalProps {
   isOpen: boolean;
@@ -39,13 +69,7 @@ interface PricePeriodModalProps {
   subscriptionId: string;
   subscriptionStartDate: Date;
   subscriptionEndDate: Date;
-  period?: {
-    id: string;
-    title: string;
-    startDate: Date;
-    endDate: Date;
-    monthlyPrice: number;
-  } | null;
+  period?: SubscriptionPeriod | null;
   onSuccess?: () => void;
 }
 
@@ -60,7 +84,10 @@ export const SubscriptionPeriodFormModal = ({
 }: PricePeriodModalProps) => {
   const [createPeriod, { isLoading: isCreating }] = useCreatePeriodMutation();
   const [updatePeriod, { isLoading: isUpdating }] = useUpdatePeriodMutation();
+  const { data: periods } = useGetPeriodsQuery({ params: { subscriptionId } });
   const isEditing = !!period;
+
+  const periodSchema = getPeriodSchema(isEditing, periods, period);
 
   const {
     control,
