@@ -7,7 +7,7 @@ const subscription = z.object({
   id: z.string(),
   name: z.string(),
   price: z.number(),
-  category: z.string(), // TODO this field should return caregory info
+  category: z.string(),
   groupId: z.string(),
   userId: z.string(),
   startDate: z.string(),

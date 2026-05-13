@@ -15,11 +15,11 @@ import {
   RenewSubscriptionModal,
 } from "@/app/components";
 import { cn } from "@/app/lib/utils";
-import { Subscription } from "@/app/services/subscription";
 import { useState, useRef, useEffect } from "react";
+import { GroupSubscription } from "@/app/services/group";
 
 interface SubscriptionCardProps {
-  subscription: Subscription;
+  subscription: GroupSubscription;
   onClick: () => void;
   onPriceChange?: () => void;
 }

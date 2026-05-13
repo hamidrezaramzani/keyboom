@@ -17,7 +17,7 @@ import {
 } from "@dnd-kit/sortable";
 import { BoardColumn } from "../board-column/board-column.component";
 import { AddGroupColumn } from "../add-group-column/add-group-column.component";
-import { Group } from "@/app/services/group";
+import { Group, GroupSubscription } from "@/app/services/group";
 import { Subscription } from "@/app/services/subscription";
 
 interface BoardProps {
@@ -25,7 +25,7 @@ interface BoardProps {
   onGroupsReorder: (groups: Group[]) => void;
   onAddGroup: () => void;
   onGroupSettings: (groupId: string, groupName: string) => void;
-  onSubscriptionClick: (subscription: Subscription) => void;
+  onSubscriptionClick: (subscription: GroupSubscription) => void;
   onSubscriptionMove?: (
     subscriptionId: string,
     fromGroupId: string,

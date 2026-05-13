@@ -13,12 +13,12 @@ import {
 import { useState } from "react";
 import { useReadManyWorkspacesQuery } from "../services/workspace";
 import {
+  GroupSubscription,
   useCreateGroupMutation,
   useGetGroupsQuery,
   useReorderGroupsMutation,
 } from "../services/group";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { Subscription } from "../services/subscription";
 
 export default function SubscriptionsPage() {
   const { data: workspace } = useReadManyWorkspacesQuery({});
@@ -36,7 +36,7 @@ export default function SubscriptionsPage() {
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [selectedGroupName, setSelectedGroupName] = useState<string>();
   const [selectedSubscription, setSelectedSubscription] =
-    useState<Subscription>();
+    useState<GroupSubscription>();
   const [isAddSubscriptionOpen, setIsAddSubscriptionOpen] = useState(false);
   const [isSubscriptionDetailOpen, setIsSubscriptionDetailOpen] =
     useState(false);
@@ -63,7 +63,7 @@ export default function SubscriptionsPage() {
     setIsGroupSettingsOpen(true);
   };
 
-  const handleSubscriptionClick = (subscription: Subscription) => {
+  const handleSubscriptionClick = (subscription: GroupSubscription) => {
     setSelectedSubscription(subscription);
     setIsSubscriptionDetailOpen(true);
   };
@@ -104,15 +104,17 @@ export default function SubscriptionsPage() {
       <AddSubscriptionModal
         isOpen={isAddSubscriptionOpen}
         onClose={() => setIsAddSubscriptionOpen(false)}
-        defaultGroupId={selectedGroupId}
-        groups={groups}
+        workspaceId={workspace?.defaultWorkspace.id}
       />
 
       <SubscriptionModal
         isOpen={isSubscriptionDetailOpen}
-        onClose={() => setIsSubscriptionDetailOpen(false)}
+        onClose={() => {
+          setIsSubscriptionDetailOpen(false);
+          setSelectedSubscription(undefined);
+        }}
         subscription={selectedSubscription}
-        groupName={selectedGroupName}
+        workspaceId={workspace?.defaultWorkspace.id}
       />
 
       <GroupSettingsModal

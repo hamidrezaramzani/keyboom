@@ -1,4 +1,3 @@
-// app/components/sections/subscriptions/AddWorkspaceModal.tsx
 "use client";
 
 import { useForm } from "react-hook-form";

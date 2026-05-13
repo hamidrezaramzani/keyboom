@@ -21,7 +21,14 @@ const groupWithSubscriptions = group.extend({
       id: z.string(),
       name: z.string(),
       price: z.number(),
-      category: z.string(),
+      category: z.object({
+        id: z.string(),
+        name: z.string(),
+      }),
+      group: z.object({
+        id: z.string(),
+        name: z.string(),
+      }),
       startDate: z.date(),
       endDate: z.date(),
       website: z.string().nullable(),

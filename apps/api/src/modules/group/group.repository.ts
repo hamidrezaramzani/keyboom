@@ -4,6 +4,7 @@ import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { DRIZZLE } from 'src/core/db/drizzle.provider';
 import { groups } from '../workspace/workspace.schema';
 import { subscriptions } from '../subscription/subscription.schema';
+import { categories } from '../category/category.schema';
 
 @Injectable()
 export class GroupRepository {
@@ -48,7 +49,32 @@ export class GroupRepository {
   async findByWorkspaceIdWithSubscriptions(workspaceId: string) {
     const groupsList = await this.findByWorkspaceId(workspaceId);
 
-    const subscriptionsList = await this.db.select().from(subscriptions);
+    const subscriptionsList = await this.db
+      .select({
+        id: subscriptions.id,
+        name: subscriptions.name,
+        price: subscriptions.price,
+        startDate: subscriptions.startDate,
+        endDate: subscriptions.endDate,
+        website: subscriptions.website,
+        description: subscriptions.description,
+        reminderDays: subscriptions.reminderDays,
+        createdAt: subscriptions.createdAt,
+        updatedAt: subscriptions.updatedAt,
+        userId: subscriptions.userId,
+        groupId: subscriptions.groupId,
+        category: {
+          id: categories.id,
+          name: categories.name,
+        },
+        group: {
+          id: groups.id,
+          name: groups.name,
+        },
+      })
+      .from(subscriptions)
+      .innerJoin(categories, eq(subscriptions.category, categories.id))
+      .innerJoin(groups, eq(subscriptions.groupId, groups.id));
 
     const now = new Date();
     const subscriptionsWithStatus = subscriptionsList.map((sub) => ({
@@ -76,7 +102,6 @@ export class GroupRepository {
       subscriptions: subscriptionsByGroup[group.id] || [],
     }));
   }
-
   async create(data: {
     id: string;
     workspaceId: string;

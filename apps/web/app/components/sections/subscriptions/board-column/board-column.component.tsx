@@ -10,13 +10,13 @@ import { GripVertical, Settings, Wallet } from "lucide-react";
 import { SubscriptionCard } from "../subscription-card/subscription-card.component";
 import { Button, EmptyState } from "@/app/components";
 import { cn } from "@/app/lib/utils";
-import { Group } from "@/app/services/group";
+import { Group, GroupSubscription } from "@/app/services/group";
 import { Subscription } from "@/app/services/subscription";
 
 interface BoardColumnProps {
   group: Group;
   onSettings: () => void;
-  onSubscriptionClick: (subscription: Subscription) => void;
+  onSubscriptionClick: (subscription: GroupSubscription) => void;
   onAddSubscriptionClick: (groupId: string, groupName: string) => void;
 }
 
@@ -94,9 +94,7 @@ export const BoardColumn = ({
                   <SubscriptionCard
                     key={sub.id}
                     subscription={sub}
-                    onClick={() =>
-                      onSubscriptionClick(sub as unknown as Subscription)
-                    }
+                    onClick={() => onSubscriptionClick(sub)}
                   />
                 ))}
               </div>
@@ -116,9 +114,7 @@ export const BoardColumn = ({
                   <SubscriptionCard
                     key={sub.id}
                     subscription={sub}
-                    onClick={() =>
-                      onSubscriptionClick(sub as unknown as Subscription)
-                    }
+                    onClick={() => onSubscriptionClick(sub)}
                   />
                 ))}
               </div>

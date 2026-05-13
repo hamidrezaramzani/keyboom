@@ -7,11 +7,9 @@ import { Modal, Input, Button } from "@/app/components";
 import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
-import {
-  Subscription,
-  useRenewSubscriptionMutation,
-} from "@/app/services/subscription";
+import { useRenewSubscriptionMutation } from "@/app/services/subscription";
 import { toast } from "@/app/lib";
+import { GroupSubscription } from "@/app/services/group";
 
 const renewSchema = z.object({
   title: z.string().min(1, "عنوان تمدید الزامی است"),
@@ -23,7 +21,7 @@ type RenewForm = z.infer<typeof renewSchema>;
 interface RenewSubscriptionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  subscription: Subscription;
+  subscription: GroupSubscription;
   onSuccess?: () => void;
 }
 

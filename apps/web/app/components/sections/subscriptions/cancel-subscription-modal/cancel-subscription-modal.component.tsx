@@ -4,11 +4,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Modal, Input, Button } from "@/app/components";
-import {
-  Subscription,
-  useCancelSubscriptionMutation,
-} from "@/app/services/subscription";
+import { useCancelSubscriptionMutation } from "@/app/services/subscription";
 import { toast } from "@/app/lib";
+import { GroupSubscription } from "@/app/services/group";
 
 const cancelSchema = z.object({
   title: z.string().min(1, "عنوان لغو الزامی است"),
@@ -19,7 +17,7 @@ type CancelForm = z.infer<typeof cancelSchema>;
 interface CancelSubscriptionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  subscription: Subscription | null;
+  subscription: GroupSubscription | null;
   onSuccess?: () => void;
 }
 
@@ -80,7 +78,7 @@ export const CancelSubscriptionModal = ({
           <p className="text-gray-400 text-xs">اشتراک: {subscription?.name}</p>
           <p className="text-gray-400 text-xs mt-1">
             تاریخ پایان فعلی:{" "}
-            {subscription?.endDate ? formatDate(subscription.endDate) : "-"}
+            {subscription?.endDate ? formatDate(subscription.endDate.toString()) : "-"}
           </p>
         </div>
 
