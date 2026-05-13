@@ -3,9 +3,31 @@ import { InputProps } from "./input.type";
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
-    { label, error, icon, containerClassName = "", className = "", ...props },
+    {
+      label,
+      error,
+      icon,
+      type = "text",
+      containerClassName = "",
+      className = "",
+      ...props
+    },
     ref,
   ) => {
+    const isPrice = type === "price";
+    const inputType = isPrice ? "text" : type;
+
+    const formatPrice = (value: string) => {
+      const numbers = value.replace(/[^0-9]/g, "");
+      return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const formatted = formatPrice(e.target.value);
+      e.target.value = formatted;
+      props.onChange?.(e);
+    };
+
     return (
       <div className={`w-full ${containerClassName}`}>
         {label && (
@@ -21,6 +43,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
           <input
             ref={ref}
+            type={inputType}
             className={`
               disabled:text-gray-300 disabled:bg-slate-900 disabled:cursor-not-allowed
               w-full px-4 py-2.5 bg-gray-800/50 border rounded-xl 
@@ -32,6 +55,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               ${icon ? "pl-10" : ""}
               ${className}
             `}
+            onChange={isPrice ? handlePriceChange : props.onChange}
             {...props}
           />
         </div>

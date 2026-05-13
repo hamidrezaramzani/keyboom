@@ -17,6 +17,7 @@ import {
 import { cn } from "@/app/lib/utils";
 import { useState, useRef, useEffect } from "react";
 import { GroupSubscription } from "@/app/services/group";
+import { SubscriptionPeriodFormModal } from "../subscription-period-form/subscription-period-form.component";
 
 interface SubscriptionCardProps {
   subscription: GroupSubscription;
@@ -44,6 +45,10 @@ export const SubscriptionCard = ({
   onPriceChange,
 }: SubscriptionCardProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [
+    isAddSubscriptionPeriodModalOpen,
+    setIsAddSubscriptionPeriodModalOpen,
+  ] = useState(false);
   const [isRenewModalOpen, setIsRenewModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -80,7 +85,7 @@ export const SubscriptionCard = ({
     setIsMenuOpen(false);
     if (action === "renew") onToggleRenewModal();
     if (action === "cancel") onToggleCancelModal();
-    if (action === "price-change" && onPriceChange) onPriceChange();
+    if (action === "price-change") onToggleAddSubscriptionPeriodModal();
   };
 
   const onToggleRenewModal = () => {
@@ -89,6 +94,10 @@ export const SubscriptionCard = ({
 
   const onToggleCancelModal = () => {
     setIsCancelModalOpen((prevState) => !prevState);
+  };
+
+  const onToggleAddSubscriptionPeriodModal = () => {
+    setIsAddSubscriptionPeriodModalOpen((prevState) => !prevState);
   };
 
   return (
@@ -102,6 +111,13 @@ export const SubscriptionCard = ({
         isOpen={isCancelModalOpen}
         onClose={onToggleCancelModal}
         subscription={subscription}
+      />
+      <SubscriptionPeriodFormModal
+        isOpen={isAddSubscriptionPeriodModalOpen}
+        onClose={onToggleAddSubscriptionPeriodModal}
+        subscriptionId={subscription.id}
+        subscriptionStartDate={subscription.startDate}
+        subscriptionEndDate={subscription.endDate}
       />
       <div
         ref={setNodeRef}

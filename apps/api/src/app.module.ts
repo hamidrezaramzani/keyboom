@@ -10,6 +10,7 @@ import { InvitationModule } from './modules/invite/invite.module';
 import { WebSocketModule } from './modules/websocket/websocket.module';
 import { CategoriesModule } from './modules/category/category.module';
 import { GroupModule } from './modules/group/group.module';
+import { SubscriptionPeriodModule } from './modules/subscription-period/subscription-period.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { GroupModule } from './modules/group/group.module';
     WebSocketModule,
     CategoriesModule,
     GroupModule,
+    SubscriptionPeriodModule,
   ],
   providers: [
     {

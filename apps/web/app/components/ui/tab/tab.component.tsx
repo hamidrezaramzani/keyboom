@@ -68,7 +68,7 @@ export const Tabs = ({ tabs, defaultTab }: TabsProps) => {
         </div>
       </div>
 
-      <div className="mt-6 md:w-3/4 w-full">
+      <div className="mt-6 w-full">
         {activeTabContent || (
           <div className="text-center text-gray-400 py-8">محتوایی یافت نشد</div>
         )}
