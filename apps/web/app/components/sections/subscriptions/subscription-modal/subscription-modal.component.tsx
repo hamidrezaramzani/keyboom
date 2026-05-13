@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Modal, Input, Button, Select, Badge } from "@/app/components";
@@ -15,18 +15,40 @@ import {
 } from "@/app/services/subscription/api-subscription.endpoint";
 import { toast } from "@/app/lib";
 import { Subscription } from "@/app/services/subscription";
+import DatePicker from "react-multi-date-picker";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
 
-const editSubscriptionSchema = z.object({
-  name: z.string().min(1, "نام اشتراک الزامی است"),
-  categoryId: z.string().min(1, "دسته‌بندی الزامی است"),
-  groupId: z.string().min(1, "گروه الزامی است"),
-  price: z.string().min(1, "قیمت الزامی است"),
-  startDate: z.string().min(1, "تاریخ شروع الزامی است"),
-  endDate: z.string().min(1, "تاریخ پایان الزامی است"),
-  website: z.string().url("لینک معتبر وارد کنید").or(z.literal("")),
-  description: z.string(),
-  reminderDays: z.string(),
-});
+const editSubscriptionSchema = z
+  .object({
+    name: z.string().min(1, "نام اشتراک الزامی است"),
+    categoryId: z.string().min(1, "دسته‌بندی الزامی است"),
+    groupId: z.string().min(1, "گروه الزامی است"),
+    price: z.string().min(1, "قیمت الزامی است"),
+    startDate: z.date().min(new Date(), "تاریخ شروع الزامی است"),
+    endDate: z.date().min(new Date(), "تاریخ پایان الزامی است"),
+    website: z.string().url("لینک معتبر وارد کنید").or(z.literal("")),
+    description: z.string(),
+    reminderDays: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    const start = new Date(data.startDate);
+    const end = new Date(data.endDate);
+
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+
+    const diffTime = end.getTime() - start.getTime();
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+    if (diffDays < 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "تاریخ پایان باید حداقل یک روز بعد از تاریخ شروع باشد",
+        path: ["endDate"],
+      });
+    }
+  });
 
 type EditSubscriptionForm = z.infer<typeof editSubscriptionSchema>;
 
@@ -43,6 +65,7 @@ interface SubscriptionModalProps {
   subscription?: Subscription;
   workspaceId?: string;
   onSuccess?: () => void;
+  groupName?: string;
 }
 
 const statusConfig = {
@@ -57,6 +80,7 @@ export const SubscriptionModal = ({
   subscription,
   workspaceId,
   onSuccess,
+  groupName,
 }: SubscriptionModalProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const { confirm } = useConfirm();
@@ -78,6 +102,7 @@ export const SubscriptionModal = ({
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    control,
   } = useForm<EditSubscriptionForm>({
     resolver: zodResolver(editSubscriptionSchema),
     defaultValues: {
@@ -85,8 +110,12 @@ export const SubscriptionModal = ({
       categoryId: "",
       groupId: "",
       price: "",
-      startDate: "",
-      endDate: "",
+      startDate: subscription?.startDate
+        ? new Date(subscription?.startDate)
+        : undefined,
+      endDate: subscription?.endDate
+        ? new Date(subscription?.endDate)
+        : undefined,
       website: "",
       description: "",
       reminderDays: "3",
@@ -100,8 +129,8 @@ export const SubscriptionModal = ({
         categoryId: subscription.category,
         groupId: subscription.groupId,
         price: subscription.price.toString(),
-        startDate: subscription.startDate,
-        endDate: subscription.endDate,
+        startDate: new Date(subscription.startDate),
+        endDate: new Date(subscription.endDate),
         website: subscription.website || "",
         description: subscription.description || "",
         reminderDays: subscription?.reminderDays?.toString(),
@@ -183,8 +212,6 @@ export const SubscriptionModal = ({
   if (!subscription) return null;
 
   if (!isEditing) {
-    const isArchived = subscription.isArchived;
-
     return (
       <Modal
         isOpen={isOpen}
@@ -200,7 +227,7 @@ export const SubscriptionModal = ({
             </div>
             <div>
               <p className="text-gray-500 text-sm">گروه</p>
-              <p className="text-white">{subscription.groupId}</p>
+              <p className="text-white">{groupName}</p>
             </div>
           </div>
 
@@ -272,7 +299,7 @@ export const SubscriptionModal = ({
             </p>
           </div>
 
-          {subscription.status === "expiring" && !isArchived && (
+          {subscription.status === "expiring" && (
             <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3">
               <p className="text-amber-400 text-sm">
                 ⏰ این اشتراک به زودی منقضی می‌شود. برای تمدید اقدام کنید.
@@ -322,37 +349,88 @@ export const SubscriptionModal = ({
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="هزینه ماهانه (تومان)"
-            type="number"
-            placeholder="۵۹۰۰۰"
-            error={errors.price?.message}
-            {...register("price")}
-          />
-          <Input
-            label="تاریخ شروع"
-            type="date"
-            error={errors.startDate?.message}
-            {...register("startDate")}
-          />
-        </div>
+        <Input
+          label="هزینه ماهانه (تومان)"
+          type="number"
+          placeholder="۵۹۰۰۰"
+          error={errors.price?.message}
+          {...register("price")}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="تاریخ پایان"
-            type="date"
-            error={errors.endDate?.message}
-            {...register("endDate")}
-          />
-          <Input
-            label="لینک وب‌سایت (اختیاری)"
-            placeholder="https://filimo.com"
-            error={errors.website?.message}
-            {...register("website")}
-          />
+          <div>
+            <Controller
+              control={control}
+              name="startDate"
+              render={({ field }) => (
+                <DatePicker
+                  value={field.value}
+                  onChange={(date) => {
+                    if (date && date.isValid) {
+                      field.onChange(date.toDate());
+                    }
+                  }}
+                  calendarPosition="top-right"
+                  calendar={persian}
+                  locale={persian_fa}
+                  render={
+                    <Input
+                      type="text"
+                      label="تاریخ پایان"
+                      placeholder="انتخاب تاریخ"
+                    />
+                  }
+                  containerClassName="w-full"
+                />
+              )}
+            />
+            {errors.startDate && (
+              <p className="text-red-500 text-sm">{errors.startDate.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Controller
+              control={control}
+              name="endDate"
+              render={({ field }) => (
+                <DatePicker
+                  value={field.value}
+                  onChange={(date) => {
+                    if (date && date.isValid) {
+                      field.onChange(date.toDate());
+                    }
+                  }}
+                  calendarPosition="top-right"
+                  calendar={persian}
+                  locale={persian_fa}
+                  render={
+                    <Input
+                      type="text"
+                      label="تاریخ پایان"
+                      placeholder="انتخاب تاریخ"
+                    />
+                  }
+                  containerClassName="w-full"
+                />
+              )}
+            />
+            {errors.endDate && (
+              <p className="text-red-500 text-sm">{errors.endDate.message}</p>
+            )}
+          </div>
         </div>
 
+        <Input
+          label="لینک وب‌سایت (اختیاری)"
+          placeholder="https://filimo.com"
+          error={errors.website?.message}
+          {...register("website")}
+        />
+
+        <label className="block text-sm font-medium text-gray-300 mb-2">
+          توضیحات
+        </label>
         <textarea
           className="w-full px-4 py-2.5 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           rows={3}

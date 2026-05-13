@@ -68,8 +68,10 @@ export default function SubscriptionsPage() {
     setIsSubscriptionDetailOpen(true);
   };
 
-  const handleAddSubscription = () => {
+  const handleAddSubscription = (groupId: string, groupName: string) => {
     setIsAddSubscriptionOpen(true);
+    setSelectedGroupId(groupId);
+    setSelectedGroupName(groupName);
   };
 
   return (
@@ -110,6 +112,7 @@ export default function SubscriptionsPage() {
         isOpen={isSubscriptionDetailOpen}
         onClose={() => setIsSubscriptionDetailOpen(false)}
         subscription={selectedSubscription}
+        groupName={selectedGroupName}
       />
 
       <GroupSettingsModal

@@ -12,16 +12,35 @@ import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 
-const addSubscriptionSchema = z.object({
-  name: z.string().min(1, "نام اشتراک الزامی است"),
-  categoryId: z.string().min(1, "دسته‌بندی الزامی است"),
-  groupId: z.string().min(1, "گروه الزامی است"),
-  price: z.string().min(1, "قیمت الزامی است"),
-  startDate: z.date().min(new Date(), "تاریخ شروع الزامی است"),
-  endDate: z.date().min(new Date(), "تاریخ پایان الزامی است"),
-  website: z.string().url("لینک معتبر وارد کنید").or(z.literal("")),
-  description: z.string(),
-});
+const addSubscriptionSchema = z
+  .object({
+    name: z.string().min(1, "نام اشتراک الزامی است"),
+    categoryId: z.string().min(1, "دسته‌بندی الزامی است"),
+    groupId: z.string().min(1, "گروه الزامی است"),
+    price: z.string().min(1, "قیمت الزامی است"),
+    startDate: z.date().min(new Date(), "تاریخ شروع الزامی است"),
+    endDate: z.date().min(new Date(), "تاریخ پایان الزامی است"),
+    website: z.string().url("لینک معتبر وارد کنید").or(z.literal("")),
+    description: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    const start = new Date(data.startDate);
+    const end = new Date(data.endDate);
+
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+
+    const diffTime = end.getTime() - start.getTime();
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+    if (diffDays < 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "تاریخ پایان باید حداقل یک روز بعد از تاریخ شروع باشد",
+        path: ["endDate"],
+      });
+    }
+  });
 
 type AddSubscriptionForm = z.infer<typeof addSubscriptionSchema>;
 
@@ -49,7 +68,7 @@ export const AddSubscriptionModal = ({
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, defaultValues },
     reset,
     control,
   } = useForm<AddSubscriptionForm>({
@@ -128,6 +147,7 @@ export const AddSubscriptionModal = ({
           <Select
             label="گروه"
             options={groupsOptions}
+            defaultValue={defaultGroupId || ""}
             error={errors.groupId?.message}
             {...register("groupId")}
           />
@@ -144,60 +164,67 @@ export const AddSubscriptionModal = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Controller
-            control={control}
-            name="startDate"
-            render={({ field: { onChange, value }, formState: { errors } }) => (
-              <>
+          <div>
+            <Controller
+              control={control}
+              name="startDate"
+              render={({ field }) => (
                 <DatePicker
-                  value={value || ""}
-                  onChange={(date) => {
-                    onChange(date);
-                  }}
-                  calendarPosition="bottom-right"
-                  calendar={persian}
-                  locale={persian_fa}
-                  render={
-                    <Input
-                      type="text"
-                      label="تاریخ شروع"
-                      placeholder="1380/11/05"
-                      value={value.toISOString()}
-                      error={errors?.startDate?.message}
-                    />
-                  }
-                />
-              </>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="endDate"
-            render={({ field, formState: { errors } }) => (
-              <>
-                <DatePicker
-                  value={field.value || ""}
+                  value={field.value}
                   onChange={(date) => {
                     if (date && date.isValid) {
                       field.onChange(date.toDate());
                     }
                   }}
-                  calendarPosition="bottom-right"
+                  calendarPosition="top-right"
                   calendar={persian}
                   locale={persian_fa}
                   render={
                     <Input
                       type="text"
                       label="تاریخ پایان"
-                      placeholder="1406/11/05"
-                      error={errors?.endDate?.message}
+                      placeholder="انتخاب تاریخ"
                     />
                   }
+                  containerClassName="w-full"
                 />
-              </>
+              )}
+            />
+            {errors.startDate && (
+              <p className="text-red-500 text-sm">{errors.startDate.message}</p>
             )}
-          />
+          </div>
+
+          <div>
+            <Controller
+              control={control}
+              name="endDate"
+              render={({ field }) => (
+                <DatePicker
+                  value={field.value}
+                  onChange={(date) => {
+                    if (date && date.isValid) {
+                      field.onChange(date.toDate());
+                    }
+                  }}
+                  calendarPosition="top-right"
+                  calendar={persian}
+                  locale={persian_fa}
+                  render={
+                    <Input
+                      type="text"
+                      label="تاریخ پایان"
+                      placeholder="انتخاب تاریخ"
+                    />
+                  }
+                  containerClassName="w-full"
+                />
+              )}
+            />
+            {errors.endDate && (
+              <p className="text-red-500 text-sm">{errors.endDate.message}</p>
+            )}
+          </div>
         </div>
 
         <Input

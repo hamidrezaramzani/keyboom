@@ -2,7 +2,13 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Calendar, MoreVertical } from "lucide-react";
+import {
+  Calendar,
+  DollarSign,
+  MoreVertical,
+  RefreshCw,
+  XCircle,
+} from "lucide-react";
 import {
   Badge,
   CancelSubscriptionModal,
@@ -129,27 +135,32 @@ export const SubscriptionCard = ({
                     e.stopPropagation();
                     handleMenuAction("renew");
                   }}
-                  className="w-full text-right px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors"
+                  className="w-full text-right px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center gap-2 justify-start cursor-pointer"
                 >
-                  🔄 تمدید
+                  <RefreshCw className="w-4 h-4" />
+                  <span>تمدید</span>
                 </button>
+
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     handleMenuAction("price-change");
                   }}
-                  className="w-full text-right px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors"
+                  className="w-full  px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center gap-2 justify-start cursor-pointer"
                 >
-                  💰 تغییر قیمت
+                  <DollarSign className="w-4 h-4" />
+                  <span>تغییر قیمت</span>
                 </button>
+
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     handleMenuAction("cancel");
                   }}
-                  className="w-full text-right px-3 py-2 text-sm text-red-400 hover:bg-gray-700 transition-colors"
+                  className="w-full text-right px-3 py-2 text-sm text-red-400 hover:bg-gray-700 transition-colors flex items-center gap-2 justify-start cursor-pointer"
                 >
-                  🚫 لغو اشتراک
+                  <XCircle className="w-4 h-4" />
+                  <span>لغو اشتراک</span>
                 </button>
               </div>
             )}

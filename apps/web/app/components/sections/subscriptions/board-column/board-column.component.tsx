@@ -17,7 +17,7 @@ interface BoardColumnProps {
   group: Group;
   onSettings: () => void;
   onSubscriptionClick: (subscription: Subscription) => void;
-  onAddSubscriptionClick: (groupId: string) => void;
+  onAddSubscriptionClick: (groupId: string, groupName: string) => void;
 }
 
 export const BoardColumn = ({
@@ -126,11 +126,12 @@ export const BoardColumn = ({
           )}
         </SortableContext>
 
-        {group.subscriptions.length === 0 && (
+        {expiringSubscriptions.length === 0 &&
+        activeSubscriptions.length === 0 ? (
           <div className="w-full h-full flex justify-center items-center">
             <EmptyState icon={Wallet} title="هیچ اشتراکی در این گروه نیست" />
           </div>
-        )}
+        ) : null}
       </div>
 
       <div className="p-3 border-t border-gray-700">
@@ -139,7 +140,7 @@ export const BoardColumn = ({
           size="sm"
           fullWidth
           className="text-gray-400 hover:text-white"
-          onClick={() => onAddSubscriptionClick(group.id)}
+          onClick={() => onAddSubscriptionClick(group.id, group.name)}
         >
           + اضافه کردن اشتراک
         </Button>

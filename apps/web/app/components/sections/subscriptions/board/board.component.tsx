@@ -35,7 +35,7 @@ interface BoardProps {
     groupId: string,
     newSubscriptions: Subscription[],
   ) => void;
-  onAddSubscription: (groupId: string) => void;
+  onAddSubscription: (groupId: string, groupName: string) => void;
 }
 
 export const Board = ({
