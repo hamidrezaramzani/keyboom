@@ -76,7 +76,7 @@ export default function TicketsPage() {
           </div>
 
           <div className="p-4">
-            <div className="flex gap-3">
+            <div className="flex md:flex-row flex-col gap-3 md:mb-0 mb-5">
               <div className="relative md:col-span-2">
                 <Input
                   label="جستجو"
@@ -87,7 +87,7 @@ export default function TicketsPage() {
                   }
                 />
               </div>
-              <div className="w-full flex gap-8">
+              <div className="w-full flex md:flex-row flex-col gap-8">
                 <div className="flex items-center gap-2">
                   <Select
                     label="وضعیت"
