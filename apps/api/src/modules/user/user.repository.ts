@@ -33,4 +33,13 @@ export class UsersRepository {
 
     return result[0] || null;
   }
+
+  async findAdmin(): Promise<User> {
+    const result = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.isAdmin, true))
+      .limit(1);
+    return result[0];
+  }
 }

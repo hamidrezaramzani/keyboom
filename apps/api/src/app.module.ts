@@ -11,6 +11,7 @@ import { WebSocketModule } from './modules/websocket/websocket.module';
 import { CategoriesModule } from './modules/category/category.module';
 import { GroupModule } from './modules/group/group.module';
 import { SubscriptionPeriodModule } from './modules/subscription-period/subscription-period.module';
+import { TicketModule } from './modules/ticket/ticket.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SubscriptionPeriodModule } from './modules/subscription-period/subscrip
     CategoriesModule,
     GroupModule,
     SubscriptionPeriodModule,
+    TicketModule,
   ],
   providers: [
     {

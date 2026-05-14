@@ -9,3 +9,4 @@ export { CategoryActions } from "./modules/categories/categories";
 export { GroupActions } from "./modules/group/group";
 export { SubscriptionActions } from "./modules/subscription/subscription";
 export { SubscriptionPeriodActions } from "./modules/subscription-period/subscription-period";
+export { TicketActions } from "./modules/ticket/ticket";

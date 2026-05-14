@@ -11,6 +11,7 @@ export const baseApi = createApi({
     "Group",
     "Notification",
     "Invitation",
+    "Ticket",
   ],
   endpoints: () => ({}),
 });

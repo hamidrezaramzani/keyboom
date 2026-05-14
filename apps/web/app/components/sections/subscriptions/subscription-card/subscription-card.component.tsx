@@ -183,11 +183,10 @@ export const SubscriptionCard = ({
           </div>
         </div>
 
-        <div className="flex items-start gap-2 pr-8">
+        <div className="flex items-start gap-2">
           <div className="flex-1 min-w-0">
             <p className="text-white text-sm font-medium truncate flex gap-2">
               {subscription.name}
-
               <p className="text-gray-400 text-xs font-medium shrink-0">
                 {formatPrice(subscription.price)}
               </p>

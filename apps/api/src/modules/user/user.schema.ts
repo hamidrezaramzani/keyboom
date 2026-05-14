@@ -19,6 +19,7 @@ export const users = pgTable(
       length: 36,
     }),
     isActive: boolean('is_active').notNull().default(true),
+    isAdmin: boolean('is_admin').notNull().default(false),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },

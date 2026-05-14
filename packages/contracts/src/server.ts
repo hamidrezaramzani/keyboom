@@ -6,3 +6,4 @@ export * from "./modules/categories/categories.js";
 export * from "./modules/group/group.js";
 export * from "./modules/subscription/subscription.js";
 export * from "./modules/subscription-period/subscription-period.js";
+export * from "./modules/ticket/ticket.js";

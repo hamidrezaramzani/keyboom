@@ -1,13 +1,14 @@
 // app/components/layout/header/header.component.tsx
 "use client";
 
-import { Menu, Search } from "lucide-react";
+import { Menu, Search, Ticket } from "lucide-react";
 import { Avatar } from "@/app/components/ui";
 import { WorkspaceSwitcher } from "../workspace-switcher/workspace-switcher.component";
 import { NotificationPopover } from "@/app/components/sections/notifications";
 import { Me } from "@/app/services";
 import { AddWorkspaceModal } from "../../sections";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -16,6 +17,12 @@ interface HeaderProps {
 
 export const Header = ({ onMenuClick, user }: HeaderProps) => {
   const [isAddWorkspaceOpen, setIsAddWorkspaceOpen] = useState(false);
+
+  const { push } = useRouter();
+
+  const handlRedirectToTicket = () => {
+    push("/dashboard/ticket");
+  };
 
   return (
     <header className="w-full bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-40">
@@ -43,6 +50,13 @@ export const Header = ({ onMenuClick, user }: HeaderProps) => {
 
           <NotificationPopover />
 
+          <button
+            className="relative p-2 text-gray-400 hover:text-white rounded-lg transition-colors"
+            onClick={handlRedirectToTicket}
+          >
+            <Ticket className="w-5 h-5" />
+          </button>
+
           {user && (
             <div className="flex items-center gap-2">
               <Avatar name={user.fullName} />
@@ -57,9 +71,9 @@ export const Header = ({ onMenuClick, user }: HeaderProps) => {
         </div>
       </div>
 
-      <AddWorkspaceModal 
-        isOpen={isAddWorkspaceOpen} 
-        onClose={() => setIsAddWorkspaceOpen(false)} 
+      <AddWorkspaceModal
+        isOpen={isAddWorkspaceOpen}
+        onClose={() => setIsAddWorkspaceOpen(false)}
       />
     </header>
   );
