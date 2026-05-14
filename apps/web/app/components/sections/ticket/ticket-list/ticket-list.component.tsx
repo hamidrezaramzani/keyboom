@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Badge, EmptyState } from "@/app/components/ui";
-import { toast } from "sonner";
 import {
   AlertCircle,
   CheckCircle,
@@ -16,6 +15,7 @@ import { useConfirm } from "@/app/lib/store/context";
 import { TicketDetailModal } from "../ticket-details-modal/ticket-details-modal.component";
 import { formatDistanceToNow } from "date-fns";
 import { faIR } from "date-fns/locale";
+import { toast } from "@/app/lib";
 
 interface TicketListProps {
   tickets: Ticket[];
