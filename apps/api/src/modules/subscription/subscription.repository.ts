@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { DRIZZLE } from 'src/core/db/drizzle.provider';
 import {
@@ -10,6 +10,10 @@ import {
   subscriptions,
 } from './subscription.schema';
 import { categories } from '../category/category.schema';
+import {
+  SubscriptionPeriod,
+  subscriptionPeriods,
+} from '../subscription-period/subscription-period.schema';
 
 @Injectable()
 export class SubscriptionRepository {
@@ -70,5 +74,23 @@ export class SubscriptionRepository {
       .where(eq(subscriptions.id, id))
       .returning();
     return result[0];
+  }
+
+  async findPeriodsBySubscriptionId(
+    subscriptionId: string,
+  ): Promise<SubscriptionPeriod[]> {
+    return this.db
+      .select()
+      .from(subscriptionPeriods)
+      .where(eq(subscriptionPeriods.subscriptionId, subscriptionId))
+      .orderBy(subscriptionPeriods.startDate);
+  }
+
+  async findHistoryBySubscriptionId(subscriptionId: string) {
+    return this.db
+      .select()
+      .from(subscriptionHistory)
+      .where(eq(subscriptionHistory.subscriptionId, subscriptionId))
+      .orderBy(desc(subscriptionHistory.createdAt));
   }
 }

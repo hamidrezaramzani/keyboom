@@ -5,4 +5,7 @@ export const SUBSCRIPTION_ENDPOINTS = {
   delete: (subscriptionId: string) => `/subscriptions/${subscriptionId}`,
   renew: (subscriptionId: string) => `/subscriptions/${subscriptionId}/renew`,
   cancel: (subscriptionId: string) => `/subscriptions/${subscriptionId}/cancel`,
+  stats: (subscriptionId: string) => `/subscriptions/${subscriptionId}/stats`,
+  timeline: (subscriptionId: string) =>
+    `/subscriptions/${subscriptionId}/timeline`,
 };

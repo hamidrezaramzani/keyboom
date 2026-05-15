@@ -8,6 +8,7 @@ import {
   Param,
   HttpCode,
   HttpStatus,
+  Get,
 } from '@nestjs/common';
 import { UserId } from 'src/core/decorators';
 import {
@@ -27,6 +28,10 @@ import {
   SubscriptionCancelParamsDto,
   SubscriptionCancelPayloadDto,
   SubscriptionCancelResponseOkDto,
+  SubscriptionGetStatsParamsDto,
+  SubscriptionGetStatsResponseOkDto,
+  SubscriptionGetTimelineParamsDto,
+  SubscriptionGetTimelineResponseOkDto,
 } from '@keyboom/contracts/server';
 import { SubscriptionService } from './subscription.service';
 
@@ -135,6 +140,40 @@ export class SubscriptionController {
     return {
       data: { success: true },
       message: 'Subscription deleted successfully',
+      statusCode: 200,
+    };
+  }
+
+  @Get(':subscriptionId/stats')
+  @HttpCode(HttpStatus.OK)
+  async getStats(
+    @UserId() userId: string,
+    @Param() params: SubscriptionGetStatsParamsDto,
+  ): Promise<SubscriptionGetStatsResponseOkDto> {
+    const stats = await this.subscriptionService.getStats(
+      userId,
+      params.subscriptionId,
+    );
+    return {
+      data: stats,
+      message: 'Subscription stats retrieved',
+      statusCode: 200,
+    };
+  }
+
+  @Get(':subscriptionId/timeline')
+  @HttpCode(HttpStatus.OK)
+  async getTimeline(
+    @UserId() userId: string,
+    @Param() params: SubscriptionGetTimelineParamsDto,
+  ): Promise<SubscriptionGetTimelineResponseOkDto> {
+    const timeline = await this.subscriptionService.getTimeline(
+      userId,
+      params.subscriptionId,
+    );
+    return {
+      data: timeline,
+      message: 'Subscription timeline retrieved',
       statusCode: 200,
     };
   }

@@ -2,6 +2,7 @@ import { SubscriptionActions } from "@keyboom/contracts/client";
 import { baseApi } from "../api";
 import { ERD, QueryArgsNew } from "../api.type";
 import { SUBSCRIPTION_ENDPOINTS } from "./api-subscription.constant";
+import { transformResponse } from "../api.helper";
 
 export const subscriptionEndpoints = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -68,7 +69,29 @@ export const subscriptionEndpoints = baseApi.injectEndpoints({
         url: SUBSCRIPTION_ENDPOINTS.delete(params.subscriptionId),
         method: "DELETE",
       }),
-      invalidatesTags: ["Group"],
+      invalidatesTags: ["Group", "Subscription"],
+    }),
+    getSubscriptionStats: builder.query<
+      ERD<SubscriptionActions["getStats"]>,
+      QueryArgsNew<SubscriptionActions["getStats"]>
+    >({
+      query: ({ params }) => ({
+        url: SUBSCRIPTION_ENDPOINTS.stats(params.subscriptionId),
+        method: "GET",
+      }),
+      providesTags: ["Subscription"],
+      transformResponse,
+    }),
+    getSubscriptionTimeline: builder.query<
+      ERD<SubscriptionActions["getTimeline"]>,
+      QueryArgsNew<SubscriptionActions["getTimeline"]>
+    >({
+      query: ({ params }) => ({
+        url: SUBSCRIPTION_ENDPOINTS.timeline(params.subscriptionId),
+        method: "GET",
+      }),
+      providesTags: ["Subscription"],
+      transformResponse,
     }),
   }),
   overrideExisting: false,
@@ -81,4 +104,6 @@ export const {
   useRenewSubscriptionMutation,
   useCancelSubscriptionMutation,
   useDeleteSubscriptionMutation,
+  useGetSubscriptionStatsQuery,
+  useGetSubscriptionTimelineQuery,
 } = subscriptionEndpoints;

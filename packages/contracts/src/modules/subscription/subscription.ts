@@ -96,6 +96,57 @@ const subscriptionActions = {
       ok: cdtoSuccess(z.object({ success: z.boolean() })),
     },
   },
+  getStats: {
+    params: z.object({
+      subscriptionId: z.string(),
+    }),
+    response: {
+      ok: cdtoSuccess(
+        z.object({
+          costToDate: z.number(),
+          costToEnd: z.number(),
+          annualCost: z.number(),
+          dailyCost: z.number(),
+        }),
+      ),
+    },
+  },
+  getTimeline: {
+    params: z.object({
+      subscriptionId: z.string(),
+    }),
+    response: {
+      ok: cdtoSuccess(
+        z.object({
+          groups: z.array(
+            z.object({
+              id: z.string(),
+              title: z.string(),
+            }),
+          ),
+          items: z.array(
+            z.object({
+              id: z.number(),
+              group: z.string(),
+              title: z.string(),
+              start_time: z.number(),
+              end_time: z.number(),
+              itemProps: z.object({
+                style: z.object({
+                  background: z.string(),
+                  border: z.string(),
+                  color: z.string(),
+                  borderRadius: z.string(),
+                }),
+              }),
+            }),
+          ),
+          startDate: z.string().datetime(),
+          endDate: z.string().datetime(),
+        }),
+      ),
+    },
+  },
 } as const;
 
 export type SubscriptionActions = Actions<typeof subscriptionActions>;
@@ -149,4 +200,17 @@ export class SubscriptionCancelPayloadDto extends createZodDto(
 ) {}
 export class SubscriptionCancelResponseOkDto extends createZodDto(
   subscriptionActions.cancel.response.ok,
+) {}
+
+export class SubscriptionGetStatsParamsDto extends createZodDto(
+  subscriptionActions.getStats.params,
+) {}
+export class SubscriptionGetStatsResponseOkDto extends createZodDto(
+  subscriptionActions.getStats.response.ok,
+) {}
+export class SubscriptionGetTimelineParamsDto extends createZodDto(
+  subscriptionActions.getTimeline.params,
+) {}
+export class SubscriptionGetTimelineResponseOkDto extends createZodDto(
+  subscriptionActions.getTimeline.response.ok,
 ) {}

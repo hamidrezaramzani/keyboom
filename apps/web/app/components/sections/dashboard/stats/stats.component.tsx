@@ -1,4 +1,3 @@
-// app/components/sections/dashboard/StatsCards.tsx
 "use client";
 
 import { Package, CheckCircle, Calendar, TrendingUp } from "lucide-react";
@@ -69,7 +68,7 @@ export const StatsCards = ({ data }: StatsCardsProps) => {
         icon={<Calendar className="w-5 h-5 text-amber-400" />}
       />
       <StatCard
-        title="هزینه سالانه"
+        title="برآورد هزینه سالانه"
         value={formatCurrency(data.yearlyCost)}
         icon={<TrendingUp className="w-5 h-5 text-purple-400" />}
       />

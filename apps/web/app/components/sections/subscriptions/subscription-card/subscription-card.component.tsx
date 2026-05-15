@@ -4,9 +4,11 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
   Calendar,
+  ChartArea,
   DollarSign,
   History,
   MoreVertical,
+  PieChart,
   RefreshCw,
   XCircle,
 } from "lucide-react";
@@ -178,8 +180,8 @@ export const SubscriptionCard = ({
                   }}
                   className="w-full  px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center gap-2 justify-start cursor-pointer"
                 >
-                  <History className="w-4 h-4" />
-                  <span>حط زمانی</span>
+                  <ChartArea className="w-4 h-4" />
+                  <span>اطلاعات آماری</span>
                 </button>
 
                 <button
