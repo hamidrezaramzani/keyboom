@@ -5,6 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import {
   Calendar,
   DollarSign,
+  History,
   MoreVertical,
   RefreshCw,
   XCircle,
@@ -18,6 +19,7 @@ import { cn } from "@/app/lib/utils";
 import { useState, useRef, useEffect } from "react";
 import { GroupSubscription } from "@/app/services/group";
 import { SubscriptionPeriodFormModal } from "../subscription-period-form/subscription-period-form.component";
+import { useRouter } from "next/navigation";
 
 interface SubscriptionCardProps {
   subscription: GroupSubscription;
@@ -42,8 +44,9 @@ const formatDate = (dateString: string) => {
 export const SubscriptionCard = ({
   subscription,
   onClick,
-  onPriceChange,
 }: SubscriptionCardProps) => {
+  const { push } = useRouter();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [
     isAddSubscriptionPeriodModalOpen,
@@ -166,6 +169,17 @@ export const SubscriptionCard = ({
                 >
                   <DollarSign className="w-4 h-4" />
                   <span>تغییر قیمت</span>
+                </button>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    push(`/dashboard/timeline/${subscription.id}`);
+                  }}
+                  className="w-full  px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center gap-2 justify-start cursor-pointer"
+                >
+                  <History className="w-4 h-4" />
+                  <span>حط زمانی</span>
                 </button>
 
                 <button
