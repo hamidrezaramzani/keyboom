@@ -82,17 +82,6 @@ export const subscriptionEndpoints = baseApi.injectEndpoints({
       providesTags: ["Subscription"],
       transformResponse,
     }),
-    getSubscriptionTimeline: builder.query<
-      ERD<SubscriptionActions["getTimeline"]>,
-      QueryArgsNew<SubscriptionActions["getTimeline"]>
-    >({
-      query: ({ params }) => ({
-        url: SUBSCRIPTION_ENDPOINTS.timeline(params.subscriptionId),
-        method: "GET",
-      }),
-      providesTags: ["Subscription"],
-      transformResponse,
-    }),
   }),
   overrideExisting: false,
 });
@@ -105,5 +94,4 @@ export const {
   useCancelSubscriptionMutation,
   useDeleteSubscriptionMutation,
   useGetSubscriptionStatsQuery,
-  useGetSubscriptionTimelineQuery,
 } = subscriptionEndpoints;

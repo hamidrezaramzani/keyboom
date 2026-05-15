@@ -4,3 +4,4 @@ export { ExpiringSoon } from "./epxiring-soon/expiring-soon.component";
 export { MonthlyChart } from "./monthly-chart/monthly-chart.component";
 export { QuickAddButton } from "./quick-actions/quick-actions.component";
 export { AICard } from "./ai-card/ai-card.component";
+export { DashboardContentHeader } from "./dashboard-content-header/dashboard-content-header.component";

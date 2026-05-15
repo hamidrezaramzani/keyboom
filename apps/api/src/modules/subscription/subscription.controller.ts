@@ -30,8 +30,6 @@ import {
   SubscriptionCancelResponseOkDto,
   SubscriptionGetStatsParamsDto,
   SubscriptionGetStatsResponseOkDto,
-  SubscriptionGetTimelineParamsDto,
-  SubscriptionGetTimelineResponseOkDto,
 } from '@keyboom/contracts/server';
 import { SubscriptionService } from './subscription.service';
 
@@ -157,23 +155,6 @@ export class SubscriptionController {
     return {
       data: stats,
       message: 'Subscription stats retrieved',
-      statusCode: 200,
-    };
-  }
-
-  @Get(':subscriptionId/timeline')
-  @HttpCode(HttpStatus.OK)
-  async getTimeline(
-    @UserId() userId: string,
-    @Param() params: SubscriptionGetTimelineParamsDto,
-  ): Promise<SubscriptionGetTimelineResponseOkDto> {
-    const timeline = await this.subscriptionService.getTimeline(
-      userId,
-      params.subscriptionId,
-    );
-    return {
-      data: timeline,
-      message: 'Subscription timeline retrieved',
       statusCode: 200,
     };
   }

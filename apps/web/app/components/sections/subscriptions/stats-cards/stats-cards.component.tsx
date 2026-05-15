@@ -1,4 +1,3 @@
-// app/components/sections/stats/StatsCards.tsx
 "use client";
 
 import { Card } from "@/app/components/ui";
@@ -32,7 +31,7 @@ export const StatsCards = ({ stats }: StatsCardsProps) => {
         </p>
       </Card>
       <Card variant="hover">
-        <p className="text-gray-500 text-sm mb-1">هزینه سالانه</p>
+        <p className="text-gray-500 text-sm mb-1">برآورد هزینه سالانه</p>
         <p className="text-2xl font-bold text-white">
           {formatPrice(stats.annualCost)}
         </p>

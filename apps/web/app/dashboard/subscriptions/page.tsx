@@ -11,13 +11,13 @@ import {
   SubscriptionModal,
 } from "@/app/components/sections/subscriptions";
 import { useState } from "react";
-import { useReadManyWorkspacesQuery } from "../services/workspace";
+import { useReadManyWorkspacesQuery } from "../../services/workspace";
 import {
   GroupSubscription,
   useCreateGroupMutation,
   useGetGroupsQuery,
   useReorderGroupsMutation,
-} from "../services/group";
+} from "../../services/group";
 import { skipToken } from "@reduxjs/toolkit/query";
 
 export default function SubscriptionsPage() {

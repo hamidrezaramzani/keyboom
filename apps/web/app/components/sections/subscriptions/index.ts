@@ -10,5 +10,4 @@ export { AddWorkspaceModal } from "./add-workspace-modal/add-workspace-modal.com
 export { AddGroupModal } from "./add-group-modal/add-group-modal.component";
 export { RenewSubscriptionModal } from "./renewal-subscription-modal/renewal-subscription.component";
 export { CancelSubscriptionModal } from "./cancel-subscription-modal/cancel-subscription-modal.component";
-export { TimelineView } from "./timeline/timeline.component";
-export { StatsCards } from "./timeline-stats/timeline-stats.component";
+export { StatsCards } from "./stats-cards/stats-cards.component";

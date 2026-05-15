@@ -28,8 +28,8 @@ interface SidebarProps {
 
 const navItems = [
   { name: "داشبورد", href: "/dashboard", icon: LayoutDashboard },
-  { name: "اشتراک‌ها", href: "/subscriptions", icon: Package },
-  { name: "گزارشات", href: "/reports", icon: Package },
+  { name: "اشتراک‌ها", href: "/dashboard/subscriptions", icon: Package },
+  { name: "گزارشات", href: "/dashboard/report", icon: Package },
   { name: "تنظیمات", href: "/settings", icon: ChartArea },
 ];
 
