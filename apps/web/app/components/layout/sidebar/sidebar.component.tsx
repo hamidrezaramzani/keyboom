@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
-  Settings,
   LogOut,
   ChevronLeft,
   ChevronRight,
   Zap,
+  ChartArea,
 } from "lucide-react";
 import { cn } from "@/app/lib/utils";
 import { Avatar } from "@/app/components/ui";
@@ -23,13 +23,14 @@ interface SidebarProps {
   activeWorkspace?: { id: string; name: string };
   user?: Me;
   onLogout?: () => void;
-  isMobile?: boolean; // اضافه شد
+  isMobile?: boolean;
 }
 
 const navItems = [
   { name: "داشبورد", href: "/dashboard", icon: LayoutDashboard },
   { name: "اشتراک‌ها", href: "/subscriptions", icon: Package },
-  { name: "تنظیمات", href: "/settings", icon: Settings },
+  { name: "گزارشات", href: "/reports", icon: Package },
+  { name: "تنظیمات", href: "/settings", icon: ChartArea },
 ];
 
 export const Sidebar = ({
