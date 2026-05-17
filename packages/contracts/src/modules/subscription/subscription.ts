@@ -42,6 +42,28 @@ const deleteSubscriptionParams = z.object({
   subscriptionId: z.string(),
 });
 
+const periodDetailInMonthSchema = z.object({
+  title: z.string(),
+  startDate: z.string(),
+  endDate: z.string().nullable(),
+  monthlyPrice: z.number(),
+  daysInMonth: z.array(z.number()).optional(),
+  dateRange: z
+    .object({
+      start: z.number(),
+      end: z.number(),
+    })
+    .optional(),
+});
+
+const monthlyCostSchema = z.object({
+  year: z.number(),
+  month: z.number(),
+  monthName: z.string(),
+  cost: z.number(),
+  periods: z.array(periodDetailInMonthSchema),
+});
+
 const subscriptionActions = {
   create: {
     payload: createSubscriptionPayload,
@@ -111,6 +133,33 @@ const subscriptionActions = {
       ),
     },
   },
+
+  getReport: {
+    params: z.object({
+      subscriptionId: z.string(),
+    }),
+    response: {
+      ok: cdtoSuccess(
+        z.object({
+          name: z.string(),
+          status: z.string(),
+          startDate: z.string(),
+          endDate: z.string(),
+
+          groupName: z.string(),
+          categoryName: z.string(),
+          countdown: z.number(),
+
+          totalSpent: z.number(),
+          currentPrice: z.number(),
+          renewalCount: z.number(),
+          remainingDays: z.number(),
+
+          costOverTime: z.array(monthlyCostSchema),
+        }),
+      ),
+    },
+  },
 } as const;
 
 export type SubscriptionActions = Actions<typeof subscriptionActions>;
@@ -171,4 +220,12 @@ export class SubscriptionGetStatsParamsDto extends createZodDto(
 ) {}
 export class SubscriptionGetStatsResponseOkDto extends createZodDto(
   subscriptionActions.getStats.response.ok,
+) {}
+
+export class SubscriptionGetReportParamsDto extends createZodDto(
+  subscriptionActions.getReport.params,
+) {}
+
+export class SubscriptionGetReportResponseOkDto extends createZodDto(
+  subscriptionActions.getReport.response.ok,
 ) {}

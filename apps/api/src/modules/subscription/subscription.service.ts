@@ -15,6 +15,44 @@ import {
   SubscriptionUpdatePayloadDto,
 } from '@keyboom/contracts/server';
 
+import { getFaMoment, getMonthName, toPersianDate } from './subscription.utils';
+
+type DailyCost = {
+  year: number;
+  month: number;
+  monthName: string;
+  day: number;
+  cost: number;
+  period: Period;
+  originalPrice: number;
+  dailyPrice: number;
+};
+
+type Period = {
+  title: string;
+  startDate: Date;
+  endDate: Date;
+  monthlyPrice: number;
+} | null;
+
+type PeriodDetail = {
+  title: string;
+  startDate: Date | string;
+  endDate: Date | string;
+  monthlyPrice: number;
+  days: DailyCost[];
+  dayNumbers: number[];
+};
+
+type MonthlyData = {
+  year: number;
+  month: number;
+  monthName: string;
+  totalCost: number;
+  days: DailyCost[];
+  periodDetails: Map<string, PeriodDetail>;
+};
+
 @Injectable()
 export class SubscriptionService {
   constructor(
@@ -380,5 +418,198 @@ export class SubscriptionService {
       annualCost: Math.round(annualCost),
       dailyCost: Math.round(dailyCost),
     };
+  }
+
+  async getReport(userId: string, subscriptionId: string) {
+    const subscription =
+      await this.sanityCheckService.checkSubscriptionIsExists(subscriptionId);
+
+    if (subscription.userId !== userId) {
+      throw new ForbiddenException(
+        'You do not have access to this subscription',
+      );
+    }
+
+    const details =
+      await this.subscriptionRepository.getSubscriptionWithDetails(
+        subscriptionId,
+      );
+    if (!details) {
+      throw new NotFoundException('Subscription details not found');
+    }
+
+    const now = new Date();
+    const endDate = new Date(subscription.endDate);
+    const remainingDays = Math.max(
+      0,
+      Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
+    );
+    const countdown = remainingDays;
+
+    const monthlyCostOverTime = await this.calculateDailyCostOverTime(
+      subscriptionId,
+      subscription.price,
+      subscription.startDate,
+      subscription.endDate,
+    );
+
+    const dailyCostOverTime = await this.calculateDailyCostOverTime(
+      subscriptionId,
+      subscription.price,
+      subscription.startDate,
+    );
+
+    const totalSpentUntilToday = Math.round(
+      dailyCostOverTime.reduce((a, b) => a + b.cost, 0),
+    );
+
+    const renewalsData =
+      await this.subscriptionRepository.findRenewalsBySubscriptionId(
+        subscriptionId,
+      );
+    const renewals = renewalsData.map((item) => ({
+      date: toPersianDate(item.date),
+      amount: item.amount,
+    }));
+
+    const renewalCount = renewals.length;
+    const currentPrice = subscription.price;
+
+    let status = 'فعال';
+    if (subscription.status === 'cancelled') status = 'لغو شده';
+    else if (subscription.endDate < new Date()) status = 'منقضی شده';
+    else if (remainingDays <= 7) status = 'در حال اتمام';
+
+    return {
+      name: subscription.name,
+      status,
+      startDate: subscription.startDate.toString(),
+      endDate: subscription.endDate.toString(),
+      groupName: details.groupName,
+      categoryName: details.categoryName,
+      countdown,
+      totalSpent: totalSpentUntilToday,
+      currentPrice,
+      renewalCount,
+      remainingDays,
+      costOverTime: monthlyCostOverTime,
+    };
+  }
+
+  private async calculateDailyCostOverTime(
+    subscriptionId: string,
+    subscriptionMonthlyPrice: number,
+    startDate: Date,
+    endDate?: Date,
+  ) {
+    const periods =
+      await this.subscriptionRepository.findPeriodsBySubscriptionId(
+        subscriptionId,
+      );
+
+    const start = getFaMoment(startDate);
+    const end = endDate ? getFaMoment(endDate) : getFaMoment(new Date());
+
+    const result = [];
+    const currentDate = start.clone();
+
+    while (currentDate <= end) {
+      const period = periods.find((p) => {
+        const periodStart = getFaMoment(p.startDate);
+        const periodEnd = p.endDate ? getFaMoment(p.endDate) : null;
+        return (
+          periodStart <= currentDate && (!periodEnd || periodEnd > currentDate)
+        );
+      });
+
+      const monthlyPrice = period
+        ? period.monthlyPrice
+        : subscriptionMonthlyPrice;
+      const dailyPrice = monthlyPrice / 30;
+
+      result.push({
+        year: currentDate.get('year'),
+        month: currentDate.get('month') + 1,
+        monthName: getMonthName(currentDate.get('month')),
+        day: currentDate.get('date'),
+        cost: dailyPrice,
+        period: period
+          ? {
+              title: period.title,
+              startDate: period.startDate,
+              endDate: period.endDate,
+              monthlyPrice: period.monthlyPrice,
+            }
+          : null,
+        originalPrice: monthlyPrice,
+        dailyPrice: dailyPrice,
+      });
+
+      currentDate.add(1, 'day');
+    }
+
+    const monthlyResult = this.aggregateDailyToMonthly(result);
+
+    return monthlyResult;
+  }
+
+  private aggregateDailyToMonthly(dailyData: DailyCost[]) {
+    const monthlyMap = new Map<string, MonthlyData>();
+
+    dailyData?.forEach((day) => {
+      const key = `${day.year}-${day.month}`;
+
+      if (!monthlyMap.has(key)) {
+        monthlyMap.set(key, {
+          year: day.year,
+          month: day.month,
+          monthName: day.monthName,
+          totalCost: 0,
+          days: [],
+          periodDetails: new Map<string, PeriodDetail>(),
+        });
+      }
+
+      const monthData = monthlyMap.get(key)!;
+      monthData.totalCost += day.cost;
+      monthData.days.push(day);
+
+      if (day.period) {
+        const periodKey = day.period.title;
+        if (!monthData.periodDetails.has(periodKey)) {
+          monthData.periodDetails.set(periodKey, {
+            title: day.period.title,
+            startDate: day.period.startDate,
+            endDate: day.period.endDate,
+            monthlyPrice: day.period.monthlyPrice,
+            days: [],
+            dayNumbers: [],
+          });
+        }
+
+        const periodInfo = monthData.periodDetails.get(periodKey)!;
+        periodInfo.days.push(day);
+        periodInfo.dayNumbers.push(day.day);
+      }
+    });
+
+    return Array.from(monthlyMap.values()).map((item) => ({
+      year: item.year,
+      month: item.month,
+      monthName: item.monthName,
+      cost: Math.round(item.totalCost * 100) / 100,
+      periods: Array.from(item.periodDetails.values()).map((period) => ({
+        title: period.title,
+        startDate: period.startDate.toString(),
+        endDate: period.endDate.toString(),
+        monthlyPrice: period.monthlyPrice,
+        daysCount: period.days.length,
+        dayRange: {
+          start: Math.min(...period.dayNumbers),
+          end: Math.max(...period.dayNumbers),
+        },
+        affectedDays: period.dayNumbers,
+      })),
+    }));
   }
 }

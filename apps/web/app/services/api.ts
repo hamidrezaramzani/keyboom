@@ -8,6 +8,7 @@ export const baseApi = createApi({
     "User",
     "Workspace",
     "Subscription",
+    "SubscriptionReport",
     "Group",
     "Notification",
     "Invitation",

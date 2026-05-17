@@ -8,4 +8,5 @@ export const SUBSCRIPTION_ENDPOINTS = {
   stats: (subscriptionId: string) => `/subscriptions/${subscriptionId}/stats`,
   timeline: (subscriptionId: string) =>
     `/subscriptions/${subscriptionId}/timeline`,
+  report: (subscriptionId: string) => `/subscriptions/${subscriptionId}/report`,
 };

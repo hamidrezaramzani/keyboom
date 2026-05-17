@@ -82,6 +82,17 @@ export const subscriptionEndpoints = baseApi.injectEndpoints({
       providesTags: ["Subscription"],
       transformResponse,
     }),
+    getSubscriptionReport: builder.query<
+      ERD<SubscriptionActions["getReport"]>,
+      QueryArgsNew<SubscriptionActions["getReport"]>
+    >({
+      query: ({ params }) => ({
+        url: SUBSCRIPTION_ENDPOINTS.report(params.subscriptionId),
+        method: "GET",
+      }),
+      providesTags: ["SubscriptionReport"],
+      transformResponse,
+    }),
   }),
   overrideExisting: false,
 });
@@ -91,6 +102,7 @@ export const {
   useUpdateSubscriptionMutation,
   useMoveSubscriptionMutation,
   useRenewSubscriptionMutation,
+  useGetSubscriptionReportQuery,
   useCancelSubscriptionMutation,
   useDeleteSubscriptionMutation,
   useGetSubscriptionStatsQuery,

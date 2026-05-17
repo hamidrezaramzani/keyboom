@@ -6,9 +6,7 @@ import {
   Calendar,
   ChartArea,
   DollarSign,
-  History,
   MoreVertical,
-  PieChart,
   RefreshCw,
   XCircle,
 } from "lucide-react";
@@ -176,7 +174,7 @@ export const SubscriptionCard = ({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    push(`/dashboard/timeline/${subscription.id}`);
+                    push(`/dashboard/subscriptions/stats/${subscription.id}`);
                   }}
                   className="w-full  px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center gap-2 justify-start cursor-pointer"
                 >

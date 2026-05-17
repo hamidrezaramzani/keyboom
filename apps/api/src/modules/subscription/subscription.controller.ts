@@ -30,6 +30,8 @@ import {
   SubscriptionCancelResponseOkDto,
   SubscriptionGetStatsParamsDto,
   SubscriptionGetStatsResponseOkDto,
+  SubscriptionGetReportParamsDto,
+  SubscriptionGetReportResponseOkDto,
 } from '@keyboom/contracts/server';
 import { SubscriptionService } from './subscription.service';
 
@@ -155,6 +157,24 @@ export class SubscriptionController {
     return {
       data: stats,
       message: 'Subscription stats retrieved',
+      statusCode: 200,
+    };
+  }
+
+  @Get(':subscriptionId/report')
+  @HttpCode(HttpStatus.OK)
+  async getReport(
+    @UserId() userId: string,
+    @Param() params: SubscriptionGetReportParamsDto,
+  ): Promise<SubscriptionGetReportResponseOkDto> {
+    const report = await this.subscriptionService.getReport(
+      userId,
+      params.subscriptionId,
+    );
+
+    return {
+      data: report,
+      message: 'Report retrieved successfully',
       statusCode: 200,
     };
   }

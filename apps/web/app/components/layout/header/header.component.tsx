@@ -1,7 +1,6 @@
-// app/components/layout/header/header.component.tsx
 "use client";
 
-import { Menu, MessageSquare, Search, Ticket } from "lucide-react";
+import { Menu, MessageSquare, Search } from "lucide-react";
 import { Avatar } from "@/app/components/ui";
 import { WorkspaceSwitcher } from "../workspace-switcher/workspace-switcher.component";
 import { NotificationPopover } from "@/app/components/sections/notifications";
