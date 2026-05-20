@@ -12,6 +12,7 @@ import { CategoriesModule } from './modules/category/category.module';
 import { GroupModule } from './modules/group/group.module';
 import { SubscriptionPeriodModule } from './modules/subscription-period/subscription-period.module';
 import { TicketModule } from './modules/ticket/ticket.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { TicketModule } from './modules/ticket/ticket.module';
     GroupModule,
     SubscriptionPeriodModule,
     TicketModule,
+    DashboardModule,
   ],
   providers: [
     {

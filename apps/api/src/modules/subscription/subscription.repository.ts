@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { DRIZZLE } from 'src/core/db/drizzle.provider';
 import {
@@ -150,5 +150,23 @@ export class SubscriptionRepository {
       },
       ...periods,
     ];
+  }
+
+  async findByGroupIds(groupIds: string[]): Promise<Subscription[]> {
+    if (!groupIds.length) {
+      return [];
+    }
+
+    const result = await this.db
+      .select()
+      .from(subscriptions)
+      .where(
+        and(
+          inArray(subscriptions.groupId, groupIds),
+          eq(subscriptions.status, 'active'),
+        ),
+      );
+
+    return result;
   }
 }

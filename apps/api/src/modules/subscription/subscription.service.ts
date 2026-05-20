@@ -16,6 +16,8 @@ import {
 } from '@keyboom/contracts/server';
 
 import { getFaMoment, getMonthName, toPersianDate } from './subscription.utils';
+import { Subscription } from './subscription.schema';
+import moment from 'jalali-moment';
 
 type DailyCost = {
   year: number;
@@ -496,7 +498,7 @@ export class SubscriptionService {
     };
   }
 
-  private async calculateDailyCostOverTime(
+  async calculateDailyCostOverTime(
     subscriptionId: string,
     subscriptionMonthlyPrice: number,
     startDate: Date,
@@ -525,7 +527,9 @@ export class SubscriptionService {
       const monthlyPrice = period
         ? period.monthlyPrice
         : subscriptionMonthlyPrice;
-      const dailyPrice = monthlyPrice / 30;
+      const daysInMonth = currentDate.daysInMonth();
+
+      const dailyPrice = monthlyPrice / daysInMonth;
 
       result.push({
         year: currentDate.get('year'),
@@ -611,5 +615,114 @@ export class SubscriptionService {
         affectedDays: period.dayNumbers,
       })),
     }));
+  }
+
+  async calculateMonthlyCost(
+    subscriptions: Subscription[],
+    range: '3' | '6' | '12',
+  ): Promise<{ month: string; cost: number }[]> {
+    if (subscriptions.length === 0) return [];
+
+    const now = getFaMoment(new Date());
+    const monthsToGo = parseInt(range);
+    const startDate = now
+      .clone()
+      .subtract(monthsToGo - 1, 'jMonth')
+      .startOf('jMonth');
+
+    const monthlyMap = new Map<string, number>();
+
+    for (const sub of subscriptions) {
+      // گرفتن بازه‌های قیمتی اشتراک
+      const periods =
+        await this.subscriptionRepository.findPeriodsBySubscriptionId(sub.id);
+
+      // تبدیل تاریخ‌های اشتراک به moment شمسی
+      const subStart = getFaMoment(sub.startDate);
+      const subEnd = getFaMoment(sub.endDate);
+
+      // محدود کردن به بازه مورد نظر
+      const effectiveStart = subStart.isBefore(startDate)
+        ? startDate.clone()
+        : subStart.clone();
+      const effectiveEnd = subEnd.isAfter(now) ? now.clone() : subEnd.clone();
+
+      if (effectiveStart.isAfter(effectiveEnd)) continue;
+
+      // شروع از اول ماه
+      const currentDate = effectiveStart.clone().startOf('jMonth');
+
+      while (currentDate.isSameOrBefore(effectiveEnd, 'jMonth')) {
+        const year = currentDate.jYear();
+        const month = currentDate.jMonth();
+        const monthKey = `${year}-${month}`;
+
+        // محاسبه هزینه کل این ماه
+        let monthlyCost = 0;
+        const daysInMonth = currentDate.daysInMonth();
+
+        // محدوده روزهای این ماه که در بازه اشتراک است
+        const monthStart = currentDate.clone();
+        const monthEnd = currentDate.clone().endOf('jMonth');
+
+        const rangeStart = monthStart.isBefore(effectiveStart)
+          ? effectiveStart.clone()
+          : monthStart.clone();
+        const rangeEnd = monthEnd.isAfter(effectiveEnd)
+          ? effectiveEnd.clone()
+          : monthEnd.clone();
+
+        if (rangeStart.isAfter(rangeEnd)) {
+          currentDate.add(1, 'jMonth');
+          continue;
+        }
+
+        // محاسبه روز به روز در این ماه
+        const day = rangeStart.clone();
+        while (day.isSameOrBefore(rangeEnd, 'day')) {
+          // پیدا کردن بازه قیمتی مناسب برای این روز
+          const period = periods.find((p) => {
+            const periodStart = getFaMoment(p.startDate);
+            const periodEnd = p.endDate ? getFaMoment(p.endDate) : null;
+            return (
+              periodStart.isSameOrBefore(day, 'day') &&
+              (!periodEnd || periodEnd.isAfter(day, 'day'))
+            );
+          });
+
+          const monthlyPrice = period ? period.monthlyPrice : sub.price;
+          const dailyPrice = monthlyPrice / daysInMonth;
+          monthlyCost += dailyPrice;
+
+          day.add(1, 'day');
+        }
+
+        const currentTotal = monthlyMap.get(monthKey) || 0;
+        monthlyMap.set(monthKey, currentTotal + monthlyCost);
+
+        currentDate.add(1, 'jMonth');
+      }
+    }
+
+    const sortedMonths = Array.from(monthlyMap.entries())
+      .sort((a, b) => {
+        const [yearA, monthA] = a[0].split('-').map(Number);
+        const [yearB, monthB] = b[0].split('-').map(Number);
+        if (yearA !== yearB) return yearA - yearB;
+        return monthA - monthB;
+      })
+      .slice(-monthsToGo);
+
+    const result = sortedMonths.map(([key, value]) => {
+      const [year, month] = key.split('-').map(Number);
+      const date = moment(`${year}/${month + 1}/01`, 'jYYYY/jM/jD');
+
+      return {
+        month: getMonthName(date.jMonth()),
+        cost: Math.round(value),
+      };
+    });
+
+    return result;
   }
 }

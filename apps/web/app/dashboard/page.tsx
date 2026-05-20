@@ -1,122 +1,274 @@
 "use client";
 
+import { useGetDashboardQuery } from "@/app/services/dashboard/api-dashboard.endpoint";
 import { useState } from "react";
-import { DashboardLayout } from "@/app/components/layout";
 import {
-  AICard,
-  StatsCards,
-  RecentSubscriptions,
-  ExpiringSoon,
-  MonthlyChart,
-} from "@/app/components/sections/dashboard";
-import { AddSubscriptionModal, SubscriptionModal } from "../components";
-
-const mockStats = {
-  totalSubscriptions: 12,
-  activeSubscriptions: 8,
-  monthlyCost: 380000,
-  yearlyCost: 4560000,
-  monthlyTrend: 12,
-};
-
-const mockRecentSubscriptions = [
-  {
-    id: "1",
-    name: "فیلیمو",
-    price: 59000,
-    status: "active" as const,
-    endDate: "2025-01-15",
-  },
-  {
-    id: "2",
-    name: "نواپلی",
-    price: 35000,
-    status: "expiring" as const,
-    endDate: "2025-01-10",
-  },
-  {
-    id: "3",
-    name: "یوتیوب",
-    price: 65000,
-    status: "active" as const,
-    endDate: "2025-01-20",
-  },
-  {
-    id: "4",
-    name: "اسپاتیفای",
-    price: 45000,
-    status: "active" as const,
-    endDate: "2025-01-25",
-  },
-  {
-    id: "5",
-    name: "ادوبی",
-    price: 180000,
-    status: "expiring" as const,
-    endDate: "2025-01-08",
-  },
-];
-
-const mockExpiring = [
-  { id: "1", name: "نواپلی", daysLeft: 3 },
-  { id: "2", name: "ادوبی", daysLeft: 5 },
-];
-
-const mockChartData = [
-  { month: "مرداد", cost: 320000 },
-  { month: "شهریور", cost: 350000 },
-  { month: "مهر", cost: 380000 },
-  { month: "آبان", cost: 370000 },
-  { month: "آذر", cost: 390000 },
-  { month: "دی", cost: 380000 },
-];
-
-const aiMessage =
-  "سلام {name} جان! این ماه ۳۸۰ هزار تومان خرج اشتراک کردی، ۱۲٪ بیشتر از ماه قبل. دلیل اصلی اضافه شدن فیلیمو هست.";
+  Wallet,
+  TrendingUp,
+  CreditCard,
+  Users,
+  BarChart3,
+  PieChart as PieIcon,
+  Activity,
+  LucideLayoutDashboard,
+} from "lucide-react";
+import {
+  Card,
+  DashboardContentHeader,
+  DashboardLayout,
+  SubscriptionCalendar,
+  SubscriptionReportStatsCard,
+} from "@/app/components";
+import { formatPriceIRR } from "../lib/helpers";
+import {
+  Cell,
+  Pie,
+  ResponsiveContainer,
+  Tooltip,
+  PieChart,
+  LineChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Line,
+} from "recharts";
 
 export default function DashboardPage() {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [selectedSubscriptionId, setSelectedSubscriptionId] = useState<
-    string | null
-  >(null);
-  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
+  const [range, setRange] = useState<"3" | "6" | "12">("6");
 
-  const handleSubscriptionClick = (id: string) => {
-    setSelectedSubscriptionId(id);
-    setIsSubscriptionModalOpen(true);
-  };
+  const {
+    data: dashboard,
+    isLoading,
+    error,
+  } = useGetDashboardQuery({
+    params: {
+      range,
+    },
+  });
+
+  if (!dashboard) return null;
+
+  if (isLoading) return <div>در حال بارگذاری...</div>;
+  if (error) return <div>خطا در دریافت اطلاعات</div>;
+
+  const COLORS = [
+    "#6366f1",
+    "#22c55e",
+    "#f59e0b",
+    "#ef4444",
+    "#8b5cf6",
+    "#ec4899",
+    "#06b6d4",
+    "#84cc16",
+  ];
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <AICard message={aiMessage} userName="علی" />
-        <StatsCards data={mockStats} />
-
-        <div className="grid lg:grid-cols-2 gap-6">
-          <RecentSubscriptions
-            subscriptions={mockRecentSubscriptions}
-            onSubscriptionClick={handleSubscriptionClick}
-            onViewAll={() => console.log("view all")}
+      <DashboardContentHeader
+        Icon={LucideLayoutDashboard}
+        title="داشبورد"
+        description="خلاصه وضعیت مالی و اشتراک‌های شما"
+      />
+      <div className="space-y-6 vazir rtl mt-3">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <SubscriptionReportStatsCard
+            title="مجموع هزینه"
+            value={formatPriceIRR(dashboard.stats.totalCost)}
+            icon={Wallet}
+            titleBadge="تا به امروز"
           />
-          <ExpiringSoon
-            subscriptions={mockExpiring}
-            onRenew={(id) => console.log("Renew", id)}
+          <SubscriptionReportStatsCard
+            title="میانگین ماهانه"
+            value={dashboard.stats.averageMonthly}
+            icon={TrendingUp}
+          />
+          <SubscriptionReportStatsCard
+            title="اشتراک‌های فعال"
+            value={dashboard.stats.activeSubscriptions}
+            icon={Users}
+          />
+          <SubscriptionReportStatsCard
+            title="هزینه ماه جاری"
+            value={formatPriceIRR(dashboard.stats.currentMonthCost)}
+            icon={CreditCard}
           />
         </div>
 
-        <MonthlyChart data={mockChartData} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Card>
+            <div className="flex justify-between items-center mb-10">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <BarChart3 size={18} />
+                روند هزینه ماهانه
+              </h2>
+              <div className="flex gap-2">
+                {["3", "6", "12"].map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setRange(r as "3" | "6" | "12")}
+                    className={`px-3 py-1 rounded-lg transition-colors ${
+                      range === r
+                        ? "bg-indigo-500 text-white"
+                        : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                    }`}
+                  >
+                    {r} ماه
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <ResponsiveContainer width="100%" height={450}>
+              <LineChart data={dashboard.costPerMonthly}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis
+                  dataKey="month"
+                  stroke="#9ca3af"
+                  textAnchor="start"
+                  height={60}
+                  interval={0}
+                />
+                <YAxis
+                  stroke="#9ca3af"
+                  tickFormatter={(value) => value.toLocaleString("fa-IR")}
+                />
+                <Tooltip
+                  formatter={(value: number) => [
+                    `${value.toLocaleString("fa-IR")} تومان`,
+                    "هزینه",
+                  ]}
+                  contentStyle={{
+                    backgroundColor: "#1f2937",
+                    border: "1px solid #4b5563",
+                    borderRadius: "8px",
+                    padding: "8px 12px",
+                  }}
+                  labelStyle={{ color: "#d1d5db", fontSize: "12px" }}
+                  itemStyle={{
+                    color: "#818cf8",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  }}
+                  cursor={{ stroke: "#4b5563", strokeWidth: 1 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="cost"
+                  stroke="#6366f1"
+                  strokeWidth={2}
+                  dot={{ fill: "#6366f1", r: 4, strokeWidth: 0 }}
+                  activeDot={{ r: 6, fill: "#818cf8" }}
+                  name="هزینه ماهانه"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </Card>
+
+          <Card>
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <PieIcon size={18} />
+              هزینه بر اساس دسته‌بندی
+            </h2>
+            <ResponsiveContainer width="100%" height={400}>
+              <PieChart>
+                <Pie
+                  data={dashboard.costPerCategories}
+                  dataKey="cost"
+                  nameKey="categoryName"
+                  cx="50%"
+                  cy="50%"
+                  label={({ categoryName, percentage }) => {
+                    return `${categoryName} ${percentage}%`;
+                  }}
+                  outerRadius={150}
+                  innerRadius={50}
+                  paddingAngle={5}
+                >
+                  {dashboard.costPerCategories.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                      stroke="#1f2937"
+                      strokeWidth={2}
+                      width="500px"
+                    />
+                  ))}
+                </Pie>
+                <Tooltip
+                  formatter={(value: number) =>
+                    `${value.toLocaleString("fa-IR")} تومان`
+                  }
+                  contentStyle={{
+                    backgroundColor: "#1f2937",
+                    border: "1px solid #4b5563",
+                    borderRadius: "8px",
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-4 flex flex-wrap gap-3 justify-center">
+              {dashboard.costPerCategories.map((category, index) => (
+                <div
+                  key={category.categoryId}
+                  className="flex items-center gap-2"
+                >
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                  />
+                  <span className="text-sm text-gray-300">
+                    {category.categoryName}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    ({category.percentage}%)
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Card>
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Activity size={18} />
+              آخرین فعالیت‌ها
+            </h2>
+            <div className="space-y-2">
+              {dashboard?.lastActivities?.map((activity) => (
+                <div
+                  key={activity.id}
+                  className="border-b border-gray-800 py-2"
+                >
+                  <p className="text-sm">{activity.title}</p>
+                  <p className="text-xs text-gray-500">{activity.date}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card>
+            <h2 className="text-lg font-semibold mb-4">گران‌ترین اشتراک‌ها</h2>
+            <div className="space-y-2">
+              {dashboard.topSubscriptions.map((sub) => (
+                <div
+                  key={sub.id}
+                  className="flex justify-between items-center border-b border-gray-800 py-2"
+                >
+                  <span>{sub.name}</span>
+                  <span className="text-amber-400">
+                    {sub.price.toLocaleString()} تومان
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1">
+          <SubscriptionCalendar items={dashboard.subscriptionCalendar} />
+        </div>
       </div>
-
-      <AddSubscriptionModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-      />
-
-      <SubscriptionModal
-        isOpen={isSubscriptionModalOpen}
-        onClose={() => setIsSubscriptionModalOpen(false)}
-        subscriptionId={selectedSubscriptionId}
-      />
     </DashboardLayout>
   );
 }

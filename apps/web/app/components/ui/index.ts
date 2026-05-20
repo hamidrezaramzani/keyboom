@@ -14,3 +14,4 @@ export { Drawer } from "./drawer/drawer.component";
 export { Popover } from "./popover/popover.component";
 export { ConfirmDialog } from "./confirmation/confirmation.component";
 export { Tooltip } from "./tooltip/tooltip.component";
+export { AlertDialog } from "./alert/alert.component";

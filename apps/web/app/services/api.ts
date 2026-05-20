@@ -13,6 +13,7 @@ export const baseApi = createApi({
     "Notification",
     "Invitation",
     "Ticket",
+    "Dashboard",
   ],
   endpoints: () => ({}),
 });

@@ -13,17 +13,12 @@ export const DashboardContentHeader = ({
   Icon,
 }: DashboardContentHeaderProps) => {
   return (
-    <Card variant="default">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Icon className="text-primary-400" size={22} />
-            {title}
-          </h1>
-
-          <p className="text-gray-400 mt-2">{description}</p>
-        </div>
+    <div className="flex items-center gap-4">
+      <Icon className="text-primary-400" size={35} />
+      <div>
+        <h1 className="text-2xl font-bold flex items-center gap-2">{title}</h1>
+        <p className="text-gray-400 mt-1">{description}</p>
       </div>
-    </Card>
+    </div>
   );
 };

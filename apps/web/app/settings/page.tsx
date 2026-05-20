@@ -6,20 +6,18 @@ import {
   NotificationsTab,
   InboxTab,
 } from "@/app/components/sections/settings";
-import { Tabs } from "../components";
-import { Bell, User, User2 } from "lucide-react";
+import { DashboardContentHeader, Tabs } from "../components";
+import { Bell, Settings2, User, User2 } from "lucide-react";
 
 export default function SettingsPage() {
   return (
     <DashboardLayout>
-      <div className="w-full">
-        <div className="mb-6 mt-4 w-full">
-          <h1 className="text-2xl font-bold text-white">تنظیمات</h1>
-          <p className="text-gray-400 text-sm mt-1">
-            مدیریت حساب کاربری و تنظیمات اعلان‌ها
-          </p>
-        </div>
-
+      <DashboardContentHeader
+        Icon={Settings2}
+        title={"تنظیمات"}
+        description={"تنظیمات حساب کاربری خود را در این قسمت انجام دهید"}
+      />
+      <div className="w-full mt-4">
         <Tabs
           tabs={[
             {
