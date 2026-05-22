@@ -8,10 +8,13 @@ import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 
 const getJalaliMonthDays = (year: number, month: number) => {
-  const firstDayOfMonth = moment(`${year}/${month + 1}/01`, "jYYYY/jM/jDD");
+  const firstDayOfMonth = moment(
+    `${year}/${month + 1}/01`,
+    "jYYYY/jM/jDD",
+  ).locale("fa");
   const startDayOfWeek = firstDayOfMonth.weekday();
 
-  const daysInMonth = firstDayOfMonth.daysInMonth();
+  const daysInMonth = firstDayOfMonth.jDaysInMonth();
   const days = [];
 
   for (let i = 0; i < startDayOfWeek; i++) {

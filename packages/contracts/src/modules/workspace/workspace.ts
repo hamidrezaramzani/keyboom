@@ -61,6 +61,7 @@ const workspaceActions = {
             name: z.string(),
             email: z.string(),
             joinedAt: z.date(),
+            isOwner: z.boolean(),
           }),
         ),
       ),

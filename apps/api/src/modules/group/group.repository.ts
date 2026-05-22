@@ -31,9 +31,7 @@ export class GroupRepository {
     return this.db
       .select()
       .from(groups)
-      .where(
-        and(eq(groups.workspaceId, workspaceId), eq(groups.isArchived, false)),
-      )
+      .where(and(eq(groups.workspaceId, workspaceId)))
       .orderBy(asc(groups.order));
   }
 

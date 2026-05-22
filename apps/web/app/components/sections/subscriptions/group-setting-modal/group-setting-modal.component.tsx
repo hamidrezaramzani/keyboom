@@ -13,6 +13,7 @@ import {
   useUpdateGroupMutation,
 } from "@/app/services/group";
 import { toast } from "@/app/lib";
+import { useEffect } from "react";
 
 const groupSettingsSchema = z.object({
   name: z.string().min(1, "نام گروه الزامی است"),
@@ -47,12 +48,19 @@ export const GroupSettingsModal = ({
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<GroupSettingsForm>({
     resolver: zodResolver(groupSettingsSchema),
     defaultValues: {
       name: groupName || "",
     },
   });
+
+  useEffect(() => {
+    reset({
+      name: groupName,
+    });
+  }, []);
 
   const onSubmit = async (data: GroupSettingsForm) => {
     if (!groupId) return;

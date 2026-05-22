@@ -2,7 +2,6 @@
 
 import { DashboardLayout } from "@/app/components/layout";
 import {
-  SubscriptionsHeader,
   Board,
   AddSubscriptionModal,
   GroupSettingsModal,
@@ -11,7 +10,10 @@ import {
   SubscriptionModal,
 } from "@/app/components/sections/subscriptions";
 import { useState } from "react";
-import { useReadManyWorkspacesQuery } from "../../services/workspace";
+import {
+  useGetWorkspaceMembersQuery,
+  useReadManyWorkspacesQuery,
+} from "../../services/workspace";
 import {
   GroupSubscription,
   useCreateGroupMutation,
@@ -19,9 +21,27 @@ import {
   useReorderGroupsMutation,
 } from "../../services/group";
 import { skipToken } from "@reduxjs/toolkit/query";
+import {
+  Button,
+  DashboardContentHeader,
+  Drawer,
+  WorkspaceMembers,
+  Tabs,
+} from "@/app/components";
+import { Carrot, CircuitBoard, Menu, Users } from "lucide-react";
+import { WorkspaceArchivedGroups } from "@/app/components/sections/dashboard/workspaces";
 
 export default function SubscriptionsPage() {
   const { data: workspace } = useReadManyWorkspacesQuery({});
+  const { data: members } = useGetWorkspaceMembersQuery(
+    workspace
+      ? {
+          params: {
+            workspaceId: workspace.defaultWorkspace.id,
+          },
+        }
+      : skipToken,
+  );
   const { data: groupsData = [], refetch: refetchGroups } = useGetGroupsQuery(
     workspace
       ? { params: { workspaceId: workspace?.defaultWorkspace.id } }
@@ -40,6 +60,7 @@ export default function SubscriptionsPage() {
   const [isAddSubscriptionOpen, setIsAddSubscriptionOpen] = useState(false);
   const [isSubscriptionDetailOpen, setIsSubscriptionDetailOpen] =
     useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const groups = groupsData || [];
 
@@ -74,12 +95,28 @@ export default function SubscriptionsPage() {
     setSelectedGroupName(groupName);
   };
 
+  const activeGroups = groups.filter((group) => !group.isArchived);
+  const archivedGroups = groups.filter((group) => group.isArchived);
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <SubscriptionsHeader />
+        <DashboardContentHeader
+          Icon={Carrot}
+          title={"اشتراک ها"}
+          description={"مدیریت اشتراک های فضای کاری"}
+          actions={
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsDrawerOpen(true)}
+            >
+              <Menu fontSize={10} />
+            </Button>
+          }
+        />
         <Board
-          groups={groups}
+          groups={activeGroups}
           onGroupsReorder={handleGroupsReorder}
           onAddGroup={handleAddGroup}
           onGroupSettings={handleGroupSettings}
@@ -89,6 +126,33 @@ export default function SubscriptionsPage() {
           onSubscriptionReorder={() => {}}
         />
       </div>
+
+      <Drawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        position="left"
+        size="auto"
+      >
+        <div className="mt-15">
+          <Tabs
+            defaultTab="users"
+            tabs={[
+              {
+                id: "users",
+                icon: Users,
+                label: "کاربران",
+                content: <WorkspaceMembers members={members} />,
+              },
+              {
+                id: "archvied-groups",
+                icon: CircuitBoard,
+                label: "گروه های آرشیو شده",
+                content: <WorkspaceArchivedGroups groups={archivedGroups} />,
+              },
+            ]}
+          />
+        </div>
+      </Drawer>
 
       <AddWorkspaceModal
         isOpen={isAddWorkspaceOpen}
