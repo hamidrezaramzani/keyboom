@@ -8,3 +8,4 @@ export * from "./modules/subscription/subscription.js";
 export * from "./modules/subscription-period/subscription-period.js";
 export * from "./modules/ticket/ticket.js";
 export * from "./modules/dashboard/dashboard.js";
+export * from "./modules/bale/bale.js";

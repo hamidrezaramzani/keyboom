@@ -1,121 +1,144 @@
-// app/components/sections/settings/NotificationsTab.tsx
 "use client";
 
 import { useState } from "react";
-import { Card, Button } from "@/app/components";
-
-interface NotificationSetting {
-  id: string;
-  title: string;
-  description: string;
-  enabled: boolean;
-}
-
-const defaultSettings: NotificationSetting[] = [
-  {
-    id: "browser",
-    title: "نوتیفیکیشن مرورگر",
-    description: "دریافت نوتیفیکیشن در مرورگر حتی وقتی کی‌بوم باز نیست",
-    enabled: true,
-  },
-  {
-    id: "email",
-    title: "یادآوری ایمیلی",
-    description: "دریافت یادآوری تمدید اشتراک از طریق ایمیل",
-    enabled: false,
-  },
-  {
-    id: "expiring_3days",
-    title: "یادآوری ۳ روز قبل",
-    description: "دریافت یادآوری ۳ روز قبل از اتمام اشتراک",
-    enabled: true,
-  },
-  {
-    id: "expiring_7days",
-    title: "یادآوری ۷ روز قبل",
-    description: "دریافت یادآوری ۷ روز قبل از اتمام اشتراک",
-    enabled: false,
-  },
-];
-
-const reminderOptions = [
-  { value: "1", label: "۱ روز قبل" },
-  { value: "3", label: "۳ روز قبل" },
-  { value: "7", label: "۷ روز قبل" },
-  { value: "0", label: "خاموش" },
-];
+import { Card, Button, useAlertDialog } from "@/app/components";
+import {
+  useGenerateCodeMutation,
+  useGetBaleStatusQuery,
+  useDisconnectBaleMutation,
+} from "@/app/services/bale";
+import { Copy, Check, Link2, Unlink } from "lucide-react";
+import { useConfirm } from "@/app/lib/store/context";
 
 export const NotificationsTab = () => {
-  const [settings, setSettings] = useState(defaultSettings);
-  const [defaultReminder, setDefaultReminder] = useState("3");
-  const [isSaving, setIsSaving] = useState(false);
+  const [generatedCode, setGeneratedCode] = useState<string | null>(null);
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const { showAlert } = useAlertDialog();
+  const { confirm } = useConfirm();
 
-  const toggleSetting = (id: string) => {
-    setSettings(
-      settings.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s)),
-    );
+  const { data: statusData, refetch: refetchStatus } = useGetBaleStatusQuery();
+  const [generateCode, { isLoading: isGenerating }] = useGenerateCodeMutation();
+  const [disconnect, { isLoading: isDisconnecting }] =
+    useDisconnectBaleMutation();
+
+  const isConnected = statusData?.isConnected || false;
+
+  const handleGenerateCode = async () => {
+    try {
+      const result = await generateCode().unwrap();
+      setGeneratedCode(result.code);
+      setExpiresAt(result.expiresAt);
+    } catch (error) {
+      console.error(error);
+      showAlert({
+        variant: "error",
+        title: "خطا در تولید کد",
+        message: "مشکلی در تولید کد به وجود آمده است لطفا مجدد تلاش کنید",
+      });
+    }
   };
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Save notification settings:", { settings, defaultReminder });
-    setIsSaving(false);
+  const handleDisconnect = async () => {
+    const isConfirmed = await confirm({
+      variant: "danger",
+      title: "قطع ربات",
+      description: "آیا از قطع اتصال ربات بله اطمینان دارید؟",
+    });
+    if (isConfirmed) {
+      await disconnect().unwrap();
+      refetchStatus();
+      setGeneratedCode(null);
+    }
+  };
+
+  const copyToClipboard = () => {
+    if (generatedCode) {
+      navigator.clipboard.writeText(generatedCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const getRemainingSeconds = () => {
+    if (!expiresAt) return 0;
+    const remaining = new Date(expiresAt).getTime() - new Date().getTime();
+    return Math.max(0, Math.floor(remaining / 1000));
   };
 
   return (
     <div className="space-y-6 w-full">
       <Card>
-        <h3 className="text-white font-semibold mb-4">دریافت نوتیفیکیشن</h3>
-        <div className="space-y-4">
-          {settings.map((setting) => (
-            <div key={setting.id} className="flex items-center justify-between">
-              <div>
-                <p className="text-white text-sm font-medium">
-                  {setting.title}
-                </p>
-                <p className="text-gray-500 text-xs">{setting.description}</p>
-              </div>
-              <button
-                onClick={() => toggleSetting(setting.id)}
-                className={`relative w-11 h-6 rounded-full transition-colors ${
-                  setting.enabled ? "bg-indigo-600" : "bg-gray-700"
-                }`}
+        <h3 className="text-white font-semibold mb-4">اتصال به ربات بله</h3>
+
+        {!isConnected ? (
+          <div className="space-y-4">
+            <p className="text-gray-400 text-sm">
+              برای اتصال، کد زیر را در ربات بله ارسال کنید:
+            </p>
+
+            {!generatedCode ? (
+              <Button
+                onClick={handleGenerateCode}
+                loading={isGenerating}
+                className="w-full"
               >
-                <span
-                  className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
-                    setting.enabled ? "translate-x-5" : "translate-x-0.5"
-                  }`}
-                />
-              </button>
+                <Link2 size={16} className="ml-2" />
+                دریافت کد اتصال
+              </Button>
+            ) : (
+              <div className="bg-gray-900 rounded-lg p-6 text-center">
+                <p className="text-sm text-gray-400 mb-2">کد اتصال شما:</p>
+                <div className="flex items-center justify-center gap-3">
+                  <span className="text-4xl font-mono font-bold text-indigo-400 tracking-wider">
+                    {generatedCode}
+                  </span>
+                  <button
+                    onClick={copyToClipboard}
+                    className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
+                  >
+                    {copied ? (
+                      <Check size={18} className="text-green-400" />
+                    ) : (
+                      <Copy size={18} className="text-gray-400" />
+                    )}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-3">
+                  این کد تا {Math.floor(getRemainingSeconds() / 60)} دقیقه و{" "}
+                  {getRemainingSeconds() % 60} ثانیه دیگر اعتبار دارد
+                </p>
+                <p className="text-xs text-gray-500 mt-2">
+                  کد را در ربات بله با فرمت{" "}
+                  <span className="text-indigo-400">/code {generatedCode}</span>{" "}
+                  ارسال کنید
+                </p>
+                <p className="text-xs text-gray-500 mt-2">
+                  تا زمان تایید احراز هویت، صفحه را رفرش نکنید
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+              <div className="flex items-center gap-2 text-green-400">
+                <Check size={16} />
+                <span className="text-sm">ربات بله متصل است</span>
+              </div>
             </div>
-          ))}
-        </div>
-      </Card>
 
-      <Card>
-        <h3 className="text-white font-semibold mb-4">یادآوری پیش‌فرض</h3>
-        <p className="text-gray-400 text-sm mb-3">
-          برای اشتراک‌های جدید، چند روز قبل از اتمام یادآوری شود؟
-        </p>
-        <select
-          value={defaultReminder}
-          onChange={(e) => setDefaultReminder(e.target.value)}
-          className="w-full md:w-48 px-4 py-2.5 bg-gray-800/50 border border-gray-700 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        >
-          {reminderOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+            <Button
+              variant="danger"
+              onClick={handleDisconnect}
+              loading={isDisconnecting}
+            >
+              <Unlink size={16} className="ml-2" />
+              قطع اتصال ربات بله
+            </Button>
+          </div>
+        )}
       </Card>
-
-      <div className="flex justify-end">
-        <Button onClick={handleSave} loading={isSaving}>
-          ذخیره تنظیمات
-        </Button>
-      </div>
     </div>
   );
 };

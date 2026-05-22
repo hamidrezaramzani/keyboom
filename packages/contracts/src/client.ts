@@ -11,3 +11,4 @@ export { SubscriptionActions } from "./modules/subscription/subscription";
 export { SubscriptionPeriodActions } from "./modules/subscription-period/subscription-period";
 export { TicketActions } from "./modules/ticket/ticket";
 export { DashboardActions } from "./modules/dashboard/dashboard";
+export { BaleActions } from "./modules/bale/bale";

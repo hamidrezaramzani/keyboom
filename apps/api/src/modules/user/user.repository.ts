@@ -42,4 +42,25 @@ export class UsersRepository {
       .limit(1);
     return result[0];
   }
+
+  async update(
+    id: string,
+    data: Partial<Omit<User, 'id' | 'createdAt'>>,
+  ): Promise<User> {
+    const result = await this.db
+      .update(users)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async findByBaleChatId(baleChatId: string): Promise<User | undefined> {
+    const result = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.baleChatId, baleChatId))
+      .limit(1);
+    return result[0];
+  }
 }

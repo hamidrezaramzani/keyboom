@@ -18,6 +18,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { WorkspaceRepository } from '../workspace/workspace.repository';
 import { NotificationService } from '../notification/notification.service';
+import { BaleHelper } from 'src/core/helpers/bale.helper';
 
 @Injectable()
 export class UsersService {
@@ -27,6 +28,7 @@ export class UsersService {
     private readonly workspaceRepository: WorkspaceRepository,
     private readonly jwtService: JwtService,
     private readonly notificationService: NotificationService,
+    private readonly baleHelper: BaleHelper,
   ) {}
 
   private generateId(): string {

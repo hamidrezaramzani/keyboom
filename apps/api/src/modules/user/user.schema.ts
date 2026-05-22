@@ -1,3 +1,4 @@
+// server/src/core/db/schema/user.schema.ts
 import { relations } from 'drizzle-orm';
 import {
   pgTable,
@@ -15,9 +16,9 @@ export const users = pgTable(
     fullName: varchar('full_name', { length: 255 }).notNull(),
     email: varchar('email', { length: 255 }).notNull().unique(),
     password: varchar('password', { length: 255 }).notNull(),
-    defaultWorkspaceId: varchar('default_workspace_id', {
-      length: 36,
-    }),
+    defaultWorkspaceId: varchar('default_workspace_id', { length: 36 }),
+    baleChatId: varchar('bale_chat_id', { length: 50 }),
+    baleConnectedAt: timestamp('bale_connected_at'),
     isActive: boolean('is_active').notNull().default(true),
     isAdmin: boolean('is_admin').notNull().default(false),
     createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -26,6 +27,7 @@ export const users = pgTable(
   (table) => ({
     emailIdx: index('users_email_idx').on(table.email),
     isActiveIdx: index('users_is_active_idx').on(table.isActive),
+    baleChatIdIdx: index('users_bale_chat_id_idx').on(table.baleChatId),
   }),
 );
 

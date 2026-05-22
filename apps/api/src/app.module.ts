@@ -13,6 +13,7 @@ import { GroupModule } from './modules/group/group.module';
 import { SubscriptionPeriodModule } from './modules/subscription-period/subscription-period.module';
 import { TicketModule } from './modules/ticket/ticket.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { BaleModule } from './modules/bale/bale.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     SubscriptionPeriodModule,
     TicketModule,
     DashboardModule,
+    BaleModule,
   ],
   providers: [
     {

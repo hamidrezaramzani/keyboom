@@ -2,16 +2,26 @@ import { Injectable } from '@nestjs/common';
 import { NotificationRepository } from './notification.repository';
 import { NewNotification, Notification } from './notification.schema';
 import { WebSocketGateway } from '../websocket/websocket.gateway';
+import { BaleHelper } from 'src/core/helpers/bale.helper';
+import { UsersRepository } from '../user/user.repository';
 
 @Injectable()
 export class NotificationService {
   constructor(
     private readonly notificationRepo: NotificationRepository,
+    private readonly baleHelper: BaleHelper,
+    private readonly userRepo: UsersRepository,
     private readonly websocketGateway: WebSocketGateway,
   ) {}
 
   async create(data: NewNotification): Promise<Notification> {
     const notification = await this.notificationRepo.create(data);
+
+    const user = await this.userRepo.findById(data.userId);
+
+    if (user?.baleChatId) {
+      await this.baleHelper.sendMessage(user?.baleChatId, notification.message);
+    }
     this.websocketGateway.emitToUser(data.userId, 'notification:new', {
       notification,
     });

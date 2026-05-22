@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { WorkspaceModule } from '../workspace/workspace.module';
 import { NotificationModule } from '../notification/notification.module';
 import { SanityCheckModule } from '../sanity-check/sanity-check.module';
+import { BaleHelper } from 'src/core/helpers/bale.helper';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { SanityCheckModule } from '../sanity-check/sanity-check.module';
     forwardRef(() => SanityCheckModule),
   ],
   controllers: [UsersController],
-  providers: [UsersService, UsersRepository],
+  providers: [UsersService, UsersRepository, BaleHelper],
   exports: [UsersService, UsersRepository],
 })
 export class UsersModule {}

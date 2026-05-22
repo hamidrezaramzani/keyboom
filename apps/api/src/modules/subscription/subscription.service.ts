@@ -633,15 +633,12 @@ export class SubscriptionService {
     const monthlyMap = new Map<string, number>();
 
     for (const sub of subscriptions) {
-      // گرفتن بازه‌های قیمتی اشتراک
       const periods =
         await this.subscriptionRepository.findPeriodsBySubscriptionId(sub.id);
 
-      // تبدیل تاریخ‌های اشتراک به moment شمسی
       const subStart = getFaMoment(sub.startDate);
       const subEnd = getFaMoment(sub.endDate);
 
-      // محدود کردن به بازه مورد نظر
       const effectiveStart = subStart.isBefore(startDate)
         ? startDate.clone()
         : subStart.clone();
@@ -649,7 +646,6 @@ export class SubscriptionService {
 
       if (effectiveStart.isAfter(effectiveEnd)) continue;
 
-      // شروع از اول ماه
       const currentDate = effectiveStart.clone().startOf('jMonth');
 
       while (currentDate.isSameOrBefore(effectiveEnd, 'jMonth')) {
@@ -657,11 +653,9 @@ export class SubscriptionService {
         const month = currentDate.jMonth();
         const monthKey = `${year}-${month}`;
 
-        // محاسبه هزینه کل این ماه
         let monthlyCost = 0;
         const daysInMonth = currentDate.daysInMonth();
 
-        // محدوده روزهای این ماه که در بازه اشتراک است
         const monthStart = currentDate.clone();
         const monthEnd = currentDate.clone().endOf('jMonth');
 
@@ -677,10 +671,8 @@ export class SubscriptionService {
           continue;
         }
 
-        // محاسبه روز به روز در این ماه
         const day = rangeStart.clone();
         while (day.isSameOrBefore(rangeEnd, 'day')) {
-          // پیدا کردن بازه قیمتی مناسب برای این روز
           const period = periods.find((p) => {
             const periodStart = getFaMoment(p.startDate);
             const periodEnd = p.endDate ? getFaMoment(p.endDate) : null;
