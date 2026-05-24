@@ -60,6 +60,7 @@ export const SubscriptionGeneralDetails = ({
           endDate: new Date(data.endDate).toISOString(),
           website: data.website || null,
           description: data.description || null,
+          reminderDays: data.reminderDays,
         },
       }).unwrap();
       toast.success("اشتراک با موفقیت ویرایش شد");
@@ -156,6 +157,15 @@ export const SubscriptionGeneralDetails = ({
             </div>
           </div>
 
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-gray-500 text-sm flex items-center gap-1">
+                <Calendar className="w-3 h-3" /> یادآوری تمدید
+              </p>
+              <p className="text-white">{subscription.reminderDays} روز</p>
+            </div>
+          </div>
+
           {subscription.website && (
             <div>
               <p className="text-gray-500 text-sm flex items-center gap-1">
@@ -217,6 +227,7 @@ export const SubscriptionGeneralDetails = ({
         categoryId: subscription.category.id,
         website: subscription.website || "",
         description: subscription.description || "",
+        reminderDays: subscription.reminderDays || 3,
       }}
       onClose={closeSafeModal}
       isEditing

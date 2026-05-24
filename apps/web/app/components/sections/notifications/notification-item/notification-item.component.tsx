@@ -1,7 +1,15 @@
 "use client";
 
 import { cn } from "@/app/lib/utils";
-import { Calendar, Bell, AlertTriangle, CreditCard, Users, LogOut } from "lucide-react";
+import {
+  Calendar,
+  Bell,
+  AlertTriangle,
+  CreditCard,
+  Users,
+  LogOut,
+} from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 export type NotificationType =
   | "expiring"
@@ -127,8 +135,31 @@ export const NotificationItem = ({
             {formatDate(notification.createdAt)}
           </span>
         </div>
+
         <p className="text-gray-400 text-sm mt-1 line-clamp-2">
-          {notification.message}
+          <ReactMarkdown
+            components={{
+              strong: ({ children }) => (
+                <strong className="font-bold text-white">{children}</strong>
+              ),
+              em: ({ children }) => (
+                <em className="italic text-gray-300">{children}</em>
+              ),
+              a: ({ href, children }) => (
+                <a
+                  href={href}
+                  className="text-indigo-400 hover:underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {children}
+                </a>
+              ),
+              p: ({ children }) => <span>{children}</span>,
+            }}
+          >
+            {notification.message}
+          </ReactMarkdown>
         </p>
       </div>
 

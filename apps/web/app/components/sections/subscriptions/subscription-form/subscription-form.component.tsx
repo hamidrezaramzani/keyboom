@@ -20,6 +20,7 @@ const subscriptionSchema = z
     price: z.string().min(1, "قیمت الزامی است"),
     startDate: z.date(),
     endDate: z.date(),
+    reminderDays: z.number().min(0).max(7).default(3),
     website: z.string().url("لینک معتبر وارد کنید").or(z.literal("")),
     description: z.string(),
   })
@@ -90,6 +91,7 @@ export const SubscriptionForm = ({
       endDate: new Date(),
       website: "",
       description: "",
+      reminderDays: 3,
     },
   });
 
@@ -106,6 +108,8 @@ export const SubscriptionForm = ({
       if (initialValues.website) setValue("website", initialValues.website);
       if (initialValues.description)
         setValue("description", initialValues.description);
+      if (initialValues.reminderDays)
+        setValue("reminderDays", initialValues.reminderDays);
     }
   }, [initialValues, setValue]);
 
@@ -245,6 +249,32 @@ export const SubscriptionForm = ({
         placeholder="توضیحات (اختیاری)"
         {...register("description")}
       />
+
+      <div className="grid grid-cols-1 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-400 mb-1.5">
+            یادآوری تمدید
+          </label>
+          <select
+            className="w-full px-4 py-2.5 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            {...register("reminderDays", { valueAsNumber: true })}
+          >
+            <option value="1">۱ روز قبل</option>
+            <option value="2">۲ روز قبل</option>
+            <option value="3">۳ روز قبل</option>
+            <option value="5">۵ روز قبل</option>
+            <option value="7">۷ روز قبل</option>
+          </select>
+          <p className="text-xs text-gray-500 mt-1">
+            چند روز قبل از اتمام، یادآوری دریافت کنید
+          </p>
+          {errors.reminderDays && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.reminderDays.message}
+            </p>
+          )}
+        </div>
+      </div>
 
       <div className="flex gap-3 pt-4">
         <Button

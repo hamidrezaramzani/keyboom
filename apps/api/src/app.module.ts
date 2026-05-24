@@ -14,10 +14,14 @@ import { SubscriptionPeriodModule } from './modules/subscription-period/subscrip
 import { TicketModule } from './modules/ticket/ticket.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { BaleModule } from './modules/bale/bale.module';
+import { ReminderCron } from './modules/cron/reminder.cron';
+import { ScheduleModule } from '@nestjs/schedule';
+import { SubscriptionModule } from './modules/subscription/subscription.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ScheduleModule.forRoot(),
     DatabaseModule,
     UsersModule,
     WorkspaceModule,
@@ -30,12 +34,14 @@ import { BaleModule } from './modules/bale/bale.module';
     TicketModule,
     DashboardModule,
     BaleModule,
+    SubscriptionModule,
   ],
   providers: [
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
+    ReminderCron,
   ],
 })
 export class AppModule {}

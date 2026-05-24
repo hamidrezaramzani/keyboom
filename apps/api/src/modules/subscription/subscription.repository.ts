@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, desc, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, lte } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { DRIZZLE } from 'src/core/db/drizzle.provider';
 import {
@@ -168,5 +168,32 @@ export class SubscriptionRepository {
       );
 
     return result;
+  }
+
+  async findSubscriptionsNeedingReminder(today: Date): Promise<Subscription[]> {
+    const result = await this.db
+      .select()
+      .from(subscriptions)
+      .where(
+        and(
+          eq(subscriptions.status, 'active'),
+          lte(
+            subscriptions.endDate,
+            new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000),
+          ),
+          gte(subscriptions.endDate, today),
+        ),
+      );
+
+    const needingReminder = result.filter((sub) => {
+      const daysLeft = Math.ceil(
+        (sub.endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+      );
+
+      if (!sub || !sub.reminderDays) return false;
+      return daysLeft <= sub?.reminderDays && daysLeft > 0;
+    });
+
+    return needingReminder;
   }
 }

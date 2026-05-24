@@ -29,7 +29,7 @@ const createSubscriptionPayload = z.object({
   endDate: z.string().datetime(),
   website: z.string().url().optional().nullable(),
   description: z.string().optional().nullable(),
-  reminderDays: z.number().min(0).max(30).default(3),
+  reminderDays: z.number().min(0).max(7).default(3),
 });
 
 const updateSubscriptionPayload = createSubscriptionPayload.partial();
