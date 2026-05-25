@@ -9,7 +9,11 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.enableCors({
-    origin: ['http://10.65.165.96:3000', 'http://localhost:3000'],
+    origin: [
+      'http://10.65.165.96:3000',
+      'http://localhost:3000',
+      'https://keyboom.ir/',
+    ],
     credentials: true,
   });
 
