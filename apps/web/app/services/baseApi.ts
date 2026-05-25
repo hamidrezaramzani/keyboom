@@ -4,10 +4,9 @@ import type {
   FetchArgs,
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query";
-import { getBaseUrl } from "../lib/helpers";
 
 const rawBaseQuery = fetchBaseQuery({
-  baseUrl: getBaseUrl(),
+  baseUrl: process.env.NEXT_PUBLIC_API_URL,
   credentials: "include",
 });
 export const baseQueryWithAuth: BaseQueryFn<

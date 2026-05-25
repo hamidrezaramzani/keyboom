@@ -8,8 +8,6 @@ import {
   Settings,
   Building,
   LogOut,
-  CheckCircle,
-  Circle,
   Building2,
   Archive,
   RotateCcw,
