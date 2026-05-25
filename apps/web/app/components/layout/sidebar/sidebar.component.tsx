@@ -9,7 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Zap,
-  ChartArea,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/app/lib/utils";
 import { Avatar } from "@/app/components/ui";
@@ -29,7 +29,7 @@ interface SidebarProps {
 const navItems = [
   { name: "داشبورد", href: "/dashboard", icon: LayoutDashboard },
   { name: "اشتراک‌ها", href: "/dashboard/subscriptions", icon: Package },
-  { name: "تنظیمات", href: "/settings", icon: ChartArea },
+  { name: "تنظیمات", href: "/settings", icon: Settings },
 ];
 
 export const Sidebar = ({

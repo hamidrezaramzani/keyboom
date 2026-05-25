@@ -7,7 +7,7 @@ import {
   useGetBaleStatusQuery,
   useDisconnectBaleMutation,
 } from "@/app/services/bale";
-import { Copy, Check, Link2, Unlink } from "lucide-react";
+import { Copy, Check, Link2, Unlink, Link } from "lucide-react";
 import { useConfirm } from "@/app/lib/store/context";
 
 export const NotificationsTab = () => {
@@ -69,7 +69,12 @@ export const NotificationsTab = () => {
   return (
     <div className="space-y-6 w-full">
       <Card>
-        <h3 className="text-white font-semibold mb-4">اتصال به ربات بله</h3>
+        <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+          اتصال به ربات بله
+          <a href="https://ble.ir/keyboombot" target="_blank">
+            <Link size={12} />
+          </a>
+        </h3>
 
         {!isConnected ? (
           <div className="space-y-4">
