@@ -18,7 +18,10 @@ export const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleRedirect("/")}>
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={() => handleRedirect("/")}
+          >
             <div className="p-1.5 bg-indigo-500/10 rounded-lg">
               <Zap className="w-5 h-5 text-indigo-400" />
             </div>
@@ -40,10 +43,18 @@ export const Navbar = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => handleRedirect("/login")}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleRedirect("/login")}
+            >
               ورود
             </Button>
-            <Button variant="primary" size="sm"  onClick={() => handleRedirect("/register")}>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => handleRedirect("/register")}
+            >
               شروع رایگان
             </Button>
           </div>
@@ -74,7 +85,12 @@ export const Navbar = () => {
               </a>
             ))}
             <div className="flex gap-3 pt-2">
-              <Button variant="outline" size="sm" className="flex-1">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={() => handleRedirect("/login")}
+              >
                 ورود
               </Button>
               <Button variant="primary" size="sm" className="flex-1">

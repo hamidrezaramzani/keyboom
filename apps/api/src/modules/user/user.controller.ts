@@ -18,6 +18,7 @@ import {
 } from '@keyboom/contracts/server';
 import type { Request, Response } from 'express';
 import { Public, UserId } from 'src/core/decorators';
+import moment from 'jalali-moment';
 
 @Controller('users')
 export class UsersController {
@@ -46,10 +47,23 @@ export class UsersController {
   @Post('/login')
   @HttpCode(HttpStatus.OK)
   async login(
+    @Req() req: Request,
     @Body() payload: UserLoginPayloadDto,
     @Res({ passthrough: true }) response: Response,
   ): Promise<UserLoginResponseOkDto> {
-    const result = await this.usersService.login(payload);
+    const userAgent = req.useragent;
+
+    const deviceInfo = `${userAgent?.os} - ${userAgent?.browser} ${userAgent?.version}`;
+    const ipAddress = req.ip;
+    const loginTime = moment(new Date())
+      .locale('fa')
+      .format('YYYY/MM/DD HH:mm');
+
+    const result = await this.usersService.login(payload, {
+      deviceInfo,
+      ipAddress,
+      loginTime,
+    });
 
     response.cookie(this.accessTokenKey, result.accessToken, {
       httpOnly: true,

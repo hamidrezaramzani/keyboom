@@ -1,8 +1,15 @@
+"use client";
 import { Zap } from "lucide-react";
 import { Button } from "../../../ui";
 import { stats } from "./hero.constant";
+import { useRouter } from "next/navigation";
 
 export const Hero = () => {
+  const { push } = useRouter();
+
+  const handleRedirectToLogin = () => {
+    push("/login");
+  };
   return (
     <section className="relative pt-32 pb-20 px-4 w-full h-screen flex justify-center items-center overflow-hidden">
       <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[100px]"></div>
@@ -29,9 +36,13 @@ export const Hero = () => {
             هزینه‌هات رو نشون میده و کمکت می‌کنه تصمیم بهتری بگیری.
           </p>
 
-          {/* دکمه‌های CTA */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button variant="primary" size="lg" icon>
+            <Button
+              variant="primary"
+              size="lg"
+              icon
+              onClick={handleRedirectToLogin}
+            >
               شروع کنید
             </Button>
             <Button variant="secondary" size="lg">

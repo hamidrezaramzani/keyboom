@@ -50,7 +50,18 @@ export class UsersService {
     return { id: user.id, fullName: user.fullName, email: user.email };
   }
 
-  async login(payload: UserLoginPayloadDto) {
+  async login(
+    payload: UserLoginPayloadDto,
+    {
+      deviceInfo,
+      ipAddress,
+      loginTime,
+    }: {
+      deviceInfo: string;
+      ipAddress?: string;
+      loginTime: string;
+    },
+  ) {
     const user = await this.usersRepository.findByEmail(payload.email);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -69,7 +80,7 @@ export class UsersService {
 
     await this.notificationService.create({
       title: 'ورود به حساب',
-      message: 'کاربر گرامی ورود جدیدی به حساب شما صورت گرفته است',
+      message: `ورود جدید به حساب کاربری شما \n  زمان: ${loginTime} \n دستگاه: ${deviceInfo} \n آدرس IP: ${ipAddress}`,
       id: this.generateId(),
       userId: user.id,
       type: 'system',

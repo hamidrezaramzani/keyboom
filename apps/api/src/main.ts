@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
+import * as useragent from 'express-useragent';
 import { LoggingInterceptor } from './core/interceptors/logger.interceptor';
 
 async function bootstrap() {
@@ -18,6 +19,8 @@ async function bootstrap() {
   });
 
   app.useGlobalInterceptors(new LoggingInterceptor());
+
+  app.use(useragent.express());
 
   await app.listen(process.env.PORT ?? 3001);
 }
