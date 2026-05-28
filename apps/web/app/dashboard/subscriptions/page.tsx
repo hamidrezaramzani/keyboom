@@ -28,7 +28,7 @@ import {
   WorkspaceMembers,
   Tabs,
 } from "@/app/components";
-import { Carrot, CircuitBoard, Menu, Users } from "lucide-react";
+import { CircuitBoard, IdCard, Menu, Users } from "lucide-react";
 import { WorkspaceArchivedGroups } from "@/app/components/sections/dashboard/workspaces";
 
 export default function SubscriptionsPage() {
@@ -102,7 +102,7 @@ export default function SubscriptionsPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <DashboardContentHeader
-          Icon={Carrot}
+          Icon={IdCard}
           title={"اشتراک ها"}
           description={"مدیریت اشتراک های فضای کاری"}
           actions={
@@ -131,7 +131,7 @@ export default function SubscriptionsPage() {
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         position="left"
-        size="auto"
+        size="full"
       >
         <div className="mt-15">
           <Tabs

@@ -6,12 +6,11 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { GripVertical, Settings, Wallet } from "lucide-react";
+import { GripVertical, IdCard, Settings } from "lucide-react";
 import { SubscriptionCard } from "../subscription-card/subscription-card.component";
 import { Button, EmptyState } from "@/app/components";
 import { cn } from "@/app/lib/utils";
 import { Group, GroupSubscription } from "@/app/services/group";
-import { Subscription } from "@/app/services/subscription";
 
 interface BoardColumnProps {
   group: Group;
@@ -125,7 +124,7 @@ export const BoardColumn = ({
         {expiringSubscriptions.length === 0 &&
         activeSubscriptions.length === 0 ? (
           <div className="w-full h-full flex justify-center items-center">
-            <EmptyState icon={Wallet} title="هیچ اشتراکی در این گروه نیست" />
+            <EmptyState icon={IdCard} title="هیچ اشتراکی در این گروه نیست" />
           </div>
         ) : null}
       </div>

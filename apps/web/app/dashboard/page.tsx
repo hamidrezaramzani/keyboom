@@ -11,11 +11,16 @@ import {
   PieChart as PieIcon,
   Activity,
   LucideLayoutDashboard,
+  ActivityIcon,
+  IdCard,
+  ChartArea,
+  ChartPie,
 } from "lucide-react";
 import {
   Card,
   DashboardContentHeader,
   DashboardLayout,
+  EmptyState,
   SubscriptionCalendar,
   SubscriptionReportStatsCard,
 } from "@/app/components";
@@ -101,67 +106,73 @@ export default function DashboardPage() {
                 <BarChart3 size={18} />
                 روند هزینه ماهانه
               </h2>
-              <div className="flex gap-2">
-                {["3", "6", "12"].map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => setRange(r as "3" | "6" | "12")}
-                    className={`px-3 py-1 rounded-lg transition-colors ${
-                      range === r
-                        ? "bg-indigo-500 text-white"
-                        : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                    }`}
-                  >
-                    {r} ماه
-                  </button>
-                ))}
-              </div>
+              {dashboard && dashboard.costPerMonthly?.length ? (
+                <div className="flex gap-2">
+                  {["3", "6", "12"].map((r) => (
+                    <button
+                      key={r}
+                      onClick={() => setRange(r as "3" | "6" | "12")}
+                      className={`px-3 py-1 rounded-lg transition-colors ${
+                        range === r
+                          ? "bg-indigo-500 text-white"
+                          : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                      }`}
+                    >
+                      {r} ماه
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
-            <ResponsiveContainer width="100%" height={450}>
-              <LineChart data={dashboard.costPerMonthly}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis
-                  dataKey="month"
-                  stroke="#9ca3af"
-                  textAnchor="start"
-                  height={60}
-                  interval={0}
-                />
-                <YAxis
-                  stroke="#9ca3af"
-                  tickFormatter={(value) => value.toLocaleString("fa-IR")}
-                />
-                <Tooltip
-                  formatter={(value: number) => [
-                    `${value.toLocaleString("fa-IR")} تومان`,
-                    "هزینه",
-                  ]}
-                  contentStyle={{
-                    backgroundColor: "#1f2937",
-                    border: "1px solid #4b5563",
-                    borderRadius: "8px",
-                    padding: "8px 12px",
-                  }}
-                  labelStyle={{ color: "#d1d5db", fontSize: "12px" }}
-                  itemStyle={{
-                    color: "#818cf8",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                  }}
-                  cursor={{ stroke: "#4b5563", strokeWidth: 1 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="cost"
-                  stroke="#6366f1"
-                  strokeWidth={2}
-                  dot={{ fill: "#6366f1", r: 4, strokeWidth: 0 }}
-                  activeDot={{ r: 6, fill: "#818cf8" }}
-                  name="هزینه ماهانه"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {dashboard && dashboard.costPerMonthly?.length ? (
+              <ResponsiveContainer width="100%" height={450}>
+                <LineChart data={dashboard.costPerMonthly}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <XAxis
+                    dataKey="month"
+                    stroke="#9ca3af"
+                    textAnchor="start"
+                    height={60}
+                    interval={0}
+                  />
+                  <YAxis
+                    stroke="#9ca3af"
+                    tickFormatter={(value) => value.toLocaleString("fa-IR")}
+                  />
+                  <Tooltip
+                    formatter={(value: number) => [
+                      `${value.toLocaleString("fa-IR")} تومان`,
+                      "هزینه",
+                    ]}
+                    contentStyle={{
+                      backgroundColor: "#1f2937",
+                      border: "1px solid #4b5563",
+                      borderRadius: "8px",
+                      padding: "8px 12px",
+                    }}
+                    labelStyle={{ color: "#d1d5db", fontSize: "12px" }}
+                    itemStyle={{
+                      color: "#818cf8",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                    }}
+                    cursor={{ stroke: "#4b5563", strokeWidth: 1 }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="cost"
+                    stroke="#6366f1"
+                    strokeWidth={2}
+                    dot={{ fill: "#6366f1", r: 4, strokeWidth: 0 }}
+                    activeDot={{ r: 6, fill: "#818cf8" }}
+                    name="هزینه ماهانه"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <EmptyState icon={ChartArea} title="هنوز اشتراکی ثبت نشده" />
+            )}
           </Card>
 
           <Card>
@@ -169,43 +180,50 @@ export default function DashboardPage() {
               <PieIcon size={18} />
               هزینه بر اساس دسته‌بندی
             </h2>
-            <ResponsiveContainer width="100%" height={400}>
-              <PieChart>
-                <Pie
-                  data={dashboard.costPerCategories}
-                  dataKey="cost"
-                  nameKey="categoryName"
-                  cx="50%"
-                  cy="50%"
-                  label={({ categoryName, percentage }) => {
-                    return `${categoryName} ${percentage}%`;
-                  }}
-                  outerRadius={150}
-                  innerRadius={50}
-                  paddingAngle={5}
-                >
-                  {dashboard.costPerCategories.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                      stroke="#1f2937"
-                      strokeWidth={2}
-                      width="500px"
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  formatter={(value: number) =>
-                    `${value.toLocaleString("fa-IR")} تومان`
-                  }
-                  contentStyle={{
-                    backgroundColor: "#1f2937",
-                    border: "1px solid #4b5563",
-                    borderRadius: "8px",
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+
+            {dashboard.costPerCategories &&
+            dashboard.costPerCategories?.length ? (
+              <ResponsiveContainer width="100%" height={400}>
+                <PieChart>
+                  <Pie
+                    data={dashboard.costPerCategories}
+                    dataKey="cost"
+                    nameKey="categoryName"
+                    cx="50%"
+                    cy="50%"
+                    label={({ categoryName, percentage }) => {
+                      return `${categoryName} ${percentage}%`;
+                    }}
+                    outerRadius={150}
+                    innerRadius={50}
+                    paddingAngle={5}
+                  >
+                    {dashboard.costPerCategories.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                        stroke="#1f2937"
+                        strokeWidth={2}
+                        width="500px"
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(value: number) =>
+                      `${value.toLocaleString("fa-IR")} تومان`
+                    }
+                    contentStyle={{
+                      backgroundColor: "#1f2937",
+                      border: "1px solid #4b5563",
+                      borderRadius: "8px",
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <EmptyState icon={ChartPie} title="هنوز اشتراکی ثبت نشده" />
+            )}
+
             <div className="mt-4 flex flex-wrap gap-3 justify-center">
               {dashboard.costPerCategories.map((category, index) => (
                 <div
@@ -235,32 +253,43 @@ export default function DashboardPage() {
               آخرین فعالیت‌ها
             </h2>
             <div className="space-y-2">
-              {dashboard?.lastActivities?.map((activity) => (
-                <div
-                  key={activity.id}
-                  className="border-b border-gray-800 py-2"
-                >
-                  <p className="text-sm">{activity.title}</p>
-                  <p className="text-xs text-gray-500">{activity.date}</p>
-                </div>
-              ))}
+              {dashboard?.lastActivities?.length ? (
+                dashboard?.lastActivities?.map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="border-b border-gray-800 py-2"
+                  >
+                    <p className="text-sm">{activity.title}</p>
+                    <p className="text-xs text-gray-500">{activity.date}</p>
+                  </div>
+                ))
+              ) : (
+                <EmptyState icon={ActivityIcon} title="هنوز فعالیتی ثبت نشده" />
+              )}
             </div>
           </Card>
 
           <Card>
-            <h2 className="text-lg font-semibold mb-4">گران‌ترین اشتراک‌ها</h2>
+            <h2 className="text-lg font-semibold mb-4 flex gap-2 items-center">
+              <IdCard size={18} />
+              گران‌ترین اشتراک‌ها
+            </h2>
             <div className="space-y-2">
-              {dashboard.topSubscriptions.map((sub) => (
-                <div
-                  key={sub.id}
-                  className="flex justify-between items-center border-b border-gray-800 py-2"
-                >
-                  <span>{sub.name}</span>
-                  <span className="text-amber-400">
-                    {sub.price.toLocaleString()} تومان
-                  </span>
-                </div>
-              ))}
+              {dashboard?.topSubscriptions?.length ? (
+                dashboard.topSubscriptions.map((sub) => (
+                  <div
+                    key={sub.id}
+                    className="flex justify-between items-center border-b border-gray-800 py-2"
+                  >
+                    <span>{sub.name}</span>
+                    <span className="text-amber-400">
+                      {sub.price.toLocaleString()} تومان
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <EmptyState icon={IdCard} title="هنوز اشتراکی ثبت نشده" />
+              )}
             </div>
           </Card>
         </div>

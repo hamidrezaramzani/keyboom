@@ -40,7 +40,7 @@ export const workspaceEndpoints = baseApi.injectEndpoints({
         method: "PATCH",
         body: payload,
       }),
-      invalidatesTags: ["Workspace"],
+      invalidatesTags: ["Workspace", "Dashboard", "SubscriptionReport"],
       transformResponse,
     }),
     updateWorkspaceSetting: builder.mutation<

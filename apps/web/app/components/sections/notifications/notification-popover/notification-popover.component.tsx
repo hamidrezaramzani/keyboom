@@ -59,7 +59,7 @@ export const NotificationPopover = () => {
       <Bell className="w-5 h-5" />
       {unreadCount > 0 && (
         <div className="absolute flex items-center justify-center w-4 h-4 text-[9px] font-bold text-white bg-danger border-2 border-buffer rounded-full -top-1 -start-1">
-          <span>{formatNotificationCount(unreadCount)}</span>
+          <span className="mt-1">{formatNotificationCount(unreadCount)}</span>
         </div>
       )}
     </button>

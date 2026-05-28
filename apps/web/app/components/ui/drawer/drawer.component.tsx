@@ -19,7 +19,6 @@ export const Drawer = ({
   onClose,
   children,
   position = "left",
-  size = "full",
 }: DrawerProps) => {
   useEffect(() => {
     if (isOpen) {
@@ -54,8 +53,12 @@ export const Drawer = ({
         className={cn(
           "absolute top-0 bottom-0 bg-gray-900 shadow-2xl transition-all duration-300",
           position === "left" ? "left-0" : "right-0",
-          size === "full" ? "w-full" : "w-80",
-          isOpen ? "translate-x-0" : position === "left" ? "-translate-x-full" : "translate-x-full"
+          "md:w-80 w-full",
+          isOpen
+            ? "translate-x-0"
+            : position === "left"
+              ? "-translate-x-full"
+              : "translate-x-full",
         )}
       >
         <button
@@ -67,6 +70,6 @@ export const Drawer = ({
         {children}
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
