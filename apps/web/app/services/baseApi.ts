@@ -12,7 +12,6 @@ const rawBaseQuery = fetchBaseQuery({
 });
 
 const VALID_ROUTES = ["/login"];
-const CURRENT_PATH = window.location.pathname;
 
 export const baseQueryWithAuth: BaseQueryFn<
   string | FetchArgs,
@@ -21,16 +20,22 @@ export const baseQueryWithAuth: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   const result = await rawBaseQuery(args, api, extraOptions);
 
-  if (
-    result.error &&
-    result.error.status === 401 &&
-    !VALID_ROUTES.includes(CURRENT_PATH)
-  ) {
-    api.dispatch({ type: "api/util/resetApiState" });
-
-    if (typeof window !== "undefined") {
+  if (typeof window !== "undefined") {
+    const currentPath = window.location.pathname;
+    
+    if (
+      result.error &&
+      result.error.status === 401 &&
+      !VALID_ROUTES.includes(currentPath)
+    ) {
+      api.dispatch({ type: "api/util/resetApiState" });
       window.location.href = "/login";
     }
+  } else {
+    if (result.error && result.error.status === 401) {
+      api.dispatch({ type: "api/util/resetApiState" });
+    }
   }
+  
   return result;
 };
