@@ -7,14 +7,19 @@ import {
   Res,
   Get,
   Req,
+  Put,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
 import {
+  UserChangePasswordPayloadDto,
+  UserChangePasswordResponseOkDto,
   UserGetMeResponseOkDTO,
   UserLoginPayloadDto,
   UserLoginResponseOkDto,
   UserRegisterPayloadDto,
   UserRegisterResponseOkDto,
+  UserUpdateProfilePayloadDto,
+  UserUpdateProfileResponseOkDto,
 } from '@keyboom/contracts/server';
 import type { Request, Response } from 'express';
 import { Public, UserId } from 'src/core/decorators';
@@ -92,5 +97,33 @@ export class UsersController {
     });
 
     return { message: 'Logout successful' };
+  }
+
+  @Put('profile')
+  @HttpCode(HttpStatus.OK)
+  async updateProfile(
+    @UserId() userId: string,
+    @Body() body: UserUpdateProfilePayloadDto,
+  ): Promise<UserUpdateProfileResponseOkDto> {
+    const data = await this.usersService.updateProfile(userId, body);
+    return {
+      data,
+      message: 'Profile updated successfully',
+      statusCode: 200,
+    };
+  }
+
+  @Post('change-password')
+  @HttpCode(HttpStatus.OK)
+  async changePassword(
+    @UserId() userId: string,
+    @Body() body: UserChangePasswordPayloadDto,
+  ): Promise<UserChangePasswordResponseOkDto> {
+    const data = await this.usersService.changePassword(userId, body);
+    return {
+      data,
+      message: 'Password changed successfully',
+      statusCode: 200,
+    };
   }
 }

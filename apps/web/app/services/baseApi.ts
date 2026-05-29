@@ -9,6 +9,10 @@ const rawBaseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_API_URL,
   credentials: "include",
 });
+
+const VALID_ROUTES = ["/login"];
+const CURRENT_PATH = window.location.pathname;
+
 export const baseQueryWithAuth: BaseQueryFn<
   string | FetchArgs,
   unknown,
@@ -16,7 +20,11 @@ export const baseQueryWithAuth: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   const result = await rawBaseQuery(args, api, extraOptions);
 
-  if (result.error && result.error.status === 401) {
+  if (
+    result.error &&
+    result.error.status === 401 &&
+    !VALID_ROUTES.includes(CURRENT_PATH)
+  ) {
     api.dispatch({ type: "api/util/resetApiState" });
 
     if (typeof window !== "undefined") {

@@ -41,7 +41,32 @@ export const userEndpoints = baseApi.injectEndpoints({
         url: USER_ENDPOINTS.getMe,
         method: "GET",
       }),
+      providesTags: ["User"],
       transformResponse,
+    }),
+
+    updateProfile: builder.mutation<
+      ERD<UserActions["updateProfile"]>,
+      QueryArgsNew<UserActions["updateProfile"]>
+    >({
+      query: ({ payload }) => ({
+        url: USER_ENDPOINTS.profile,
+        method: "PUT",
+        body: payload,
+      }),
+      invalidatesTags: ["User"],
+    }),
+
+    changePassword: builder.mutation<
+      ERD<UserActions["changePassword"]>,
+      QueryArgsNew<UserActions["changePassword"]>
+    >({
+      query: ({ payload }) => ({
+        url: USER_ENDPOINTS.changePassword,
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: ["User"],
     }),
   }),
   overrideExisting: true,
@@ -52,4 +77,6 @@ export const {
   useLoginUserMutation,
   useLogoutUserMutation,
   useGetMeQuery,
+  useUpdateProfileMutation,
+  useChangePasswordMutation,
 } = userEndpoints;

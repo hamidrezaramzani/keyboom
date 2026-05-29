@@ -1,34 +1,34 @@
 import {
   Injectable,
   ConflictException,
-  Inject,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { customAlphabet } from 'nanoid';
 import { User } from './user.schema';
-import { DRIZZLE } from 'src/core/db/drizzle.provider';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { UsersRepository } from './user.repository';
 import {
+  UserChangePasswordPayloadDto,
   UserGetMeResponseOkDTO,
   UserLoginPayloadDto,
   UserRegisterPayloadDto,
+  UserUpdateProfilePayloadDto,
 } from '@keyboom/contracts/server';
 import { JwtService } from '@nestjs/jwt';
 import { WorkspaceRepository } from '../workspace/workspace.repository';
 import { NotificationService } from '../notification/notification.service';
-import { BaleHelper } from 'src/core/helpers/bale.helper';
+import { SanityCheckService } from '../sanity-check/sanity-check.service';
+import { getFaMoment } from '../subscription/subscription.utils';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(DRIZZLE) private db: NodePgDatabase,
     private readonly usersRepository: UsersRepository,
     private readonly workspaceRepository: WorkspaceRepository,
     private readonly jwtService: JwtService,
     private readonly notificationService: NotificationService,
-    private readonly baleHelper: BaleHelper,
+    private readonly sanityCheckService: SanityCheckService,
   ) {}
 
   private generateId(): string {
@@ -47,7 +47,12 @@ export class UsersService {
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    return { id: user.id, fullName: user.fullName, email: user.email };
+    return {
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      memberSince: getFaMoment(user.createdAt).format('YYYY/MM/DD'),
+    };
   }
 
   async login(
@@ -116,5 +121,38 @@ export class UsersService {
     );
 
     return newUser;
+  }
+
+  async updateProfile(userId: string, body: UserUpdateProfilePayloadDto) {
+    const updatedUser = await this.usersRepository.update(userId, {
+      fullName: body.fullName,
+    });
+
+    return {
+      id: updatedUser.id,
+      fullName: updatedUser.fullName,
+      email: updatedUser.email,
+    };
+  }
+
+  async changePassword(userId: string, body: UserChangePasswordPayloadDto) {
+    const user = await this.sanityCheckService.checkUserIsExists(userId);
+
+    const isPasswordValid = await bcrypt.compare(
+      body.currentPassword,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new BadRequestException({ passwordIsInvalid: true });
+    }
+
+    const hashedPassword = await bcrypt.hash(body.newPassword, 10);
+
+    await this.usersRepository.update(userId, {
+      password: hashedPassword,
+    });
+
+    return { success: true };
   }
 }
