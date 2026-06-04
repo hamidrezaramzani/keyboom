@@ -191,22 +191,6 @@ export class SubscriptionService {
     });
   }
 
-  async delete(userId: string, subscriptionId: string) {
-    const subscription =
-      await this.sanityCheckService.checkSubscriptionIsExists(subscriptionId);
-
-    const group = await this.groupRepository.findById(subscription.groupId);
-    const workspace = await this.sanityCheckService.checkWorkspaceIsExists(
-      group.workspaceId,
-    );
-    await this.sanityCheckService.checkUserIsWorkspaceMember(
-      userId,
-      workspace.id,
-    );
-
-    await this.subscriptionRepository.delete(subscriptionId);
-  }
-
   async renew(
     userId: string,
     subscriptionId: string,

@@ -2,6 +2,7 @@
 import { Card } from "@/app/components/ui";
 import { useAlertDialog } from "@/app/components/ui/alert/alert.component";
 import { getJalaliMonthFa } from "@/app/lib";
+import { useIsMobile } from "@/app/lib/hooks/use-is-mobile";
 import { Dashboard } from "@/app/services/dashboard";
 import moment from "jalali-moment";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
@@ -39,7 +40,7 @@ export function SubscriptionCalendar({
   items: Dashboard["subscriptionCalendar"];
 }) {
   const [currentDate, setCurrentDate] = useState(() => moment());
-
+  const isMobile = useIsMobile();
   const { showAlert } = useAlertDialog();
 
   const year = currentDate.jYear();
@@ -122,7 +123,7 @@ export function SubscriptionCalendar({
       <div className="grid grid-cols-7 gap-1 mb-2">
         {weekDays.map((day) => (
           <div key={day} className="text-center text-gray-500 text-sm py-2">
-            {day}
+            {isMobile ? day.substring(0, 1) : day}
           </div>
         ))}
       </div>

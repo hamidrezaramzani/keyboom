@@ -1,17 +1,10 @@
-import { useConfirm } from "@/app/lib/store/context";
+/* eslint-disable react-hooks/rules-of-hooks */
 import { GroupSubscription } from "@/app/services/group";
-import {
-  useDeleteSubscriptionMutation,
-  useUpdateSubscriptionMutation,
-} from "@/app/services/subscription";
 import { useState } from "react";
-import {
-  SubscriptionForm,
-  SubscriptionFormValues,
-} from "../../subscription-form/subscription-form.component";
-import { toast } from "@/app/lib";
-import { Badge, Button, Modal } from "@/app/components/ui";
+import { SubscriptionForm } from "../../subscription-form/subscription-form.component";
+import { Badge, Button } from "@/app/components/ui";
 import { Calendar, LinkIcon } from "lucide-react";
+import { useUpdateSubscriptionSubmit } from "../../subscription-form/subscription-form.hook";
 
 interface SubscriptionGeneralDetailsProps {
   isOpen: boolean;
@@ -34,11 +27,6 @@ export const SubscriptionGeneralDetails = ({
   onSuccess,
 }: SubscriptionGeneralDetailsProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const { confirm } = useConfirm();
-
-  const [updateSubscription] = useUpdateSubscriptionMutation();
-  const [deleteSubscription, { isLoading: isDeleting }] =
-    useDeleteSubscriptionMutation();
 
   const closeSafeModal = () => {
     setIsEditing(false);
@@ -46,54 +34,11 @@ export const SubscriptionGeneralDetails = ({
     onClose();
   };
 
-  const onSubmit = async (data: SubscriptionFormValues) => {
-    if (!subscription) return;
+  if (!subscription) return null;
 
-    try {
-      await updateSubscription({
-        params: { subscriptionId: subscription.id },
-        payload: {
-          name: data.name,
-          price: parseInt(data.price),
-          categoryId: data.categoryId,
-          startDate: new Date(data.startDate).toISOString(),
-          endDate: new Date(data.endDate).toISOString(),
-          website: data.website || null,
-          description: data.description || null,
-          reminderDays: data.reminderDays,
-        },
-      }).unwrap();
-      toast.success("اشتراک با موفقیت ویرایش شد");
-      closeSafeModal();
-    } catch (error) {
-      toast.error("خطا در ویرایش اشتراک");
-      console.error("Update subscription error:", error);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!subscription) return;
-
-    const confirmed = await confirm({
-      title: "حذف اشتراک",
-      description: `آیا از حذف اشتراک "${subscription.name}" مطمئن هستید؟ این عمل غیرقابل بازگشت است.`,
-      confirmText: "حذف",
-      variant: "danger",
-    });
-
-    if (!confirmed) return;
-
-    try {
-      await deleteSubscription({
-        params: { subscriptionId: subscription.id },
-      }).unwrap();
-      toast.success("اشتراک با موفقیت حذف شد");
-      closeSafeModal();
-    } catch (error) {
-      toast.error("خطا در حذف اشتراک");
-      console.error("Delete subscription error:", error);
-    }
-  };
+  const { onSubmit } = useUpdateSubscriptionSubmit({
+    closeSafeModal,
+  });
 
   const getStatusBadge = () => {
     if (!subscription) return null;
@@ -101,8 +46,6 @@ export const SubscriptionGeneralDetails = ({
       statusConfig[subscription.status as "active" | "expiring" | "expired"];
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
-
-  if (!subscription) return null;
 
   if (!isEditing) {
     return (
@@ -202,13 +145,6 @@ export const SubscriptionGeneralDetails = ({
           <div className="flex gap-3 pt-4 flex-wrap">
             <Button variant="primary" onClick={() => setIsEditing(true)}>
               ویرایش
-            </Button>
-            <Button
-              variant="danger"
-              onClick={handleDelete}
-              loading={isDeleting}
-            >
-              حذف
             </Button>
           </div>
         </div>

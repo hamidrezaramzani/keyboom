@@ -3,7 +3,7 @@
 import { Modal, Tabs } from "@/app/components";
 import { GroupSubscription } from "@/app/services/group";
 import { SubscriptionGeneralDetails } from "./subscription-general-details/subscription-general-details.component";
-import { CalendarRange, Settings, User } from "lucide-react";
+import { CalendarRange, Settings } from "lucide-react";
 import { SubscriptionPeriodList } from "./subscription-periods-list/subscription-periods-list.component";
 
 interface SubscriptionModalProps {

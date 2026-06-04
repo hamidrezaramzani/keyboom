@@ -160,7 +160,7 @@ export const SubscriptionForm = ({
       <div className="grid grid-cols-1 gap-4">
         <Input
           label="هزینه ماهانه (تومان)"
-          type="number"
+          type="price"
           placeholder="۵۹۰۰۰"
           error={errors.price?.message}
           {...register("price")}

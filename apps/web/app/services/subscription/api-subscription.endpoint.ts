@@ -48,7 +48,12 @@ export const subscriptionEndpoints = baseApi.injectEndpoints({
         method: "POST",
         body: payload,
       }),
-      invalidatesTags: ["Group", "Subscription"],
+      invalidatesTags: [
+        "Group",
+        "Subscription",
+        "Dashboard",
+        "SubscriptionReport",
+      ],
     }),
     cancelSubscription: builder.mutation<
       ERD<SubscriptionActions["cancel"]>,
@@ -59,17 +64,12 @@ export const subscriptionEndpoints = baseApi.injectEndpoints({
         method: "POST",
         body: payload,
       }),
-      invalidatesTags: ["Group", "Subscription"],
-    }),
-    deleteSubscription: builder.mutation<
-      ERD<SubscriptionActions["delete"]>,
-      QueryArgsNew<SubscriptionActions["delete"]>
-    >({
-      query: ({ params }) => ({
-        url: SUBSCRIPTION_ENDPOINTS.delete(params.subscriptionId),
-        method: "DELETE",
-      }),
-      invalidatesTags: ["Group", "Subscription"],
+      invalidatesTags: [
+        "Group",
+        "Subscription",
+        "Dashboard",
+        "SubscriptionReport",
+      ],
     }),
     getSubscriptionStats: builder.query<
       ERD<SubscriptionActions["getStats"]>,
@@ -104,6 +104,5 @@ export const {
   useRenewSubscriptionMutation,
   useGetSubscriptionReportQuery,
   useCancelSubscriptionMutation,
-  useDeleteSubscriptionMutation,
   useGetSubscriptionStatsQuery,
 } = subscriptionEndpoints;

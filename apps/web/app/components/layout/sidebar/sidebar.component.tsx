@@ -96,17 +96,8 @@ export const Sidebar = ({
         )}
       </div>
 
-      {!isCollapsed && currentWorkspace && (
-        <div className="mx-4 mt-4 p-2 bg-gray-800/50 rounded-lg border border-gray-700">
-          <p className="text-xs text-gray-500">فضای کاری فعلی</p>
-          <p className="text-sm text-white font-medium truncate">
-            {currentWorkspace?.name}
-          </p>
-        </div>
-      )}
-
       {!isCollapsed && user && (
-        <div className="mx-4 mt-4 p-3 bg-gray-800/30 rounded-xl flex items-center gap-3">
+        <div className="mx-4 mt-4 p-3 bg-gray-800/30 rounded-xl flex items-center gap-3  border border-gray-700">
           <Avatar name={user.fullName} size="sm" />
           <div className="flex-1 min-w-0">
             <p className="text-white text-sm font-medium truncate">
@@ -114,6 +105,15 @@ export const Sidebar = ({
             </p>
             <p className="text-gray-500 text-xs truncate">{user.email}</p>
           </div>
+        </div>
+      )}
+
+      {!isCollapsed && currentWorkspace && (
+        <div className="mx-4 mt-4 p-2 bg-gray-800/50 rounded-lg border border-gray-700">
+          <p className="text-xs text-gray-500">فضای کاری فعلی</p>
+          <p className="text-sm text-white font-medium truncate">
+            {currentWorkspace?.name}
+          </p>
         </div>
       )}
 

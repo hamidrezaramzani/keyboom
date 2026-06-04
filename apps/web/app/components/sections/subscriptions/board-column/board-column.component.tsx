@@ -17,6 +17,7 @@ interface BoardColumnProps {
   onSettings: () => void;
   onSubscriptionClick: (subscription: GroupSubscription) => void;
   onAddSubscriptionClick: (groupId: string, groupName: string) => void;
+  workspaceId?: string;
 }
 
 export const BoardColumn = ({
@@ -24,6 +25,7 @@ export const BoardColumn = ({
   onSettings,
   onSubscriptionClick,
   onAddSubscriptionClick,
+  workspaceId,
 }: BoardColumnProps) => {
   const {
     attributes,
@@ -94,6 +96,7 @@ export const BoardColumn = ({
                     key={sub.id}
                     subscription={sub}
                     onClick={() => onSubscriptionClick(sub)}
+                    workspaceId={workspaceId}
                   />
                 ))}
               </div>
@@ -114,6 +117,7 @@ export const BoardColumn = ({
                     key={sub.id}
                     subscription={sub}
                     onClick={() => onSubscriptionClick(sub)}
+                    workspaceId={workspaceId}
                   />
                 ))}
               </div>

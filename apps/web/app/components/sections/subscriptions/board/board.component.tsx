@@ -36,6 +36,7 @@ interface BoardProps {
     newSubscriptions: Subscription[],
   ) => void;
   onAddSubscription: (groupId: string, groupName: string) => void;
+  workspaceId?: string;
 }
 
 export const Board = ({
@@ -47,6 +48,7 @@ export const Board = ({
   onSubscriptionMove,
   onSubscriptionReorder,
   onAddSubscription,
+  workspaceId,
 }: BoardProps) => {
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -123,6 +125,7 @@ export const Board = ({
               onSettings={() => onGroupSettings(group.id, group.name)}
               onSubscriptionClick={onSubscriptionClick}
               onAddSubscriptionClick={onAddSubscription}
+              workspaceId={workspaceId}
             />
           ))}
         </SortableContext>

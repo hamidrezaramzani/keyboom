@@ -58,25 +58,6 @@ export function SubscriptionReportHeader({
             {countdown} روز تا تمدید بعدی
           </p>
         </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          <button className="btn-primary btn-md flex items-center gap-2">
-            <RefreshCw size={16} />
-            تمدید
-          </button>
-          <button className="btn-secondary btn-md flex items-center gap-2">
-            <Pencil size={16} />
-            ویرایش
-          </button>
-          <button className="btn-outline btn-md flex items-center gap-2">
-            <PlusCircle size={16} />
-            بازه قیمتی
-          </button>
-          <button className="btn-danger btn-md flex items-center gap-2">
-            <XCircle size={16} />
-            لغو
-          </button>
-        </div>
       </div>
     </div>
   );

@@ -2,7 +2,6 @@ import {
   Controller,
   Post,
   Put,
-  Delete,
   Patch,
   Body,
   Param,
@@ -20,8 +19,6 @@ import {
   SubscriptionMoveParamsDto,
   SubscriptionMovePayloadDto,
   SubscriptionMoveResponseOkDto,
-  SubscriptionDeleteParamsDto,
-  SubscriptionDeleteResponseOkDto,
   SubscriptionRenewParamsDto,
   SubscriptionRenewPayloadDto,
   SubscriptionRenewResponseOkDto,
@@ -126,20 +123,6 @@ export class SubscriptionController {
     return {
       data: subscription,
       message: 'Subscription cancelled successfully',
-      statusCode: 200,
-    };
-  }
-
-  @Delete(':subscriptionId')
-  @HttpCode(HttpStatus.OK)
-  async delete(
-    @UserId() userId: string,
-    @Param() params: SubscriptionDeleteParamsDto,
-  ): Promise<SubscriptionDeleteResponseOkDto> {
-    await this.subscriptionService.delete(userId, params.subscriptionId);
-    return {
-      data: { success: true },
-      message: 'Subscription deleted successfully',
       statusCode: 200,
     };
   }

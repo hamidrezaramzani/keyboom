@@ -11,10 +11,14 @@ import {
   PieChart as PieIcon,
   Activity,
   LucideLayoutDashboard,
-  ActivityIcon,
   IdCard,
   ChartArea,
   ChartPie,
+  RefreshCw,
+  PlusCircle,
+  MinusCircle,
+  DollarSign,
+  Ban,
 } from "lucide-react";
 import {
   Card,
@@ -66,6 +70,48 @@ export default function DashboardPage() {
     "#06b6d4",
     "#84cc16",
   ];
+
+  const getActivityInfo = (type: string) => {
+    const info = {
+      renewal: {
+        icon: RefreshCw,
+        label: "تمدید اشتراک",
+        color: "text-green-400",
+      },
+      period_added: {
+        icon: PlusCircle,
+        label: "افزودن دوره",
+        color: "text-lime-400",
+      },
+      period_removed: {
+        icon: MinusCircle,
+        label: "حذف دوره",
+        color: "text-red-400",
+      },
+      price_change: {
+        icon: DollarSign,
+        label: "تغییر قیمت",
+        color: "text-orange-400",
+      },
+      subscription_created: {
+        icon: CreditCard,
+        label: "ایجاد اشتراک",
+        color: "text-indigo-400",
+      },
+      subscription_cancelled: {
+        icon: Ban,
+        label: "لغو اشتراک",
+        color: "text-red-400",
+      },
+    };
+    return (
+      info[type as keyof typeof info] || {
+        icon: Activity,
+        label: "فعالیت",
+        color: "text-gray-400",
+      }
+    );
+  };
 
   return (
     <DashboardLayout>
@@ -254,17 +300,41 @@ export default function DashboardPage() {
             </h2>
             <div className="space-y-2">
               {dashboard?.lastActivities?.length ? (
-                dashboard?.lastActivities?.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="border-b border-gray-800 py-2"
-                  >
-                    <p className="text-sm">{activity.title}</p>
-                    <p className="text-xs text-gray-500">{activity.date}</p>
-                  </div>
-                ))
+                dashboard?.lastActivities?.map((activity) => {
+                  const {
+                    icon: Icon,
+                    label,
+                    color,
+                  } = getActivityInfo(activity.type);
+
+                  return (
+                    <div
+                      key={activity.id}
+                      className="border-b border-gray-800 py-3 flex justify-between items-center hover:bg-gray-800/30 transition-colors rounded-lg px-2"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-1.5 rounded-lg bg-gray-800">
+                          <Icon size={14} className={color} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">
+                            {activity.title}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {new Date(activity.date).toLocaleDateString(
+                              "fa-IR",
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-xs px-2 py-1 rounded-full bg-gray-800 text-gray-300">
+                        {label}
+                      </div>
+                    </div>
+                  );
+                })
               ) : (
-                <EmptyState icon={ActivityIcon} title="هنوز فعالیتی ثبت نشده" />
+                <EmptyState icon={Activity} title="هنوز فعالیتی ثبت نشده" />
               )}
             </div>
           </Card>

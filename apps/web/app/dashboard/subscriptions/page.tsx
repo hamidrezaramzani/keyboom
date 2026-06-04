@@ -124,6 +124,7 @@ export default function SubscriptionsPage() {
           onAddSubscription={handleAddSubscription}
           onSubscriptionMove={() => {}}
           onSubscriptionReorder={() => {}}
+          workspaceId={workspace?.defaultWorkspace.id}
         />
       </div>
 

@@ -112,12 +112,6 @@ const subscriptionActions = {
       ok: cdtoSuccess(subscription),
     },
   },
-  delete: {
-    params: deleteSubscriptionParams,
-    response: {
-      ok: cdtoSuccess(z.object({ success: z.boolean() })),
-    },
-  },
   getStats: {
     params: z.object({
       subscriptionId: z.string(),
@@ -187,12 +181,6 @@ export class SubscriptionMovePayloadDto extends createZodDto(
 ) {}
 export class SubscriptionMoveResponseOkDto extends createZodDto(
   subscriptionActions.move.response.ok,
-) {}
-export class SubscriptionDeleteParamsDto extends createZodDto(
-  subscriptionActions.delete.params,
-) {}
-export class SubscriptionDeleteResponseOkDto extends createZodDto(
-  subscriptionActions.delete.response.ok,
 ) {}
 
 export class SubscriptionRenewParamsDto extends createZodDto(

@@ -6,6 +6,7 @@ import {
   Calendar,
   ChartArea,
   DollarSign,
+  Edit,
   MoreVertical,
   RefreshCw,
   XCircle,
@@ -13,6 +14,7 @@ import {
 import {
   Badge,
   CancelSubscriptionModal,
+  Modal,
   RenewSubscriptionModal,
 } from "@/app/components";
 import { cn } from "@/app/lib/utils";
@@ -20,11 +22,14 @@ import { useState, useRef, useEffect } from "react";
 import { GroupSubscription } from "@/app/services/group";
 import { SubscriptionPeriodFormModal } from "../subscription-period-form/subscription-period-form.component";
 import { useRouter } from "next/navigation";
+import { SubscriptionForm } from "../subscription-form/subscription-form.component";
+import { useUpdateSubscriptionSubmit } from "../subscription-form/subscription-form.hook";
 
 interface SubscriptionCardProps {
   subscription: GroupSubscription;
   onClick: () => void;
   onPriceChange?: () => void;
+  workspaceId?: string;
 }
 
 const statusConfig = {
@@ -44,8 +49,20 @@ const formatDate = (dateString: string) => {
 export const SubscriptionCard = ({
   subscription,
   onClick,
+  workspaceId,
 }: SubscriptionCardProps) => {
   const { push } = useRouter();
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const onToggleEditModal = () => {
+    setIsEditModalOpen((prevState) => !prevState);
+  };
+
+  const { onSubmit } = useUpdateSubscriptionSubmit({
+    closeSafeModal: onToggleEditModal,
+    subscription,
+  });
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [
@@ -122,6 +139,32 @@ export const SubscriptionCard = ({
         subscriptionStartDate={subscription.startDate}
         subscriptionEndDate={subscription.endDate}
       />
+
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={onToggleEditModal}
+        title={subscription.name}
+        size="lg"
+      >
+        <SubscriptionForm
+          initialValues={{
+            ...subscription,
+            price: subscription.price.toString(),
+            startDate: new Date(subscription.startDate),
+            endDate: new Date(subscription.endDate),
+            groupId: subscription.group.id,
+            categoryId: subscription.category.id,
+            website: subscription.website || "",
+            description: subscription.description || "",
+            reminderDays: subscription.reminderDays || 3,
+          }}
+          onClose={onToggleEditModal}
+          isEditing
+          onSubmit={onSubmit}
+          workspaceId={workspaceId}
+        />
+      </Modal>
+
       <div
         ref={setNodeRef}
         style={style}
@@ -149,6 +192,17 @@ export const SubscriptionCard = ({
                 ref={menuRef}
                 className="absolute left-0 top-full mt-1 w-36 bg-gray-800 rounded-lg border border-gray-700 shadow-lg z-50 overflow-hidden"
               >
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleEditModal();
+                  }}
+                  className="w-full text-right px-3 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex items-center gap-2 justify-start cursor-pointer"
+                >
+                  <Edit className="w-4 h-4" />
+                  <span>ویرایش</span>
+                </button>
+
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
