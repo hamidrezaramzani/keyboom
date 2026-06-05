@@ -7,10 +7,7 @@ import { ConfirmProvider } from "./lib/store/context";
 
 export const metadata: Metadata = {
   title: "Keyboom",
-  description: "Keyboom is a subscription tracker",
-  icons: {
-    icon: "/logo.png",
-  },
+  description: "Keyboom is a subscription tracker and calculator",
 };
 
 export default function RootLayout({
@@ -20,6 +17,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl">
+      <head>
+        <link
+          rel="icon"
+          type="image/png"
+          href="/favicon-96x96.png"
+          sizes="96x96"
+        />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link rel="manifest" href="/site.webmanifest" />
+      </head>
       <body className="min-h-full flex flex-col">
         <Toaster
           position="bottom-right"

@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Zap,
   Settings,
+  Building,
 } from "lucide-react";
 import { cn } from "@/app/lib/utils";
 import { Avatar, Logo } from "@/app/components/ui";
@@ -100,11 +101,14 @@ export const Sidebar = ({
       )}
 
       {!isCollapsed && currentWorkspace && (
-        <div className="mx-4 mt-4 p-2 bg-gray-800/50 rounded-lg border border-gray-700">
-          <p className="text-xs text-gray-500">فضای کاری فعلی</p>
-          <p className="text-sm text-white font-medium truncate">
-            {currentWorkspace?.name}
-          </p>
+        <div className="mx-4 mt-4 p-2 bg-gray-800/50 rounded-lg border border-gray-700 flex  items-center gap-2">
+          <Building />
+          <div>
+            <p className="text-xs text-gray-500">فضای کاری فعلی</p>
+            <p className="text-sm text-white font-medium truncate">
+              {currentWorkspace?.name}
+            </p>
+          </div>
         </div>
       )}
 

@@ -75,7 +75,9 @@ export const WorkspaceSwitcher = ({
     <button className="flex items-center gap-2 px-3 py-1.5 bg-gray-800/50 rounded-lg border border-gray-700 text-white text-sm hover:bg-gray-800 transition-colors">
       <span className="w-full truncate flex gap-2 items-center">
         <Building size="15" />
-        {!isMobile ? currentWorkspace?.name : null}
+        {!isMobile
+          ? currentWorkspace?.name
+          : `${currentWorkspace?.name.substr(0, 12)}...`}
       </span>
       <ChevronDown className="w-4 h-4 transition-transform" />
     </button>
