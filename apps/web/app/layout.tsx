@@ -4,10 +4,22 @@ import { Toaster } from "sonner";
 import StoreProvider from "./lib/store/store/store.provider";
 import { AuthInitializer } from "./components";
 import { ConfirmProvider } from "./lib/store/context";
+import SWRegister from "./sw-register";
 
 export const metadata: Metadata = {
   title: "Keyboom",
   description: "Keyboom is a subscription tracker and calculator",
+  manifest: "/manifest.json",
+  themeColor: "#6366f1",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "NextApp",
+  },
+  icons: {
+    icon: "web-app-manifest-192x192.png",
+    apple: "web-app-manifest-512x512.png",
+  },
 };
 
 export default function RootLayout({
@@ -44,6 +56,7 @@ export default function RootLayout({
         <StoreProvider>
           <ConfirmProvider>
             <AuthInitializer />
+            <SWRegister />
             {children}
           </ConfirmProvider>
         </StoreProvider>
