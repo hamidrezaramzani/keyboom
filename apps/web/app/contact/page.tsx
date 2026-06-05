@@ -37,7 +37,6 @@ export default function ContactPage() {
     setSubmitStatus("idle");
 
     setTimeout(() => {
-      console.log("فرم تماس:", formData);
       setIsSubmitting(false);
       setSubmitStatus("success");
       setFormData({ name: "", email: "", subject: "", message: "" });

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Menu, X, Zap } from "lucide-react";
-import { Button } from "../../ui";
+import { Button, Logo } from "../../ui";
 import { navLinks } from "./navbar.constant";
 import { useRouter } from "next/navigation";
 
@@ -18,17 +18,7 @@ export const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div
-            className="flex items-center gap-2 cursor-pointer"
-            onClick={() => handleRedirect("/")}
-          >
-            <div className="p-1.5 bg-indigo-500/10 rounded-lg">
-              <Zap className="w-5 h-5 text-indigo-400" />
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-indigo-600 bg-clip-text text-transparent">
-              KeyBoom
-            </span>
-          </div>
+          <Logo />
 
           <div className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => (

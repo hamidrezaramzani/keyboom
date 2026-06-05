@@ -1,20 +1,17 @@
 "use client";
 
 import { Menu, MessageSquare, Search } from "lucide-react";
-import { Avatar } from "@/app/components/ui";
 import { WorkspaceSwitcher } from "../workspace-switcher/workspace-switcher.component";
 import { NotificationPopover } from "@/app/components/sections/notifications";
-import { Me } from "@/app/services";
 import { AddWorkspaceModal } from "../../sections";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   onMenuClick: () => void;
-  user?: Me;
 }
 
-export const Header = ({ onMenuClick, user }: HeaderProps) => {
+export const Header = ({ onMenuClick }: HeaderProps) => {
   const [isAddWorkspaceOpen, setIsAddWorkspaceOpen] = useState(false);
 
   const { push } = useRouter();
@@ -55,18 +52,6 @@ export const Header = ({ onMenuClick, user }: HeaderProps) => {
           >
             <MessageSquare className="w-5 h-5" />
           </button>
-
-          {user && (
-            <div className="flex items-center gap-2">
-              <Avatar name={user.fullName} />
-              <div className="hidden lg:block">
-                <p className="text-white text-sm font-medium">
-                  {user.fullName}
-                </p>
-                <p className="text-gray-500 text-xs">{user.email}</p>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

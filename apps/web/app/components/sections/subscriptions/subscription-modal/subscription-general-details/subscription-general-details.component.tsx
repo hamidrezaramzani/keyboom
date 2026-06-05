@@ -38,6 +38,7 @@ export const SubscriptionGeneralDetails = ({
 
   const { onSubmit } = useUpdateSubscriptionSubmit({
     closeSafeModal,
+    subscription,
   });
 
   const getStatusBadge = () => {

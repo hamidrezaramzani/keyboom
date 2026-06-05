@@ -66,7 +66,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       <main
         className={cn("flex-1 w-full", "md:transition-all md:duration-300")}
       >
-        <Header onMenuClick={() => setIsMobileMenuOpen(true)} user={user} />
+        <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
         <div className="p-3 md:p-6">{children}</div>
       </main>
     </div>

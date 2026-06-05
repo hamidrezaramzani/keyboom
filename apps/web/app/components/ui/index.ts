@@ -15,3 +15,4 @@ export { Popover } from "./popover/popover.component";
 export { ConfirmDialog } from "./confirmation/confirmation.component";
 export { Tooltip } from "./tooltip/tooltip.component";
 export { AlertDialog, useAlertDialog } from "./alert/alert.component";
+export { Logo } from "./logo/logo.component";

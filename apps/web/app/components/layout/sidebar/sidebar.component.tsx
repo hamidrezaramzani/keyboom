@@ -12,7 +12,7 @@ import {
   Settings,
 } from "lucide-react";
 import { cn } from "@/app/lib/utils";
-import { Avatar } from "@/app/components/ui";
+import { Avatar, Logo } from "@/app/components/ui";
 import { Me } from "@/app/services";
 import { useReadManyWorkspacesQuery } from "@/app/services/workspace";
 
@@ -65,16 +65,7 @@ export const Sidebar = ({
           isCollapsed ? "justify-center px-2" : "justify-between px-4",
         )}
       >
-        {!isCollapsed && (
-          <div className={`flex items-center gap-2 ${isMobile ? "mr-11" : ""}`}>
-            <div className="p-1.5 bg-indigo-500/10 rounded-lg">
-              <Zap className="w-5 h-5 text-indigo-400" />
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-indigo-600 bg-clip-text text-transparent">
-              KeyBoom
-            </span>
-          </div>
-        )}
+        {!isCollapsed && <Logo />}
 
         {isCollapsed && (
           <div className="p-1.5 bg-indigo-500/10 rounded-lg">

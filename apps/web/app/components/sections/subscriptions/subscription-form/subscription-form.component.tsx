@@ -124,7 +124,6 @@ export const SubscriptionForm = ({
       value: g.id,
       label: g.name,
     })) || [];
-  console.log(initialValues, groupsOptions);
 
   const handleFormSubmit = async (data: SubscriptionFormValues) => {
     await onSubmit(data);

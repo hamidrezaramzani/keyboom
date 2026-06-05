@@ -24,6 +24,7 @@ import {
 import { toast } from "@/app/lib";
 import { useConfirm } from "@/app/lib/store/context";
 import { EmptyState } from "../../ui";
+import { useIsMobile } from "@/app/lib/hooks/use-is-mobile";
 
 interface WorkspaceSwitcherProps {
   onAddWorkspace: () => void;
@@ -32,6 +33,8 @@ interface WorkspaceSwitcherProps {
 export const WorkspaceSwitcher = ({
   onAddWorkspace,
 }: WorkspaceSwitcherProps) => {
+  const isMobile = useIsMobile();
+
   const [updateCurrentWorkspace] = useUpdateCurrentWorkspaceMutation();
   const [restoreWorkspace] = useRestoreWorkspaceMutation();
   const [leaveWorkspace] = useLeaveWorkspaceMutation();
@@ -72,7 +75,7 @@ export const WorkspaceSwitcher = ({
     <button className="flex items-center gap-2 px-3 py-1.5 bg-gray-800/50 rounded-lg border border-gray-700 text-white text-sm hover:bg-gray-800 transition-colors">
       <span className="w-full truncate flex gap-2 items-center">
         <Building size="15" />
-        {currentWorkspace?.name}
+        {!isMobile ? currentWorkspace?.name : null}
       </span>
       <ChevronDown className="w-4 h-4 transition-transform" />
     </button>
@@ -133,7 +136,7 @@ export const WorkspaceSwitcher = ({
     }
   };
   const content = (
-    <div className="w-64">
+    <div className="w-full">
       <div className="p-2">
         <div className="flex justify-between  px-3 py-2">
           <span className="text-gray-500 text-xs">فضاهای کاری شما</span>
@@ -231,7 +234,7 @@ export const WorkspaceSwitcher = ({
         trigger={trigger}
         content={content}
         position="bottom-left"
-        width={256}
+        width={300}
         offset={8}
       />
 

@@ -53,8 +53,6 @@ export class TicketRepository {
     }
     const finalWhere = conditions.length > 0 ? and(...conditions) : undefined;
 
-    console.log(filters, conditions);
-
     const query = this.db.select().from(tickets);
 
     if (conditions.length > 0) {

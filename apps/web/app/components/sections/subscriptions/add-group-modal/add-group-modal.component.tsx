@@ -35,8 +35,6 @@ export const AddGroupModal = ({
   });
 
   const onSubmit = async (data: AddGroupForm) => {
-    console.log(data);
-
     onGroupAdded(data.name);
     reset();
     onClose();
