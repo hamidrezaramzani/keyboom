@@ -66,7 +66,7 @@ export const NotificationPopover = () => {
   );
 
   const content = (
-    <div className="w-96 overflow-hidden">
+    <div className="w-full overflow-hidden">
       <div className="flex items-center justify-between p-4 border-b border-gray-700">
         <h3 className="text-white font-semibold">اعلان‌ها</h3>
         {unreadCount > 0 && (
