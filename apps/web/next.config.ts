@@ -11,9 +11,7 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-
-  // 👇 IMPORTANT FIX
-  turbopack: undefined,
+  turbopack: {},
 };
 
-export default withPWA(nextConfig);
+export default nextConfig;

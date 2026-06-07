@@ -7,14 +7,32 @@ import { ConfirmProvider } from "./lib/store/context";
 import SWRegister from "./sw-register";
 
 export const metadata: Metadata = {
-  title: "Keyboom",
-  description: "Keyboom is a subscription tracker and calculator",
+  metadataBase: new URL("https://keyboom.ir"),
+  title: "کی‌بوم | مدیریت هوشمند اشتراک‌ها و هزینه‌ها",
+  description:
+    "کی‌بوم ابزار مدیریت هوشمند اشتراک‌هاست؛ هزینه‌ها، تاریخ تمدید، یادآوری‌ها و گزارش‌های مالی سرویس‌های اشتراکی خود را در یک داشبورد ساده کنترل کنید.",
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    title: "کی‌بوم | مدیریت هوشمند اشتراک‌ها و هزینه‌ها",
+    description:
+      "با کی‌بوم اشتراک‌ها، هزینه‌ها و تاریخ تمدید سرویس‌های خود را یکجا مدیریت کنید و قبل از تمدیدهای مهم یادآوری بگیرید.",
+    url: "https://keyboom.ir/",
+    siteName: "کی‌بوم",
+    locale: "fa_IR",
+    type: "website",
+  },
   manifest: "/manifest.json",
   themeColor: "#6366f1",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "NextApp",
+    title: "Keyboom",
   },
   icons: {
     icon: "web-app-manifest-192x192.png",
@@ -30,20 +48,7 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl">
       <head>
-        <link
-          rel="icon"
-          type="image/png"
-          href="/favicon-96x96.png"
-          sizes="96x96"
-        />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/apple-touch-icon.png"
-        />
-        <link rel="manifest" href="/site.webmanifest" />
+        <meta name="apple-mobile-web-app-title" content="Keyboom" />
       </head>
       <body className="min-h-full flex flex-col">
         <Toaster

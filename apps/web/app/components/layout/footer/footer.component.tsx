@@ -1,5 +1,5 @@
-import { Zap } from "lucide-react";
 import { footerSections } from "./footer.constant";
+import { Logo } from "../../ui";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -9,14 +9,7 @@ export const Footer = () => {
       <div className="container mx-auto max-w-6xl">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-1.5 bg-indigo-500/10 rounded-lg">
-                <Zap className="w-4 h-4 text-indigo-400" />
-              </div>
-              <span className="text-lg font-bold bg-gradient-to-r from-indigo-400 to-indigo-600 bg-clip-text text-transparent">
-                KeyBoom
-              </span>
-            </div>
+            <Logo />
             <p className="text-gray-500 text-sm">
               مدیریت هوشمند اشتراک‌های شما
             </p>

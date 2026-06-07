@@ -1,21 +1,21 @@
 {
   "name": "Keyboom",
-  "short_name": "keyboom",
-  "description": "Keyboom is a subscription tracker and calculator",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#6366f1",
-  "theme_color": "#6366f1",
+  "short_name": "Keyboom",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/web-app-manifest-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "theme_color": "#1d204b",
+  "background_color": "#1d204b",
+  "display": "standalone"
 }

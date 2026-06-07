@@ -24,29 +24,6 @@ export default function AboutPage() {
         </div>
       </div>
 
-      <section className="py-12 px-4 text-center rtl">
-        <div className="container mx-auto max-w-3xl">
-          <div className="bg-gray-900/40 rounded-2xl p-6 md:p-8 border border-gray-800">
-            <p className="text-gray-300 leading-relaxed mb-4">
-              مثل خیلی از شما، من هم کلی اشتراک داشتم: فیلیمو، نواپلی، یوتیوب
-              پریمیوم، ادوبی، و چندتا سرویس دیگه. هر ماه یه مبلغی از کارتم کم
-              می‌شد، بدون اینکه بدونم دقیقاً برای چی دارم پول می‌دم.
-            </p>
-            <p className="text-gray-300 leading-relaxed mb-4">
-              یه روز نشستم و با یه برگه اکسل همه اشتراک‌ها رو نوشتم. شوکه شدم.
-              ماهی حدود ۴۰۰ هزار تومان فقط برای اشتراک هزینه می‌کردم، بدون اینکه
-              نگاه دقیقی بهش داشته باشم.
-            </p>
-            <p className="text-gray-300 leading-relaxed">
-              تصمیم گرفتم این مشکل رو برای خودم و دیگران حل کنم. نتیجه شد{" "}
-              <span className="text-indigo-400 font-medium">کی‌بوم</span> –
-              ابزاری که نه فقط یادآوری می‌کنه، بلکه بهت نشون می‌ده کجا داری پولت
-              رو خرج می‌کنی و چطور می‌تونی مدیریتش کنی.
-            </p>
-          </div>
-        </div>
-      </section>
-
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-6xl">
           <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-4">
@@ -93,33 +70,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="py-16 px-4 border-y border-gray-800 w-full pt-5 ">
-        <div className="container mx-auto max-w-4xl">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-center">
-            <div>
-              <div className="text-3xl md:text-4xl font-bold text-indigo-400">
-                ۰+
-              </div>
-              <div className="text-sm text-gray-500 mt-1">کاربر فعال</div>
-            </div>
-            <div>
-              <div className="text-3xl md:text-4xl font-bold text-indigo-400">
-                ۰+
-              </div>
-              <div className="text-sm text-gray-500 mt-1">
-                اشتراک مدیریت شده
-              </div>
-            </div>
-            <div className="col-span-2 md:col-span-1">
-              <div className="text-3xl md:text-4xl font-bold text-indigo-400">
-                ۱۴۰۳
-              </div>
-              <div className="text-sm text-gray-500 mt-1">سال شروع</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="py-20 px-4">
         <div className="container mx-auto max-w-2xl text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
@@ -130,16 +80,10 @@ export default function AboutPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="mailto:hello@keyboom.app"
+              href="mailto:hamidrezaramzani80@gmail.com"
               className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-white font-medium transition-all duration-200"
             >
-              hello@keyboom.app
-            </a>
-            <a
-              href="#"
-              className="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-xl text-gray-300 font-medium transition-all duration-200 border border-gray-700"
-            >
-              توییتر ما
+              ایمیل
             </a>
           </div>
         </div>

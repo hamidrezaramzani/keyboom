@@ -45,20 +45,6 @@ export const Hero = () => {
             >
               شروع کنید
             </Button>
-            <Button variant="secondary" size="lg">
-              مشاهده دمو
-            </Button>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-8 md:gap-12">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-white">
-                  {stat.value}
-                </div>
-                <div className="text-xs text-gray-500">{stat.label}</div>
-              </div>
-            ))}
           </div>
         </div>
       </div>
